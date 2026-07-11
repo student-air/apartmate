@@ -1,4 +1,7 @@
-  import 'package:flutter/material.dart';
+// it make reuseable buttons .Every screen that needed this button
+// import this instead of writing the same code again and again.
+
+import 'package:flutter/material.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
