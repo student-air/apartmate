@@ -29,3 +29,19 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  get: ^4.6.6                    # GetX — state management, DI, routing
+  google_fonts: ^6.2.1           # Inter font (matches the mockup's font-family)
+  lucide_icons: ^0.257.0         # icon set matching the mockup's lucide-react icons
+  intl: ^0.19.0                  # date/number formatting (used later in dashboard/notices)
+  image_picker: ^1.1.2           # owner photo picker on Society Register screen
+  cupertino_icons: ^1.0.6        # default Flutter icon pack (comes with every project)
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0          # recommended lint rules
