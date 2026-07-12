@@ -20,7 +20,7 @@ class SplashView extends GetView<SplashController> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color.fromARGB(255, 205, 52, 52), AppColors.primaryDarkGradientEnd],
+              colors: [AppColors.primaryDark, AppColors.primaryDarkGradientEnd],
             ),
           ),
           child: const SafeArea(child: _SplashContent()),
@@ -125,7 +125,7 @@ class _SplashContentState extends State<_SplashContent> with TickerProviderState
                     width: 96,
                     height: 96,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
+                      color: AppColors.primaryDark.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                       boxShadow: [
