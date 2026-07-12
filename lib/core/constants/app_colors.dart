@@ -8,9 +8,9 @@
     AppColors._();
 
 //Branding
-  static const Color primaryDark = Color(0xFF0C0F14);
-  static const Color primaryDarkGradientEnd = Color(0xFF222831);
-  static const Color accentGreen = Color(0xFF10B981);
+  static const Color primaryDark = Color(0xFF121416);
+  static const Color primaryDarkGradientEnd = Color(0xFF2A2E32);
+  static const Color accentGreen = Color(0xFF34D399);
   static const Color accentGreenDark = Color(0xFF047857);
   static const Color successGreen = Color(0xFF22C55E);
   static const Color successGreenDark = Color(0xFF16A34A);
