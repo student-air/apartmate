@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:apartmate/core/bindings/initial_binding.dart';
 import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/core/theme/app_theme.dart';
 import 'package:apartmate/routes/app_pages.dart';
@@ -18,6 +19,7 @@ class ApartMateApp extends StatelessWidget {
       title: AppStrings.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      initialBinding: InitialBinding(),
       initialRoute: AppRoutes.splash,
       getPages: AppPages.pages,
     );
