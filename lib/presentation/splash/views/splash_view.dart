@@ -20,7 +20,7 @@ class SplashView extends GetView<SplashController> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [AppColors.primaryDark, AppColors.primaryDarkGradientEnd],
+              colors: [Color.fromARGB(255, 205, 52, 52), AppColors.primaryDarkGradientEnd],
             ),
           ),
           child: const SafeArea(child: _SplashContent()),
