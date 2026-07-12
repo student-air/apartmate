@@ -4,6 +4,8 @@ import 'package:apartmate/presentation/splash/views/splash_view.dart';
 import 'package:apartmate/presentation/auth/bindings/auth_binding.dart';
 import 'package:apartmate/presentation/auth/views/login_view.dart';
 import 'package:apartmate/presentation/auth/views/signup_view.dart';
+import 'package:apartmate/presentation/society_register/bindings/society_register_binding.dart';
+import 'package:apartmate/presentation/society_register/views/society_register_view.dart';
 import 'package:apartmate/routes/app_routes.dart';
 
 class AppPages {
@@ -24,6 +26,11 @@ class AppPages {
       name: AppRoutes.signup,
       page: () => const SignupView(),
       binding: AuthBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.societyRegister,
+      page: () => const SocietyRegisterView(),
+      binding: SocietyRegisterBinding(),
     ),
   ];
 }

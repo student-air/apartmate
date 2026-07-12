@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:apartmate/data/repositories/local_auth_repository.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
+import 'package:apartmate/data/repositories/local_society_repository.dart';
+import 'package:apartmate/domain/repositories/i_society_repository.dart';
 
 /// Wires every repository interface to its concrete implementation.
 ///
@@ -14,5 +16,6 @@ class InitialBinding extends Bindings {
   @override
   void dependencies() {
     Get.put<IAuthRepository>(LocalAuthRepository(), permanent: true);
+    Get.put<ISocietyRepository>(LocalSocietyRepository(), permanent: true);
   }
 }

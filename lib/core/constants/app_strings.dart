@@ -41,4 +41,16 @@ class AppStrings {
   static const confirmPasswordHint = 'Re-enter your password';
   static const register = 'Register';
   static const alreadyHaveAccount = 'Already have an account? ';
+
+  // Society register
+  static const registerSociety = 'Register Society';
+  static const societyName = 'Society Name';
+  static const ownerName = 'Owner Name';
+  static const address = 'Address';
+  static const city = 'City';
+  static const country = 'Country';
+  static const contactNumber = 'Contact Number';
+  static const descriptionOptional = 'Description (Optional)';
+  static const descriptionHint = 'Brief description about the society...';
+  static const submitRegistration = 'Submit Registration';
 }

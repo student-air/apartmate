@@ -87,7 +87,7 @@ class AuthController extends GetxController {
         phone: phoneCtrl.text.trim(),
         password: signupPasswordCtrl.text,
       );
-      Get.toNamed(AppRoutes.signup); // placeholder — updated once society_register exists
+      Get.toNamed(AppRoutes.societyRegister); // placeholder — updated once society_register endpoint is ready
     } finally {
       isLoading.value = false;
     }
