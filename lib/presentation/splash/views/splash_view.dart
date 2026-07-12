@@ -27,20 +27,7 @@ class SplashView extends GetView<SplashController> {
             child: Column(
               children: [
                 const Spacer(flex: 4),
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'A',
-                    style: AppTextStyles.h1.copyWith(color: Colors.white, fontSize: 48),
-                  ),
-                ),
+                const _AnimatedLogo(),
                 const SizedBox(height: 24),
                 Text(AppStrings.appName, style: AppTextStyles.h1.copyWith(color: Colors.white)),
                 const SizedBox(height: 8),
@@ -63,6 +50,60 @@ class SplashView extends GetView<SplashController> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Fades in and scales up the logo mark when the splash screen first opens.
+class _AnimatedLogo extends StatefulWidget {
+  const _AnimatedLogo();
+
+  @override
+  State<_AnimatedLogo> createState() => _AnimatedLogoState();
+}
+
+class _AnimatedLogoState extends State<_AnimatedLogo> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 700));
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    _scale = Tween<double>(begin: 0.7, end: 1.0)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: ScaleTransition(
+        scale: _scale,
+        child: Container(
+          width: 96,
+          height: 96,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
+          ),
+          alignment: Alignment.center,
+            child: Text(
+              "合",
+            style: AppTextStyles.h1.copyWith(color: Colors.white, fontSize: 48),
+                ),
         ),
       ),
     );

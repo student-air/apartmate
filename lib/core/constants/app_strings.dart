@@ -9,7 +9,7 @@ class AppStrings {
 
   // App
   static const appName = 'ApartMate';
-  static const appTagline = 'Smart Living, Smarter Management';
+  static const appTagline = 'Management at Your Fingertips';
   static const appVersion = 'v1.0.0';
 
   // Auth - Login
