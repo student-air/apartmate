@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:get/get.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SocietyRegisterController extends GetxController {
   final ISocietyRepository _societyRepository;
   SocietyRegisterController(this._societyRepository);
-
+  
+  final ownerPhoto = Rxn<File>();
   final societyNameCtrl = TextEditingController();
   final ownerNameCtrl = TextEditingController();
   final addressCtrl = TextEditingController();
@@ -22,6 +25,11 @@ class SocietyRegisterController extends GetxController {
 
   void setCountry(String? value) {
     if (value != null) selectedCountry.value = value;
+  }
+
+  Future<void> pickOwnerPhoto() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85);
+    if (picked != null) ownerPhoto.value = File(picked.path);
   }
 
   Future<void> submit() async {

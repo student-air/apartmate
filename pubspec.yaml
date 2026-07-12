@@ -25,7 +25,7 @@ dependencies:
   shimmer: ^3.0.0
   get: ^4.6.6
   intl: ^0.20.2
-  image_picker: ^1.1.2
+  image_picker: ^1.2.3
   cupertino_icons: ^1.0.6
   flutter_lucide: ^1.11.0
 dev_dependencies:
