@@ -6,7 +6,9 @@ import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_button.dart';
 import 'package:apartmate/core/widgets/app_text_field.dart';
+import 'package:apartmate/core/widgets/app_card.dart';
 import 'package:apartmate/presentation/auth/controllers/auth_controller.dart';
+
 
 class LoginView extends GetView<AuthController> {
   const LoginView({super.key});
@@ -41,7 +43,7 @@ class LoginView extends GetView<AuthController> {
                         border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                       ),
                       alignment: Alignment.center,
-                      child: Text('合', style: AppTextStyles.h2.copyWith(color: Colors.white)),
+                      child: Image.asset('assets/images/logo.png', width: 32, height: 32),
                     ),
                     Text(AppStrings.welcomeBack, style: AppTextStyles.h2.copyWith(color: Colors.white)),
                     const SizedBox(height: 4),
@@ -52,13 +54,14 @@ class LoginView extends GetView<AuthController> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AppTextField(
-                      label: AppStrings.username,
+                Padding(
+                padding: const EdgeInsets.fromLTRB(20, 28, 20, 24),
+                child: AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppTextField(
+                        label: AppStrings.username,
                       hint: AppStrings.usernameHint,
                       controller: controller.usernameCtrl,
                     ),
@@ -137,7 +140,8 @@ class LoginView extends GetView<AuthController> {
                   ],
                 ),
               ),
-            ],
+            ),
+          ],
           ),
         ),
       ),
