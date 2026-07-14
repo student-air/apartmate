@@ -54,9 +54,11 @@ class SignupView extends GetView<AuthController> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, -16, 20, 24),
-                child: AppCard(
+              Transform.translate(
+                offset: const Offset(0, -16),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                  child: AppCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -164,6 +166,7 @@ class SignupView extends GetView<AuthController> {
                   ),
                 ),
               ),
+             ),
               const SizedBox(height: AppDimens.space24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

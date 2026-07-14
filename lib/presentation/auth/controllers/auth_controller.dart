@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:apartmate/core/utils/validators.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/utils/app_snackbar.dart';
 
 class AuthController extends GetxController {
   final IAuthRepository _authRepository;
@@ -30,7 +31,7 @@ class AuthController extends GetxController {
 
   Future<void> login() async {
     if (usernameCtrl.text.trim().isEmpty || passwordCtrl.text.trim().isEmpty) {
-      Get.snackbar('Missing info', 'Please enter your username and password');
+      AppSnackbar.error('Missing info', 'Please enter your username and password');
       return;
     }
     isLoading.value = true;
@@ -67,16 +68,16 @@ class AuthController extends GetxController {
         emailCtrl.text.trim().isEmpty ||
         phoneCtrl.text.trim().isEmpty ||
         signupPasswordCtrl.text.isEmpty) {
-      Get.snackbar('Missing info', 'Please fill in all required fields');
+      AppSnackbar.error('Missing info', 'Please fill in all required fields');
       return;
     }
     if (signupPasswordCtrl.text != confirmPasswordCtrl.text) {
-      Get.snackbar('Password mismatch', 'Passwords do not match');
+      AppSnackbar.error('Password mismatch', 'Passwords do not match');
       return;
     }
     final passwordError = Validators.passwordErrorMessage(signupPasswordCtrl.text);
     if (passwordError != null) {
-      Get.snackbar('Weak password', passwordError);
+      AppSnackbar.error('Weak password', passwordError);
       return;
     }
     isLoading.value = true;

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,8 +6,13 @@ import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
 
+
+
 class SocietyRegisterController extends GetxController {
   final ISocietyRepository _societyRepository;
+  static const int maxPictures = 3;
+  static const int maxFileSizeBytes = 3 * 1024 * 1024; // 3MB
+
   SocietyRegisterController(this._societyRepository);
 
   final societyNameCtrl = TextEditingController();
@@ -17,6 +21,7 @@ class SocietyRegisterController extends GetxController {
   final cityCtrl = TextEditingController();
   final contactCtrl = TextEditingController();
   final descriptionCtrl = TextEditingController();
+  final societyPictures = <File>[].obs;
 
   final countries = const ['Pakistan', 'UAE', 'Saudi Arabia'];
   final selectedCountry = 'Pakistan'.obs;
@@ -26,8 +31,47 @@ class SocietyRegisterController extends GetxController {
 
   Future<void> pickOwnerPhoto() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85);
-    if (picked != null) ownerPhoto.value = File(picked.path);
+    if (picked == null) return;
+    final file = File(picked.path);
+    final sizeInBytes = await file.length();
+    if (sizeInBytes > maxFileSizeBytes) {
+      Get.snackbar('File too large', 'Owner photo must be under 3MB');
+      return;
+    }
+    ownerPhoto.value = file;
   }
+
+  Future<void> pickSocietyPictures() async {
+    if (societyPictures.length >= maxPictures) {
+      Get.snackbar('Limit reached', 'You can only select up to $maxPictures pictures');
+      return;
+    }
+    final remainingSlots = maxPictures - societyPictures.length;
+    final picked = await ImagePicker().pickMultiImage(imageQuality: 85);
+    if (picked.isEmpty) return;
+
+    final toAdd = picked.take(remainingSlots).toList();
+    int rejectedForSize = 0;
+
+    for (final xfile in toAdd) {
+      final file = File(xfile.path);
+      final sizeInBytes = await file.length();
+      if (sizeInBytes > maxFileSizeBytes) {
+        rejectedForSize++;
+        continue;
+      }
+      societyPictures.add(file);
+    }
+
+    if (picked.length > remainingSlots) {
+      Get.snackbar('Limit reached', 'Only $maxPictures pictures allowed — extra selections were skipped');
+    }
+    if (rejectedForSize > 0) {
+      Get.snackbar('File too large', '$rejectedForSize picture(s) skipped — each must be under 3MB');
+    }
+  }
+
+  void removeSocietyPicture(File file) => societyPictures.remove(file);
 
   void setCountry(String? value) {
     if (value != null) selectedCountry.value = value;

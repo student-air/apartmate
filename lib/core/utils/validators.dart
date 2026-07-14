@@ -1,7 +1,6 @@
 class Validators {
   Validators._();
 
-  /// Requires at least 8 characters and at least one special character.
   static bool isStrongPassword(String password) {
     if (password.length < 8) return false;
     final hasSpecialChar = RegExp(r'[!@#$%^&*(),.?":{}|<>_\-]').hasMatch(password);
@@ -15,4 +14,4 @@ class Validators {
     }
     return null;
   }
-}
+} 

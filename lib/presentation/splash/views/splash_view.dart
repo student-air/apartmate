@@ -126,7 +126,10 @@ class _SplashContentState extends State<_SplashContent> with TickerProviderState
                       ],
                     ),
                     alignment: Alignment.center,
-                    child: Image.asset('assets/images/logo.png', width: 56, height: 56),
+                    child: Text(
+                      '合',
+                    style: AppTextStyles.h1.copyWith(color: Colors.white, fontSize: 48),
+),
                   ),
                 ),
               ),

@@ -8,6 +8,7 @@ import 'package:apartmate/core/widgets/app_button.dart';
 import 'package:apartmate/core/widgets/app_card.dart';
 import 'package:apartmate/core/widgets/app_text_field.dart';
 import 'package:apartmate/presentation/auth/controllers/auth_controller.dart';
+import 'package:apartmate/core/utils/app_snackbar.dart';
 
 class LoginView extends GetView<AuthController> {
   const LoginView({super.key});
@@ -53,9 +54,11 @@ class LoginView extends GetView<AuthController> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, -16, 20, 24),
-                child: AppCard(
+              Transform.translate(
+                offset: const Offset(0, -16),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                  child: AppCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -86,7 +89,7 @@ class LoginView extends GetView<AuthController> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
-                            Get.snackbar('Coming soon', 'Password reset isn\'t available yet');
+                            AppSnackbar.info('Coming soon', 'Password reset isn\'t available yet');
                           },
                           child: Text(AppStrings.forgotPassword, style: AppTextStyles.labelLarge),
                         ),
@@ -129,6 +132,7 @@ class LoginView extends GetView<AuthController> {
                   ),
                 ),
               ),
+            ),
               const SizedBox(height: AppDimens.space24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
