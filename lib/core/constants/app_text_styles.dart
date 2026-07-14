@@ -1,17 +1,12 @@
-// What it does: every text style (heading, body, label, 
-// button text) used anywhere in the app is defined here once
-//  — font size, weight, color. Screens will write Text('Login
-//  ', style: AppTextStyles.h2) instead of repeating TextStyle
-//  (fontSize: 24, fontWeight: FontWeight.w700, ...) in every file.
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 
+/// Centralized typography. All text in the app should route through here.
 class AppTextStyles {
   AppTextStyles._();
-  
-  static TextStyle _base( {
+
+  static TextStyle _base({
     required double size,
     required FontWeight weight,
     Color color = AppColors.textPrimary,
@@ -27,7 +22,7 @@ class AppTextStyles {
     );
   }
 
-  //Display / headings
+  // Display / headings
   static TextStyle h1 = _base(size: 32, weight: FontWeight.w700, letterSpacing: -0.5);
   static TextStyle h2 = _base(size: 24, weight: FontWeight.w700, letterSpacing: -0.3);
   static TextStyle h3 = _base(size: 20, weight: FontWeight.w700);

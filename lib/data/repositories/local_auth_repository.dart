@@ -25,7 +25,6 @@ class LocalAuthRepository implements IAuthRepository {
   }
 
   @override
-  @override
   Future<UserModel> loginWithGoogle() async {
     await Future.delayed(const Duration(milliseconds: 700));
     _currentUser = const UserModel(

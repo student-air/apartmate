@@ -23,7 +23,7 @@ class SignupView extends GetView<AuthController> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+                padding: const EdgeInsets.fromLTRB(24, 8, 24, 40),
                 decoration: const BoxDecoration(
                   color: AppColors.primaryDark,
                   borderRadius: BorderRadius.only(
@@ -33,17 +33,17 @@ class SignupView extends GetView<AuthController> {
                 ),
                 child: Column(
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          width: 40,
+                          height: 40,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      alignment: Alignment.center,
-                      child: Image.asset('assets/images/logo.png', width: 24, height: 24),
                     ),
                     Text(AppStrings.createAccount, style: AppTextStyles.h2.copyWith(color: Colors.white)),
                     const SizedBox(height: 4),
@@ -55,7 +55,7 @@ class SignupView extends GetView<AuthController> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                padding: const EdgeInsets.fromLTRB(20, -16, 20, 24),
                 child: AppCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

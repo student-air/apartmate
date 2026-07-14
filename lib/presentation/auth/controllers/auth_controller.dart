@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:apartmate/core/utils/validators.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
-import 'package:apartmate/core/utils/validators.dart';
 
 class AuthController extends GetxController {
   final IAuthRepository _authRepository;
@@ -87,7 +87,7 @@ class AuthController extends GetxController {
         phone: phoneCtrl.text.trim(),
         password: signupPasswordCtrl.text,
       );
-      Get.toNamed(AppRoutes.societyRegister); // placeholder — updated once society_register endpoint is ready
+      Get.toNamed(AppRoutes.societyRegister);
     } finally {
       isLoading.value = false;
     }

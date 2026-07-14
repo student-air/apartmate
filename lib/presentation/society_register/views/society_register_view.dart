@@ -7,7 +7,6 @@ import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_button.dart';
 import 'package:apartmate/core/widgets/app_dropdown_field.dart';
 import 'package:apartmate/core/widgets/app_text_field.dart';
-//import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/presentation/society_register/controllers/society_register_controller.dart';
 
 class SocietyRegisterView extends GetView<SocietyRegisterController> {

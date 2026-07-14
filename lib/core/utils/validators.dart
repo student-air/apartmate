@@ -13,6 +13,6 @@ class Validators {
     if (!RegExp(r'[!@#$%^&*(),.?":{}|<>_\-]').hasMatch(password)) {
       return 'Password must include at least one special character';
     }
-    return null; // null means "valid, no error"
+    return null;
   }
 }

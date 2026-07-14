@@ -1,11 +1,11 @@
-// What it does: every color used anywhere in the app lives here as a named constant. 
+// What it does: every color used anywhere in the app lives here as a named constant.
 //Instead of writing Color(0xFF2C2F33) inside a widget, we write AppColors.primaryDark.
 // Why this matters: if the client says "make the green a bit darker" after I've built
 // 14 screens, you change one line here instead of hunting through every file.
- import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
- class AppColors {
-    AppColors._();
+class AppColors {
+  AppColors._();
 
 //Branding
   static const Color primaryDark = Color(0xFF121416);
@@ -45,4 +45,4 @@
   static const Color pending = Color(0xFFEA580C);
   static const Color pendingBg = Color(0xFFFFF7ED);
   static const Color pendingBorder = Color(0xFFFFEDD5);
- }
+}

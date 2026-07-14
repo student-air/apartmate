@@ -64,10 +64,7 @@ class _SplashContentState extends State<_SplashContent> with TickerProviderState
 
     _entranceController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
 
-    _logoFade = CurvedAnimation(
-      parent: _entranceController,
-      curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
-    );
+    _logoFade = CurvedAnimation(parent: _entranceController, curve: const Interval(0.0, 0.5, curve: Curves.easeOut));
     _logoScale = Tween<double>(begin: 0.7, end: 1.0).animate(
       CurvedAnimation(parent: _entranceController, curve: const Interval(0.0, 0.5, curve: Curves.easeOutBack)),
     );
@@ -75,18 +72,12 @@ class _SplashContentState extends State<_SplashContent> with TickerProviderState
       CurvedAnimation(parent: _entranceController, curve: const Interval(0.0, 0.5, curve: Curves.easeOut)),
     );
 
-    _titleFade = CurvedAnimation(
-      parent: _entranceController,
-      curve: const Interval(0.3, 0.75, curve: Curves.easeOut),
-    );
+    _titleFade = CurvedAnimation(parent: _entranceController, curve: const Interval(0.3, 0.75, curve: Curves.easeOut));
     _titleSlide = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(
       CurvedAnimation(parent: _entranceController, curve: const Interval(0.3, 0.75, curve: Curves.easeOut)),
     );
 
-    _taglineFade = CurvedAnimation(
-      parent: _entranceController,
-      curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
-    );
+    _taglineFade = CurvedAnimation(parent: _entranceController, curve: const Interval(0.5, 1.0, curve: Curves.easeOut));
     _taglineSlide = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero).animate(
       CurvedAnimation(parent: _entranceController, curve: const Interval(0.5, 1.0, curve: Curves.easeOut)),
     );
@@ -94,9 +85,7 @@ class _SplashContentState extends State<_SplashContent> with TickerProviderState
     _entranceController.forward();
 
     _glowController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
-    _glow = Tween<double>(begin: 0.15, end: 0.4).animate(
-      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
-    );
+    _glow = Tween<double>(begin: 0.15, end: 0.4).animate(CurvedAnimation(parent: _glowController, curve: Curves.easeInOut));
     _glowController.repeat(reverse: true);
   }
 
@@ -125,7 +114,7 @@ class _SplashContentState extends State<_SplashContent> with TickerProviderState
                     width: 96,
                     height: 96,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryDark.withValues(alpha: 0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                       boxShadow: [
@@ -137,11 +126,7 @@ class _SplashContentState extends State<_SplashContent> with TickerProviderState
                       ],
                     ),
                     alignment: Alignment.center,
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    width: 56,
-                    height: 56,
-                  ),
+                    child: Image.asset('assets/images/logo.png', width: 56, height: 56),
                   ),
                 ),
               ),

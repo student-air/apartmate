@@ -1,4 +1,3 @@
-// 
 import 'package:flutter/material.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';

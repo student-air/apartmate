@@ -1,7 +1,3 @@
-// Future localization — if you ever want the app in Urdu
-//  or Arabic, every string is already centralized in one file 
-//  instead of buried in 14 screen files.
-
 /// Centralized user-facing copy. Keeps text out of widgets and ready
 /// for future localization (l10n) without touching UI code.
 class AppStrings {

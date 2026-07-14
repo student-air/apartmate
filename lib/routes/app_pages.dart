@@ -8,7 +8,6 @@ import 'package:apartmate/presentation/society_register/bindings/society_registe
 import 'package:apartmate/presentation/society_register/views/society_register_view.dart';
 import 'package:apartmate/routes/app_routes.dart';
 
-
 class AppPages {
   AppPages._();
 

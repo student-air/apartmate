@@ -4,10 +4,10 @@ import 'package:apartmate/data/models/user_model.dart';
 /// swap the binding to a Firebase-backed implementation later without
 /// touching any controller or view.
 abstract class IAuthRepository {
-    Future<UserModel> login({required String username, required String password});
-    Future<UserModel> loginWithGoogle();
-    Future<UserModel> loginWithApple();
-    Future<UserModel> signUp({
+  Future<UserModel> login({required String username, required String password});
+  Future<UserModel> loginWithGoogle();
+  Future<UserModel> loginWithApple();
+  Future<UserModel> signUp({
     required String fullName,
     required String email,
     required String phone,
