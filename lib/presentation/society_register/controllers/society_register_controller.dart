@@ -11,7 +11,7 @@ import 'package:apartmate/core/utils/app_snackbar.dart';
 
 class SocietyRegisterController extends GetxController {
   final ISocietyRepository _societyRepository;
-  static const int maxPictures = 3;
+
   static const int maxFileSizeBytes = 3 * 1024 * 1024; // 3MB
 
   SocietyRegisterController(this._societyRepository);
@@ -22,7 +22,6 @@ class SocietyRegisterController extends GetxController {
   final cityCtrl = TextEditingController();
   final contactCtrl = TextEditingController();
   final descriptionCtrl = TextEditingController();
-  final societyPictures = <File>[].obs;
 
   final countries = const ['Pakistan', 'UAE', 'Saudi Arabia', 'USA'];
   final selectedCountry = 'Pakistan'.obs;

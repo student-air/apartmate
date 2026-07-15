@@ -49,6 +49,7 @@ class AppStrings {
   static const city = 'City';
   static const cityHint = 'Select city';
   static const country = 'Country';
+  static const countryHint = 'Select country';
   static const contactNumber = 'Contact Number';
   static const contactNumberHint = '+923001234567';
   static const descriptionOptional = 'Description (Optional)';
