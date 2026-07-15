@@ -27,6 +27,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
+	
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
@@ -66,5 +67,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- here added snippet for camera permission and photo library access permission for iOS. This is required to access camera and photo library in iOS. -->
+	<key>NSCameraUsageDescription</key>
+    <string>We need camera access to set your profile photo</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need photo library access to set your profile photo</string>
 </dict>
 </plist>

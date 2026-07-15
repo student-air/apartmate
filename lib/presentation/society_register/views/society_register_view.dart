@@ -123,7 +123,7 @@ class _OwnerPhotoPicker extends StatelessWidget {
             clipBehavior: Clip.none,
             children: [
               GestureDetector(
-                onTap: controller.pickOwnerPhoto,
+                onTap: () => _showPhotoSourceSheet(context, controller),
                 child: Container(
                   width: 96,
                   height: 96,
@@ -141,7 +141,7 @@ class _OwnerPhotoPicker extends StatelessWidget {
                 bottom: -2,
                 right: -2,
                 child: GestureDetector(
-                  onTap: controller.pickOwnerPhoto,
+                  onTap: () => _showPhotoSourceSheet(context, controller),
                   child: Container(
                     width: 32,
                     height: 32,
@@ -164,4 +164,38 @@ class _OwnerPhotoPicker extends StatelessWidget {
       ],
     );
   }
+}
+
+void _showPhotoSourceSheet(BuildContext context, SocietyRegisterController controller) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    ),
+    builder: (sheetContext) {
+      return SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Open Camera'),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                controller.pickOwnerPhotoFromCamera();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Upload from Device'),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                controller.pickOwnerPhotoFromGallery();
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

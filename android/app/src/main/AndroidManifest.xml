@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+ <uses-permission android:name="android.permission.CAMERA"/>  //permission declaration Android reads at build time.
+
     <application
         android:label="apartmate"
         android:name="${applicationName}"

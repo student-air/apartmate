@@ -32,17 +32,20 @@ class SocietyRegisterController extends GetxController {
   final ownerPhoto = Rxn<File>();
   final isSubmitting = false.obs;
 
-  Future<void> pickOwnerPhoto() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85);
-    if (picked == null) return;
-    final file = File(picked.path);
-    final sizeInBytes = await file.length();
-    if (sizeInBytes > maxFileSizeBytes) {
-      AppSnackbar.error('File too large', 'Owner photo must be under 3MB');
-      return;
-    }
-    ownerPhoto.value = file;
+  Future<void> pickOwnerPhotoFromCamera() => _pickFrom(ImageSource.camera);
+Future<void> pickOwnerPhotoFromGallery() => _pickFrom(ImageSource.gallery);
+
+Future<void> _pickFrom(ImageSource source) async {
+  final picked = await ImagePicker().pickImage(source: source, imageQuality: 85);
+  if (picked == null) return;
+  final file = File(picked.path);
+  final sizeInBytes = await file.length();
+  if (sizeInBytes > maxFileSizeBytes) {
+    AppSnackbar.error('File too large', 'Owner photo must be under 3MB');
+    return;
   }
+  ownerPhoto.value = file;
+}
 
   void setCountry(String? value) {
     if (value != null) selectedCountry.value = value;
