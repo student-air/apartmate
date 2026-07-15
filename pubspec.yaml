@@ -14,7 +14,7 @@ dependencies:
   cached_network_image: ^3.4.1
   cloud_firestore: ^6.6.0
   firebase_auth: ^6.5.4
-  firebase_storage: ^13.4.3
+  # firebase_storage: ^13.4.3
   flutter_svg: ^2.3.0
   google_fonts: ^8.1.0
   lottie: ^3.5.1
