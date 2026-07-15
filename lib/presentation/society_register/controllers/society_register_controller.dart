@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/utils/app_snackbar.dart';
 
 
 
@@ -23,9 +24,11 @@ class SocietyRegisterController extends GetxController {
   final descriptionCtrl = TextEditingController();
   final societyPictures = <File>[].obs;
 
-  final countries = const ['Pakistan', 'UAE', 'Saudi Arabia'];
+  final countries = const ['Pakistan', 'UAE', 'Saudi Arabia', 'USA'];
   final selectedCountry = 'Pakistan'.obs;
 
+  final cities = const ['Karachi', 'Lahore', 'Islamabad', 'Multan', 'Rawalpindi'];
+  final selectedCity = 'Islamabad'.obs;
   final ownerPhoto = Rxn<File>();
   final isSubmitting = false.obs;
 
@@ -35,43 +38,11 @@ class SocietyRegisterController extends GetxController {
     final file = File(picked.path);
     final sizeInBytes = await file.length();
     if (sizeInBytes > maxFileSizeBytes) {
-      Get.snackbar('File too large', 'Owner photo must be under 3MB');
+      AppSnackbar.error('File too large', 'Owner photo must be under 3MB');
       return;
     }
     ownerPhoto.value = file;
   }
-
-  Future<void> pickSocietyPictures() async {
-    if (societyPictures.length >= maxPictures) {
-      Get.snackbar('Limit reached', 'You can only select up to $maxPictures pictures');
-      return;
-    }
-    final remainingSlots = maxPictures - societyPictures.length;
-    final picked = await ImagePicker().pickMultiImage(imageQuality: 85);
-    if (picked.isEmpty) return;
-
-    final toAdd = picked.take(remainingSlots).toList();
-    int rejectedForSize = 0;
-
-    for (final xfile in toAdd) {
-      final file = File(xfile.path);
-      final sizeInBytes = await file.length();
-      if (sizeInBytes > maxFileSizeBytes) {
-        rejectedForSize++;
-        continue;
-      }
-      societyPictures.add(file);
-    }
-
-    if (picked.length > remainingSlots) {
-      Get.snackbar('Limit reached', 'Only $maxPictures pictures allowed — extra selections were skipped');
-    }
-    if (rejectedForSize > 0) {
-      Get.snackbar('File too large', '$rejectedForSize picture(s) skipped — each must be under 3MB');
-    }
-  }
-
-  void removeSocietyPicture(File file) => societyPictures.remove(file);
 
   void setCountry(String? value) {
     if (value != null) selectedCountry.value = value;
@@ -79,7 +50,7 @@ class SocietyRegisterController extends GetxController {
 
   Future<void> submit() async {
     if (societyNameCtrl.text.trim().isEmpty || ownerNameCtrl.text.trim().isEmpty) {
-      Get.snackbar('Missing info', 'Please fill in the required fields');
+      AppSnackbar.info('Missing info', 'Please fill in the required fields');
       return;
     }
     isSubmitting.value = true;

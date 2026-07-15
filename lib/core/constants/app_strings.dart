@@ -27,11 +27,11 @@ class AppStrings {
   static const createAccount = 'Create Account';
   static const signUpSubtitle = 'Join ApartMate as a society owner';
   static const fullName = 'Full Name';
-  static const fullNameHint = 'e.g. Ahmed Khan';
+  static const fullNameHint = 'e.g. John Doe';
   static const email = 'Email';
   static const emailHint = 'Enter your email';
   static const phoneNumber = 'Phone Number';
-  static const phoneHint = '+92 300 1234567';
+  static const phoneHint = '+923001234567';
   static const createPasswordHint = 'Create a strong password';
   static const confirmPassword = 'Confirm Password';
   static const confirmPasswordHint = 'Re-enter your password';
@@ -41,11 +41,16 @@ class AppStrings {
   // Society register
   static const registerSociety = 'Register Society';
   static const societyName = 'Society Name';
+  static const societyNameHint = 'e.g. Housing Society';
   static const ownerName = 'Owner Name';
+  static const ownerNameHint = 'e.g. John Doe';
   static const address = 'Address';
+  static const addressHint = 'Enter the society address';
   static const city = 'City';
+  static const cityHint = 'Select city';
   static const country = 'Country';
   static const contactNumber = 'Contact Number';
+  static const contactNumberHint = '+923001234567';
   static const descriptionOptional = 'Description (Optional)';
   static const descriptionHint = 'Brief description about the society...';
   static const submitRegistration = 'Submit Registration';
