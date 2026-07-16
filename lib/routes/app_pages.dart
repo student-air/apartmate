@@ -7,6 +7,8 @@ import 'package:apartmate/presentation/auth/views/signup_view.dart';
 import 'package:apartmate/presentation/society_register/bindings/society_register_binding.dart';
 import 'package:apartmate/presentation/society_register/views/society_register_view.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/presentation/registration_status/bindings/registration_status_binding.dart';
+import 'package:apartmate/presentation/registration_status/views/registration_status_view.dart';
 
 class AppPages {
   AppPages._();
@@ -31,6 +33,11 @@ class AppPages {
       name: AppRoutes.societyRegister,
       page: () => const SocietyRegisterView(),
       binding: SocietyRegisterBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.registrationStatus,
+      page: () => const RegistrationStatusView(),
+      binding: RegistrationStatusBinding(),
     ),
   ];
 }

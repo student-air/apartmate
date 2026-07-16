@@ -55,4 +55,10 @@ class AppStrings {
   static const descriptionOptional = 'Description (Optional)';
   static const descriptionHint = 'Brief description about the society...';
   static const submitRegistration = 'Submit Registration';
+  static const registrationSubmitted = 'Registration Submitted!';
+  static const registrationSubmittedDesc = 'Your registration request has been sent. You will be notified via SMS and email once approved.';
+  static const status = 'Status';
+  static const pendingReview = 'PENDING REVIEW';
+  static const date = 'Date';
+  static const continueSetup = 'Continue Setup';
 }
