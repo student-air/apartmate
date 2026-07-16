@@ -23,32 +23,31 @@ class SocietyRegisterController extends GetxController {
   final contactCtrl = TextEditingController();
   final descriptionCtrl = TextEditingController();
 
-  final countries = const ['Pakistan', 'UAE', 'Saudi Arabia', 'USA'];
-  final selectedCountry = 'Pakistan'.obs;
+  final selectedCountry = ''.obs;
+  final selectedState = ''.obs;
+  final selectedCity = ''.obs;
 
-  final cities = const ['Karachi', 'Lahore', 'Islamabad', 'Multan', 'Rawalpindi'];
-  final selectedCity = 'Islamabad'.obs;
+  void setCountry(String value) => selectedCountry.value = value;
+  void setState(String value) => selectedState.value = value;
+  void setCity(String value) => selectedCity.value = value;
+
   final ownerPhoto = Rxn<File>();
   final isSubmitting = false.obs;
 
   Future<void> pickOwnerPhotoFromCamera() => _pickFrom(ImageSource.camera);
-Future<void> pickOwnerPhotoFromGallery() => _pickFrom(ImageSource.gallery);
+  Future<void> pickOwnerPhotoFromGallery() => _pickFrom(ImageSource.gallery);
 
-Future<void> _pickFrom(ImageSource source) async {
-  final picked = await ImagePicker().pickImage(source: source, imageQuality: 85);
-  if (picked == null) return;
-  final file = File(picked.path);
-  final sizeInBytes = await file.length();
-  if (sizeInBytes > maxFileSizeBytes) {
-    AppSnackbar.error('File too large', 'Owner photo must be under 3MB');
+  Future<void> _pickFrom(ImageSource source) async {
+    final picked = await ImagePicker().pickImage(source: source, imageQuality: 85);
+    if (picked == null) return;
+    final file = File(picked.path);
+    final sizeInBytes = await file.length();
+    if (sizeInBytes > maxFileSizeBytes) {
+      AppSnackbar.error('File too large', 'Owner photo must be under 3MB');
     return;
   }
-  ownerPhoto.value = file;
+    ownerPhoto.value = file;
 }
-
-  void setCountry(String? value) {
-    if (value != null) selectedCountry.value = value;
-  }
 
   Future<void> submit() async {
     if (societyNameCtrl.text.trim().isEmpty || ownerNameCtrl.text.trim().isEmpty) {
@@ -63,14 +62,14 @@ Future<void> _pickFrom(ImageSource source) async {
           name: societyNameCtrl.text.trim(),
           ownerName: ownerNameCtrl.text.trim(),
           address: addressCtrl.text.trim(),
-          city: cityCtrl.text.trim(),
+          city: selectedCity.value,
           country: selectedCountry.value,
           contactNumber: contactCtrl.text.trim(),
           description: descriptionCtrl.text.trim(),
           submittedAt: DateTime.now(),
         ),
       );
-      Get.toNamed(AppRoutes.registrationStatus);
+        Get.toNamed(AppRoutes.registrationStatus);
     } finally {
       isSubmitting.value = false;
     }

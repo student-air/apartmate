@@ -6,8 +6,9 @@ import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_button.dart';
 import 'package:apartmate/core/widgets/app_card.dart';
-import 'package:apartmate/core/widgets/app_dropdown_field.dart';
+import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/core/widgets/app_text_field.dart';
+import 'package:country_state_city_picker/country_state_city_picker.dart';
 import 'package:apartmate/presentation/society_register/controllers/society_register_controller.dart';
 
 class SocietyRegisterView extends GetView<SocietyRegisterController> {
@@ -34,63 +35,63 @@ class SocietyRegisterView extends GetView<SocietyRegisterController> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-              child: AppCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _OwnerPhotoPicker(controller: controller),
-                    const SizedBox(height: AppDimens.space20),
-                    AppTextField(label: AppStrings.societyName, hint: AppStrings.societyNameHint, controller: controller.societyNameCtrl),
-                    const SizedBox(height: AppDimens.space16),
-                    AppTextField(label: AppStrings.ownerName, hint: AppStrings.ownerNameHint, controller: controller.ownerNameCtrl),
-                    const SizedBox(height: AppDimens.space16),
-                    AppTextField(label: AppStrings.address, hint: AppStrings.addressHint, controller: controller.addressCtrl, maxLines: 2),
-                    const SizedBox(height: AppDimens.space16),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Obx(
-                            () => AppDropdownField<String>(
-                              label: AppStrings.city,
-                              value: controller.selectedCity.value,
-                              items: controller.cities,
-                              labelBuilder: (v) => v,
-                              onChanged: (value) {
-                                if (value != null) controller.selectedCity.value = value;
-                              },
-                            ),
-                          ),
+              child: AppResponsiveContainer(
+                child: AppCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _OwnerPhotoPicker(controller: controller),
+                      const SizedBox(height: AppDimens.space20),
+                      AppTextField(
+                        label: AppStrings.societyName,
+                        hint: AppStrings.societyNameHint,
+                        controller: controller.societyNameCtrl,
+                      ),
+                      const SizedBox(height: AppDimens.space16),
+                      AppTextField(
+                        label: AppStrings.ownerName,
+                        hint: AppStrings.ownerNameHint,
+                        controller: controller.ownerNameCtrl,
+                      ),
+                      const SizedBox(height: AppDimens.space16),
+                      AppTextField(
+                        label: AppStrings.address,
+                        hint: AppStrings.addressHint,
+                        controller: controller.addressCtrl,
+                        maxLines: 2,
+                      ),
+                      const SizedBox(height: AppDimens.space16),
+                      Text('Country', style: AppTextStyles.labelLarge),
+                      const SizedBox(height: AppDimens.space6),
+                      SizedBox(
+                        width: double.infinity,
+                        child: SelectState(
+                          showFlag: true,
+                          showSearch: true,
+                          countryHint: 'Select Country',
+                          stateHint: 'Select State',
+                          cityHint: 'Select City',
+                          onCountryChanged: (value) => controller.setCountry(value),
+                          onStateChanged: (value) => controller.setState(value),
+                          onCityChanged: (value) => controller.setCity(value),
                         ),
-                        const SizedBox(width: AppDimens.space16),
-                        Expanded(
-                          child: Obx(
-                            () => AppDropdownField<String>(
-                              label: AppStrings.country,
-                              value: controller.selectedCountry.value,
-                              items: controller.countries,
-                              labelBuilder: (v) => v,
-                              onChanged: controller.setCountry,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppDimens.space16),
-                    AppTextField(
-                      label: AppStrings.contactNumber,
-                      hint: AppStrings.contactNumberHint,
-                      controller: controller.contactCtrl,
-                      keyboardType: TextInputType.phone,
-                    ),
-                    const SizedBox(height: AppDimens.space16),
-                    AppTextField(
-                      label: AppStrings.descriptionOptional,
-                      hint: AppStrings.descriptionHint,
-                      controller: controller.descriptionCtrl,
-                      maxLines: 3,
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: AppDimens.space16),
+                      AppTextField(
+                        label: AppStrings.contactNumber,
+                        hint: AppStrings.contactNumberHint,
+                        controller: controller.contactCtrl,
+                        keyboardType: TextInputType.phone,
+                      ),
+                      const SizedBox(height: AppDimens.space16),
+                      AppTextField(
+                        label: AppStrings.descriptionOptional,
+                        hint: AppStrings.descriptionHint,
+                        controller: controller.descriptionCtrl,
+                        maxLines: 3,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
