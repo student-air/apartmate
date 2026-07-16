@@ -61,7 +61,7 @@ class SocietyRegisterView extends GetView<SocietyRegisterController> {
                         maxLines: 2,
                       ),
                       const SizedBox(height: AppDimens.space16),
-                      Text('Country', style: AppTextStyles.labelLarge),
+                      Text('Country,State & City', style: AppTextStyles.labelLarge),
                       const SizedBox(height: AppDimens.space6),
                       SizedBox(
                         width: double.infinity,
