@@ -109,8 +109,6 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  const _StatusTimeline(),
-                  const SizedBox(height: 32),
                   AppPrimaryButton(
                     label: AppStrings.continueSetup,
                     backgroundColor: AppColors.primaryDark,
@@ -158,88 +156,6 @@ class _InfoRow extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _StatusTimeline extends StatelessWidget {
-  const _StatusTimeline();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _TimelineStep(label: 'Submitted', state: _StepState.done),
-        _TimelineConnector(active: true),
-        _TimelineStep(label: 'Under Review', state: _StepState.active),
-        _TimelineConnector(active: false),
-        _TimelineStep(label: 'Approved', state: _StepState.pending),
-      ],
-    );
-  }
-}
-
-enum _StepState { done, active, pending }
-
-class _TimelineStep extends StatelessWidget {
-  final String label;
-  final _StepState state;
-  const _TimelineStep({required this.label, required this.state});
-
-  @override
-  Widget build(BuildContext context) {
-    Color bg;
-    Widget? child;
-    Color textColor;
-    switch (state) {
-      case _StepState.done:
-        bg = AppColors.successGreen;
-        child = const Icon(Icons.check, size: 16, color: Colors.white);
-        textColor = AppColors.successGreen;
-        break;
-      case _StepState.active:
-        bg = AppColors.primaryDark;
-        child = Container(width: 10, height: 10, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle));
-        textColor = AppColors.primaryDark;
-        break;
-      case _StepState.pending:
-        bg = Colors.white;
-        child = null;
-        textColor = AppColors.textSecondary;
-        break;
-    }
-    return Column(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: bg,
-            shape: BoxShape.circle,
-            border: state == _StepState.pending ? Border.all(color: AppColors.border, width: 2) : null,
-          ),
-          alignment: Alignment.center,
-          child: child,
-        ),
-        const SizedBox(height: 6),
-        Text(label, style: AppTextStyles.labelMedium.copyWith(color: textColor)),
-      ],
-    );
-  }
-}
-
-class _TimelineConnector extends StatelessWidget {
-  final bool active;
-  const _TimelineConnector({required this.active});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        height: 2,
-        margin: const EdgeInsets.only(bottom: 20),
-        color: active ? AppColors.successGreen : AppColors.border,
-      ),
     );
   }
 }

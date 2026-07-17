@@ -14,4 +14,16 @@ class Validators {
     }
     return null;
   }
+
+  static bool isValidEmail(String email) {
+    final e = email.trim().toLowerCase();
+    return RegExp(r'^[\w.+-]+@(gmail|ymail|hotmail)\.com$').hasMatch(e);
+  }
+
+  static bool isValidPhone(String phone) {
+    final p = phone.trim();
+    final local = RegExp(r'^03\d{9}$'); // 03000000000
+    final intl = RegExp(r'^\+92 \d{3} \d{7}$'); // +92 300 0000000
+    return local.hasMatch(p) || intl.hasMatch(p);
 } 
+}

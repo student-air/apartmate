@@ -49,45 +49,9 @@ class SocietyRegisterController extends GetxController {
     ownerPhoto.value = file;
 }
 
-  // Future<void> submit() async {
-  //   if (societyNameCtrl.text.trim().isEmpty || ownerNameCtrl.text.trim().isEmpty) {
-  //     AppSnackbar.info('Missing info', 'Please fill in the required fields');
-  //     return;
-  //   }
-  //   isSubmitting.value = true;
-  //   try {
-  //     await _societyRepository.registerSociety(
-  //       SocietyModel(
-  //         id: 'society-${DateTime.now().millisecondsSinceEpoch}',
-  //         name: societyNameCtrl.text.trim(),
-  //         ownerName: ownerNameCtrl.text.trim(),
-  //         address: addressCtrl.text.trim(),
-  //         city: selectedCity.value,
-  //         country: selectedCountry.value,
-  //         contactNumber: contactCtrl.text.trim(),
-  //         description: descriptionCtrl.text.trim(),
-  //         submittedAt: DateTime.now(),
-  //       ),
-  //     );
-  //       Get.toNamed(AppRoutes.registrationStatus);
-  //   } finally {
-  //     isSubmitting.value = false;
-  //   }
-  // }
-
   Future<void> submit() async {
-    if (ownerPhoto.value == null) {
-      AppSnackbar.info('Missing info', 'Please fill in all required fields');
-      return;
-    }
-    if (societyNameCtrl.text.trim().isEmpty ||
-        ownerNameCtrl.text.trim().isEmpty ||
-        addressCtrl.text.trim().isEmpty ||
-        contactCtrl.text.trim().isEmpty ||
-        selectedCountry.value.isEmpty ||
-        selectedState.value.isEmpty ||
-        selectedCity.value.isEmpty) {
-      AppSnackbar.info('Missing info', 'Please fill in all required fields');
+    if (societyNameCtrl.text.trim().isEmpty || ownerNameCtrl.text.trim().isEmpty || addressCtrl.text.trim().isEmpty || contactCtrl.text.trim().isEmpty) {
+      AppSnackbar.info('Missing info', 'Please fill in the required fields');
       return;
     }
     isSubmitting.value = true;
@@ -110,6 +74,42 @@ class SocietyRegisterController extends GetxController {
       isSubmitting.value = false;
     }
   }
+
+  // Future<void> submit() async {
+  //   if (ownerPhoto.value == null) {
+  //     AppSnackbar.info('Missing info', 'Please fill in all required fields');
+  //     return;
+  //   }
+  //   if (societyNameCtrl.text.trim().isEmpty ||
+  //       ownerNameCtrl.text.trim().isEmpty ||
+  //       addressCtrl.text.trim().isEmpty ||
+  //       contactCtrl.text.trim().isEmpty ||
+  //       selectedCountry.value.isEmpty ||
+  //       selectedState.value.isEmpty ||
+  //       selectedCity.value.isEmpty) {
+  //     AppSnackbar.info('Missing info', 'Please fill in all required fields');
+  //     return;
+  //   }
+  //   isSubmitting.value = true;
+  //   try {
+  //     await _societyRepository.registerSociety(
+  //       SocietyModel(
+  //         id: 'society-${DateTime.now().millisecondsSinceEpoch}',
+  //         name: societyNameCtrl.text.trim(),
+  //         ownerName: ownerNameCtrl.text.trim(),
+  //         address: addressCtrl.text.trim(),
+  //         city: selectedCity.value,
+  //         country: selectedCountry.value,
+  //         contactNumber: contactCtrl.text.trim(),
+  //         description: descriptionCtrl.text.trim(),
+  //         submittedAt: DateTime.now(),
+  //       ),
+  //     );
+  //       Get.toNamed(AppRoutes.registrationStatus);
+  //   } finally {
+  //     isSubmitting.value = false;
+  //   }
+  // }
 
   @override
   void onClose() {
