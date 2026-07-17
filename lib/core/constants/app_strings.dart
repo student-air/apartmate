@@ -55,10 +55,44 @@ class AppStrings {
   static const descriptionOptional = 'Description (Optional)';
   static const descriptionHint = 'Brief description about the society...';
   static const submitRegistration = 'Submit Registration';
+  
+  // Society register - Registration status
   static const registrationSubmitted = 'Registration Submitted!';
   static const registrationSubmittedDesc = 'Your registration request has been sent. You will be notified via SMS and email once approved.';
   static const status = 'Status';
   static const pendingReview = 'PENDING REVIEW';
   static const date = 'Date';
   static const continueSetup = 'Continue Setup';
+
+
+  // Society register
+  static const societyBuildings = 'Society Buildings';
+  static const noBuildingsAdded = 'No Buildings Added';
+  static const noBuildingsHint = 'Click the button below to add your first building.';
+  static const addBuilding = 'Add Building';
+  static const buildingName = 'Building Name';
+  static const buildingNameHint = 'e.g. Building A, Tower 1, Block North…';
+  static const saveBuilding = 'Save Building';
+  static const continueToStaffSetup = 'Continue to Staff Setup';
+  static const detailsConfigured = '✓ Details configured';
+  static const tapToAddDetails = 'Tap to add details';
+
+// Building details
+  static const buildingConfiguration = 'Building Configuration';
+  static const structure = 'Structure';
+  static const totalFloors = 'Total Floors';
+  static const totalFloorsDesc = 'Number of floors in building';
+  static const flatsPerFloor = 'Flats per Floor';
+  static const flatsPerFloorDesc = 'Apartments on each level';
+  static const totalApartments = 'Total Apartments';
+  static const flatTypes = 'Flat Types';
+  static const parking = 'Parking';
+  static const dedicatedParking = 'Dedicated Parking';
+  static const dedicatedParkingDesc = 'Resident parking available';
+  static const parkingSlots = 'Parking Slots';
+  static const parkingSlotsDesc = 'Total available spots';
+  static const amenities = 'Amenities';
+  static const elevatorLift = 'Elevator / Lift';
+  static const elevatorLiftDesc = 'Passenger lift available';
+  static const saveBuildingDetails = 'Save Building Details';
 }

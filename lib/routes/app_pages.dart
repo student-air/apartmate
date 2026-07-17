@@ -6,9 +6,13 @@ import 'package:apartmate/presentation/auth/views/login_view.dart';
 import 'package:apartmate/presentation/auth/views/signup_view.dart';
 import 'package:apartmate/presentation/society_register/bindings/society_register_binding.dart';
 import 'package:apartmate/presentation/society_register/views/society_register_view.dart';
-import 'package:apartmate/routes/app_routes.dart';
 import 'package:apartmate/presentation/registration_status/bindings/registration_status_binding.dart';
 import 'package:apartmate/presentation/registration_status/views/registration_status_view.dart';
+import 'package:apartmate/presentation/society_setup/bindings/society_setup_binding.dart';
+import 'package:apartmate/presentation/society_setup/bindings/building_detail_binding.dart';
+import 'package:apartmate/presentation/society_setup/views/society_setup_view.dart';
+import 'package:apartmate/presentation/society_setup/views/building_detail_view.dart';
+import 'package:apartmate/routes/app_routes.dart';
 
 class AppPages {
   AppPages._();
@@ -38,6 +42,16 @@ class AppPages {
       name: AppRoutes.registrationStatus,
       page: () => const RegistrationStatusView(),
       binding: RegistrationStatusBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.societyBuildings,
+      page: () => const SocietySetupView(),
+      binding: SocietySetupBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.buildingDetail,
+      page: () => const BuildingDetailView(),
+      binding: BuildingDetailBinding(),
     ),
   ];
 }
