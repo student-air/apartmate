@@ -4,7 +4,7 @@ import 'package:apartmate/core/utils/validators.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
-import 'package:apartmate/core/utils/validators.dart';
+//import 'package:apartmate/core/utils/validators.dart';
 
 class AuthController extends GetxController {
   final IAuthRepository _authRepository;
@@ -64,15 +64,6 @@ class AuthController extends GetxController {
     }
   }
 
-  // Future<void> signUp() async {
-  //   if (fullNameCtrl.text.trim().isEmpty ||
-  //       emailCtrl.text.trim().isEmpty ||
-  //       phoneCtrl.text.trim().isEmpty ||
-  //       signupPasswordCtrl.text.isEmpty) {
-  //     AppSnackbar.error('Missing info', 'Please fill in all required fields');
-  //     return;
-  //   }
-  //   if (signupPasswordCtrl.text != confirmPasswordCtrl.text) {
   Future<void> signUp() async {
     if (fullNameCtrl.text.trim().isEmpty ||
         emailCtrl.text.trim().isEmpty ||
