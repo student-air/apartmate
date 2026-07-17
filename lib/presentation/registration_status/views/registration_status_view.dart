@@ -4,6 +4,7 @@ import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
+import 'package:apartmate/core/widgets/app_animations.dart';
 import 'package:apartmate/core/widgets/app_button.dart';
 import 'package:apartmate/core/widgets/app_card.dart';
 import 'package:apartmate/core/widgets/app_loading.dart';
@@ -28,22 +29,7 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(color: AppColors.successGreen.withValues(alpha: 0.1), shape: BoxShape.circle),
-                    alignment: Alignment.center,
-                    child: Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: AppColors.successGreen,
-                        shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: AppColors.successGreen.withValues(alpha: 0.3), blurRadius: 16)],
-                      ),
-                      child: const Icon(Icons.check, color: Colors.white, size: 32),
-                    ),
-                  ),
+                  const AppAnimatedCheckmark(),
                   const SizedBox(height: 24),
                   Text(AppStrings.registrationSubmitted, style: AppTextStyles.h2, textAlign: TextAlign.center),
                   const SizedBox(height: 8),
@@ -92,17 +78,33 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
                           ],
                         ),
                         const Padding(padding: EdgeInsets.symmetric(vertical: 16), child: Divider(height: 1)),
-                        _InfoRow(icon: Icons.home_outlined, label: 'Society', value: society?.name ?? '—'),
+                        _InfoRow(
+                          icon: Icons.home_outlined,
+                          label: 'Society',
+                          value: society?.name ?? '—',
+                          delay: const Duration(milliseconds: 0),
+                        ),
                         const SizedBox(height: 16),
-                        _InfoRow(icon: Icons.person_outline, label: 'Owner', value: society?.ownerName ?? '—'),
+                        _InfoRow(
+                          icon: Icons.person_outline,
+                          label: 'Owner',
+                          value: society?.ownerName ?? '—',
+                          delay: const Duration(milliseconds: 120),
+                        ),
                         const SizedBox(height: 16),
                         _InfoRow(
                           icon: Icons.location_on_outlined,
                           label: 'Location',
                           value: society != null ? '${society.city}, ${society.country}' : '—',
+                          delay: const Duration(milliseconds: 240),
                         ),
                         const SizedBox(height: 16),
-                        _InfoRow(icon: Icons.phone_outlined, label: 'Contact', value: society?.contactNumber ?? '—'),
+                        _InfoRow(
+                          icon: Icons.phone_outlined,
+                          label: 'Contact',
+                          value: society?.contactNumber ?? '—',
+                          delay: const Duration(milliseconds: 360),
+                        ),
                       ],
                     ),
                   ),
@@ -129,17 +131,21 @@ class _InfoRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  const _InfoRow({required this.icon, required this.label, required this.value});
+  final Duration delay;
+  const _InfoRow({required this.icon, required this.label, required this.value, this.delay = Duration.zero});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(color: AppColors.primaryDark.withValues(alpha: 0.05), shape: BoxShape.circle),
-          child: Icon(icon, size: 18, color: AppColors.primaryDark),
+        AppSpinInIcon(
+          delay: delay,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(color: AppColors.primaryDark.withValues(alpha: 0.05), shape: BoxShape.circle),
+            child: Icon(icon, size: 18, color: AppColors.primaryDark),
+          ),
         ),
         const SizedBox(width: 12),
         Expanded(
