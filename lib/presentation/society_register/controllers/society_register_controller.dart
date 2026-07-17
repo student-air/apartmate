@@ -6,6 +6,7 @@ import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
+import 'package:apartmate/core/utils/validators.dart';
 
 
 
@@ -50,8 +51,18 @@ class SocietyRegisterController extends GetxController {
 }
 
   Future<void> submit() async {
-    if (societyNameCtrl.text.trim().isEmpty || ownerNameCtrl.text.trim().isEmpty || addressCtrl.text.trim().isEmpty || contactCtrl.text.trim().isEmpty) {
-      AppSnackbar.info('Missing info', 'Please fill in the required fields');
+    if (societyNameCtrl.text.trim().isEmpty ||
+        ownerNameCtrl.text.trim().isEmpty ||
+        addressCtrl.text.trim().isEmpty ||
+        contactCtrl.text.trim().isEmpty ||
+        selectedCountry.value.isEmpty ||
+        selectedState.value.isEmpty ||
+        selectedCity.value.isEmpty) {
+      AppSnackbar.info('Missing info', 'Please fill in all required fields');
+      return;
+    }
+    if (!Validators.isValidPhone(contactCtrl.text)) {
+      AppSnackbar.info('Invalid phone', 'Use format 03XXXXXXXXX or\n+92 3XX XXXXXXX');
       return;
     }
     isSubmitting.value = true;
