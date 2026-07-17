@@ -43,6 +43,17 @@ class SocietySetupController extends GetxController {
     if (index != -1) buildings[index] = updated;
   }
 
+  Future<void> renameBuilding(String buildingId, String newName) async {
+    final updated = await _societyRepository.renameBuilding(buildingId, newName);
+    final index = buildings.indexWhere((b) => b.id == buildingId);
+    if (index != -1) buildings[index] = updated;
+  }
+
+  Future<void> deleteBuilding(String buildingId) async {
+    await _societyRepository.deleteBuilding(buildingId);
+    buildings.removeWhere((b) => b.id == buildingId);
+  }
+
   void continueToNextStep() {
     // Placeholder — will point to Management Staff setup once that screen exists.
   }

@@ -13,6 +13,7 @@ class BuildingDetailController extends GetxController {
   final bed2Ctrl = TextEditingController();
   final bed3Ctrl = TextEditingController();
   final parkingSlotsCtrl = TextEditingController();
+  final buildingNameCtrl = TextEditingController();
 
   final hasParking = false.obs;
   final hasLift = false.obs;
@@ -22,6 +23,7 @@ class BuildingDetailController extends GetxController {
   void onInit() {
     super.onInit();
     building = Get.arguments as BuildingModel;
+    buildingNameCtrl.text = building.name;
     final d = building.details;
     if (d != null) {
       totalFloorsCtrl.text = d.totalFloors > 0 ? '${d.totalFloors}' : '';
@@ -47,7 +49,12 @@ class BuildingDetailController extends GetxController {
   void toggleParking(bool value) => hasParking.value = value;
   void toggleLift(bool value) => hasLift.value = value;
 
-  Future<void> save() async {
+Future<void> save() async {
+    final newName = buildingNameCtrl.text.trim();
+    if (newName.isNotEmpty && newName != building.name) {
+      await Get.find<SocietySetupController>().renameBuilding(building.id, newName);
+    }
+
     final details = BuildingDetailsModel(
       totalFloors: int.tryParse(totalFloorsCtrl.text) ?? 0,
       flatsPerFloor: int.tryParse(flatsPerFloorCtrl.text) ?? 0,
@@ -62,7 +69,6 @@ class BuildingDetailController extends GetxController {
     AppSnackbar.success('Saved', 'Building details saved successfully');
     Get.back();
   }
-
   @override
   void onClose() {
     totalFloorsCtrl.dispose();

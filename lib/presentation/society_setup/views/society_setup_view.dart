@@ -43,6 +43,7 @@ class SocietySetupView extends GetView<SocietySetupController> {
                             child: _BuildingTile(
                               building: b,
                               onTap: () => Get.toNamed(AppRoutes.buildingDetail, arguments: b),
+                              onDelete: () => _confirmDelete(context, b),
                             ),
                           ),
                         ),
@@ -146,6 +147,26 @@ class SocietySetupView extends GetView<SocietySetupController> {
       isScrollControlled: true,
     );
   }
+  void _confirmDelete(BuildContext context, BuildingModel building) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete building?'),
+        content: Text('This will permanently remove "${building.name}" and its configuration.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              controller.deleteBuilding(building.id);
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _EmptyBuildingsState extends StatelessWidget {
@@ -177,7 +198,8 @@ class _EmptyBuildingsState extends StatelessWidget {
 class _BuildingTile extends StatelessWidget {
   final BuildingModel building;
   final VoidCallback onTap;
-  const _BuildingTile({required this.building, required this.onTap});
+  final VoidCallback onDelete;
+  const _BuildingTile({required this.building, required this.onTap, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -213,10 +235,21 @@ class _BuildingTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 20),
+            IconButton(
+              onPressed: onTap,
+              icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.textSecondary),
+              style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: onDelete,
+              icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.danger),
+              style: IconButton.styleFrom(backgroundColor: AppColors.dangerBg, shape: const CircleBorder()),
+            ),
           ],
         ),
       ),
     );
   }
+  
 }

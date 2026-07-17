@@ -10,4 +10,6 @@ abstract class ISocietyRepository {
   Future<List<BuildingModel>> getBuildings();
   Future<BuildingModel> addBuilding(String name);
   Future<BuildingModel> saveBuildingDetails(String buildingId, BuildingDetailsModel details);
+  Future<BuildingModel> renameBuilding(String buildingId, String newName);
+  Future<void> deleteBuilding(String buildingId);
 }

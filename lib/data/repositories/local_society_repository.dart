@@ -32,7 +32,7 @@ class LocalSocietyRepository implements ISocietyRepository {
     return building;
   }
 
-  @override
+ @override
   Future<BuildingModel> saveBuildingDetails(String buildingId, BuildingDetailsModel details) async {
     await Future.delayed(const Duration(milliseconds: 400));
     final index = _buildings.indexWhere((b) => b.id == buildingId);
@@ -42,5 +42,23 @@ class LocalSocietyRepository implements ISocietyRepository {
     final updated = _buildings[index].copyWith(details: details);
     _buildings[index] = updated;
     return updated;
+  }
+
+  @override
+  Future<BuildingModel> renameBuilding(String buildingId, String newName) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    final index = _buildings.indexWhere((b) => b.id == buildingId);
+    if (index == -1) {
+      throw StateError('Building not found: $buildingId');
+    }
+    final updated = _buildings[index].copyWith(name: newName);
+    _buildings[index] = updated;
+    return updated;
+  }
+
+  @override
+  Future<void> deleteBuilding(String buildingId) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    _buildings.removeWhere((b) => b.id == buildingId);
   }
 }

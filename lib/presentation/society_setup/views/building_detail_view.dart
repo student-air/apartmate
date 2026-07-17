@@ -17,7 +17,7 @@ class BuildingDetailView extends GetView<BuildingDetailController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(controller.building.name, style: AppTextStyles.h4.copyWith(color: Colors.white)),
+        title: const Text('Building Configuration'),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
@@ -29,6 +29,19 @@ class BuildingDetailView extends GetView<BuildingDetailController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    TextField(
+                      controller: controller.buildingNameCtrl,
+                      style: AppTextStyles.h2,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        filled: false,
+                        contentPadding: EdgeInsets.zero,
+                        hintText: 'Building name',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
                     Text(AppStrings.structure, style: AppTextStyles.h4),
                     const SizedBox(height: 12),
                     _SectionCard(
