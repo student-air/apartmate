@@ -76,8 +76,10 @@ class AppStrings {
   static const continueToStaffSetup = 'Save and Continue';
   static const detailsConfigured = '✓ Details configured';
   static const tapToAddDetails = 'Tap to add details';
+  static const buildingComplete = 'Complete';
+  static const buildingInProgress = 'In progress';
 
-// Building details
+  // Building details
   static const buildingConfiguration = 'Building Configuration';
   static const structure = 'Structure';
   static const totalFloors = 'Total Floors';
