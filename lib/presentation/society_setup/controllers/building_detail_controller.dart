@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
+import 'package:apartmate/routes/app_routes.dart';
 import 'package:apartmate/presentation/society_setup/controllers/society_setup_controller.dart';
 
 class BuildingDetailController extends GetxController {
@@ -50,6 +51,27 @@ class BuildingDetailController extends GetxController {
   void toggleParking(bool value) => hasParking.value = value;
   void toggleLift(bool value) => hasLift.value = value;
 
+// Future<void> save() async {
+//     final newName = buildingNameCtrl.text.trim();
+//     if (newName.isNotEmpty && newName != building.name) {
+//       await Get.find<SocietySetupController>().renameBuilding(building.id, newName);
+//     }
+
+//     final details = BuildingDetailsModel(
+//       totalFloors: int.tryParse(totalFloorsCtrl.text) ?? 0,
+//       flatsPerFloor: int.tryParse(flatsPerFloorCtrl.text) ?? 0,
+//       oneBedroomFlats: int.tryParse(bed1Ctrl.text) ?? 0,
+//       twoBedroomFlats: int.tryParse(bed2Ctrl.text) ?? 0,
+//       threeBedroomFlats: int.tryParse(bed3Ctrl.text) ?? 0,
+//       hasParking: hasParking.value,
+//       parkingSlots: int.tryParse(parkingSlotsCtrl.text) ?? 0,
+//       hasLift: hasLift.value,
+//     );
+//     await Get.find<SocietySetupController>().saveBuildingDetails(building.id, details);
+//     AppSnackbar.success('Saved', 'Building details saved successfully');
+//     Get.offNamed(AppRoutes.societyBuildings); // Navigate back to the buildings list
+//   }
+
 Future<void> save() async {
     final newName = buildingNameCtrl.text.trim();
     if (newName.isNotEmpty && newName != building.name) {
@@ -68,8 +90,10 @@ Future<void> save() async {
     );
     await Get.find<SocietySetupController>().saveBuildingDetails(building.id, details);
     AppSnackbar.success('Saved', 'Building details saved successfully');
-    Get.back();
+    Get.offNamed(AppRoutes.societyBuildings);
   }
+
+  
   @override
   void onClose() {
     totalFloorsCtrl.dispose();

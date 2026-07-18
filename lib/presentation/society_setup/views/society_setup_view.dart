@@ -210,6 +210,66 @@ class _EmptyBuildingsState extends StatelessWidget {
   }
 }
 
+// class _BuildingTile extends StatelessWidget {
+//   final BuildingModel building;
+//   final VoidCallback onTap;
+//   final VoidCallback onDelete;
+//   const _BuildingTile({required this.building, required this.onTap, required this.onDelete});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return InkWell(
+//       onTap: onTap,
+//       borderRadius: BorderRadius.circular(AppDimens.radius2xl),
+//       child: AppCard(
+//         child: Row(
+//           children: [
+//            AppPopIn(
+//               child: Container(
+//                 width: 48,
+//                 height: 48,
+//                 decoration: BoxDecoration(
+//                   color: AppColors.primaryDark.withValues(alpha: 0.05),
+//                   borderRadius: BorderRadius.circular(14),
+//                 ),
+//                 child: const Icon(Icons.villa_rounded, color: AppColors.primaryDark, size: 32),
+//               ),
+//             ),
+//             const SizedBox(width: 16),
+//             Expanded(
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Text(building.name, style: AppTextStyles.h4),
+//                   const SizedBox(height: 2),
+//                   Text(
+//                     building.isConfigured ? AppStrings.detailsConfigured : AppStrings.tapToAddDetails,
+//                     style: AppTextStyles.bodySmall.copyWith(
+//                       color: building.isConfigured ? AppColors.successGreen : AppColors.textMuted,
+//                       fontWeight: FontWeight.w600,
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//             IconButton(
+//               onPressed: onTap,
+//               icon: const Icon(Icons.edit_sharp, size: 18, color: AppColors.textSecondary),
+//               style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
+//             ),
+//             const SizedBox(width: 8),
+//             IconButton(
+//               onPressed: onDelete,
+//               icon: const Icon(Icons.delete_sharp, size: 18, color: AppColors.danger),
+//               style: IconButton.styleFrom(backgroundColor: AppColors.dangerBg, shape: const CircleBorder()),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+  
+// }
 class _BuildingTile extends StatelessWidget {
   final BuildingModel building;
   final VoidCallback onTap;
@@ -218,55 +278,88 @@ class _BuildingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final details = building.details;
+    final floors = details?.totalFloors ?? 0;
+    final units = details?.totalApartments ?? 0;
+    final isConfigured = building.isConfigured;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppDimens.radius2xl),
       child: AppCard(
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-           AppPopIn(
-              child: Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryDark.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(14),
+            Row(
+              children: [
+                AppPopIn(
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryDark.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.villa_rounded, color: AppColors.primaryDark, size: 26),
+                  ),
                 ),
-                child: const Icon(Icons.villa_rounded, color: AppColors.primaryDark, size: 32),
-              ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(building.name, style: AppTextStyles.h4),
+                      const SizedBox(height: 2),
+                      Text(
+                        isConfigured ? '$units units · $floors floors' : AppStrings.tapToAddDetails,
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: onTap,
+                  icon: const Icon(Icons.edit_sharp, size: 16, color: AppColors.textSecondary),
+                  style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
+                  visualDensity: VisualDensity.compact,
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete_sharp, size: 16, color: AppColors.danger),
+                  style: IconButton.styleFrom(backgroundColor: AppColors.dangerBg, shape: const CircleBorder()),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ],
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: isConfigured ? AppColors.successGreen.withValues(alpha: 0.1) : AppColors.warningBg,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(building.name, style: AppTextStyles.h4),
-                  const SizedBox(height: 2),
+                  Icon(
+                    isConfigured ? Icons.check_circle : Icons.hourglass_bottom,
+                    size: 12,
+                    color: isConfigured ? AppColors.successGreenDark : AppColors.warning,
+                  ),
+                  const SizedBox(width: 4),
                   Text(
-                    building.isConfigured ? AppStrings.detailsConfigured : AppStrings.tapToAddDetails,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: building.isConfigured ? AppColors.successGreen : AppColors.textMuted,
-                      fontWeight: FontWeight.w600,
+                    isConfigured ? AppStrings.detailsConfigured : AppStrings.buildingInProgress,
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: isConfigured ? AppColors.successGreenDark : AppColors.warning,
                     ),
                   ),
                 ],
               ),
-            ),
-            IconButton(
-              onPressed: onTap,
-              icon: const Icon(Icons.edit_sharp, size: 18, color: AppColors.textSecondary),
-              style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              onPressed: onDelete,
-              icon: const Icon(Icons.delete_sharp, size: 18, color: AppColors.danger),
-              style: IconButton.styleFrom(backgroundColor: AppColors.dangerBg, shape: const CircleBorder()),
             ),
           ],
         ),
       ),
     );
   }
-  
 }
