@@ -20,7 +20,15 @@ class SocietySetupView extends GetView<SocietySetupController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(AppStrings.societyBuildings, style: AppTextStyles.h4.copyWith(color: Colors.white)),
+        titleSpacing: 0,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/images/logo.png', height: 28),
+            const SizedBox(width: 8),
+            Text(AppStrings.societyBuildings, style: AppTextStyles.h4.copyWith(color: Colors.white)),
+          ],
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
