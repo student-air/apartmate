@@ -21,17 +21,22 @@ class SocietySetupView extends GetView<SocietySetupController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        titleSpacing: -10,
+        titleSpacing: 0,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/images/logo.png', 
-            height: 32, fit: BoxFit.cover),
-            const SizedBox(width: 2),
+            Image.asset('assets/images/logo.png', height: 28),
+            const SizedBox(width: 8),
             Text(AppStrings.societyBuildings, style: AppTextStyles.h4.copyWith(color: Colors.white)),
           ],
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            onPressed: () => _showAddBuildingSheet(context),
+            icon: const Icon(Icons.add, color: Colors.white),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -193,7 +198,7 @@ class _EmptyBuildingsState extends StatelessWidget {
               color: AppColors.primaryDark.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(AppDimens.radiusXl),
             ),
-            child: Icon(Icons.location_city_outlined, size: 40, color: AppColors.primaryDark.withValues(alpha: 0.4)),
+            child: Icon(Icons.villa_rounded, size: 60, color: AppColors.primaryDark.withValues(alpha: 0.4)),
           ),
           const SizedBox(height: 16),
           Text(AppStrings.noBuildingsAdded, style: AppTextStyles.h4),
@@ -227,7 +232,7 @@ class _BuildingTile extends StatelessWidget {
                   color: AppColors.primaryDark.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(Icons.location_city_outlined, color: AppColors.primaryDark, size: 22),
+                child: const Icon(Icons.villa_rounded, color: AppColors.primaryDark, size: 32),
               ),
             ),
             const SizedBox(width: 16),
@@ -249,13 +254,13 @@ class _BuildingTile extends StatelessWidget {
             ),
             IconButton(
               onPressed: onTap,
-              icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.textSecondary),
+              icon: const Icon(Icons.edit_sharp, size: 18, color: AppColors.textSecondary),
               style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
             ),
             const SizedBox(width: 8),
             IconButton(
               onPressed: onDelete,
-              icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.danger),
+              icon: const Icon(Icons.delete_sharp, size: 18, color: AppColors.danger),
               style: IconButton.styleFrom(backgroundColor: AppColors.dangerBg, shape: const CircleBorder()),
             ),
           ],

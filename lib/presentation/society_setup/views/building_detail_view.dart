@@ -62,7 +62,7 @@ class BuildingDetailView extends GetView<BuildingDetailController> {
                               ),
                               IconButton(
                                 onPressed: () => controller.buildingNameFocusNode.requestFocus(),
-                                icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.textSecondary),
+                                icon: const Icon(Icons.edit_sharp, size: 18, color: AppColors.textSecondary),
                                 style: IconButton.styleFrom(
                                   backgroundColor: AppColors.surfaceMuted,
                                   shape: const CircleBorder(),
