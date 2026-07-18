@@ -11,40 +11,30 @@ class SplashView extends GetView<SplashController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        onTap: controller.skip,
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [AppColors.primaryDark, AppColors.primaryDarkGradientEnd],
-            ),
-          ),
-          child: const SafeArea(child: _SplashContent()),
-        ),
-      ),
+      body: _ShutterSplash(onComplete: controller.skip),
     );
   }
 }
 
-/// Owns two animation controllers:
-/// - [_entranceController]: plays once — staggered fade + slide-up for the
-///   logo, title, and tagline.
-/// - [_glowController]: loops forever — a subtle "breathing" glow behind
-///   the logo mark.
-class _SplashContent extends StatefulWidget {
-  const _SplashContent();
+/// Two layers:
+/// - Bottom: a plain surface in `AppColors.background` — the same color
+///   LoginView's own Scaffold uses, so once the shutter slides away there's
+///   no color flash before the real LoginView appears underneath.
+/// - Top: the splash content (logo/title/tagline/hint), which slides
+///   straight up and off-screen on tap, revealing the layer beneath.
+class _ShutterSplash extends StatefulWidget {
+  final VoidCallback onComplete;
+  const _ShutterSplash({required this.onComplete});
 
   @override
-  State<_SplashContent> createState() => _SplashContentState();
+  State<_ShutterSplash> createState() => _ShutterSplashState();
 }
 
-class _SplashContentState extends State<_SplashContent> with TickerProviderStateMixin {
+class _ShutterSplashState extends State<_ShutterSplash> with TickerProviderStateMixin {
   late final AnimationController _entranceController;
   late final AnimationController _glowController;
+  late final AnimationController _hintController;
+  late final AnimationController _shutterController;
 
   late final Animation<double> _logoFade;
   late final Animation<double> _logoScale;
@@ -57,6 +47,11 @@ class _SplashContentState extends State<_SplashContent> with TickerProviderState
   late final Animation<Offset> _taglineSlide;
 
   late final Animation<double> _glow;
+  late final Animation<double> _hintPulse;
+  late final Animation<Offset> _shutterOffset;
+
+  bool _showHint = false;
+  bool _isClosing = false;
 
   @override
   void initState() {
@@ -87,86 +82,140 @@ class _SplashContentState extends State<_SplashContent> with TickerProviderState
     _glowController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600));
     _glow = Tween<double>(begin: 0.15, end: 0.4).animate(CurvedAnimation(parent: _glowController, curve: Curves.easeInOut));
     _glowController.repeat(reverse: true);
+
+    _hintController = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
+    _hintPulse = Tween<double>(begin: 0.4, end: 1.0).animate(CurvedAnimation(parent: _hintController, curve: Curves.easeInOut));
+
+    _shutterController = AnimationController(vsync: this, duration: const Duration(milliseconds: 550));
+    _shutterOffset = Tween<Offset>(begin: Offset.zero, end: const Offset(0, -1)).animate(
+      CurvedAnimation(parent: _shutterController, curve: Curves.easeInOutCubic),
+    );
+
+    Future.delayed(const Duration(milliseconds: 1800), () {
+      if (!mounted) return;
+      setState(() => _showHint = true);
+      _hintController.repeat(reverse: true);
+    });
+  }
+
+  void _handleTap() {
+    if (_isClosing) return;
+    setState(() => _isClosing = true);
+    _shutterController.forward().whenComplete(widget.onComplete);
   }
 
   @override
   void dispose() {
     _entranceController.dispose();
     _glowController.dispose();
+    _hintController.dispose();
+    _shutterController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
       children: [
-        const Spacer(flex: 4),
-        AnimatedBuilder(
-          animation: Listenable.merge([_entranceController, _glowController]),
-          builder: (context, child) {
-            return SlideTransition(
-              position: _logoSlide,
-              child: FadeTransition(
-                opacity: _logoFade,
-                child: ScaleTransition(
-                  scale: _logoScale,
-                  child: Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.accentGreen.withValues(alpha: _glow.value),
-                          blurRadius: 24,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      '合',
-                    style: AppTextStyles.h3.copyWith(color: Colors.white, fontSize: 58),
-),
-                  ),
+        Positioned.fill(child: Container(color: AppColors.background)),
+        GestureDetector(
+          onTap: _handleTap,
+          child: SlideTransition(
+            position: _shutterOffset,
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [AppColors.primaryDark, AppColors.primaryDarkGradientEnd],
                 ),
               ),
-            );
-          },
-        ),
-        const SizedBox(height: 24),
-        SlideTransition(
-          position: _titleSlide,
-          child: FadeTransition(
-            opacity: _titleFade,
-            child: Text(AppStrings.appName, style: AppTextStyles.h1.copyWith(color: Colors.white)),
-          ),
-        ),
-        const SizedBox(height: 8),
-        SlideTransition(
-          position: _taglineSlide,
-          child: FadeTransition(
-            opacity: _taglineFade,
-            child: Text(
-              AppStrings.appTagline,
-              style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.8)),
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    const Spacer(flex: 4),
+                    AnimatedBuilder(
+                      animation: Listenable.merge([_entranceController, _glowController]),
+                      builder: (context, child) {
+                        return SlideTransition(
+                          position: _logoSlide,
+                          child: FadeTransition(
+                            opacity: _logoFade,
+                            child: ScaleTransition(
+                              scale: _logoScale,
+                              child: Container(
+                                width: 96,
+                                height: 96,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.accentGreen.withValues(alpha: _glow.value),
+                                      blurRadius: 24,
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '合',
+                                  style: AppTextStyles.h3.copyWith(color: Colors.white, fontSize: 58),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+                    SlideTransition(
+                      position: _titleSlide,
+                      child: FadeTransition(
+                        opacity: _titleFade,
+                        child: Text(AppStrings.appName, style: AppTextStyles.h1.copyWith(color: Colors.white)),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SlideTransition(
+                      position: _taglineSlide,
+                      child: FadeTransition(
+                        opacity: _taglineFade,
+                        child: Text(
+                          AppStrings.appTagline,
+                          style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.8)),
+                        ),
+                      ),
+                    ),
+                    const Spacer(flex: 5),
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 600),
+                      opacity: _showHint ? 1 : 0,
+                      child: FadeTransition(
+                        opacity: _hintPulse,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.touch_app_outlined, size: 16, color: Colors.white.withValues(alpha: 0.6)),
+                            const SizedBox(width: 6),
+                            Text(
+                              AppStrings.tapToContinue,
+                              style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withValues(alpha: 0.6)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
-        const Spacer(flex: 5),
-        const SizedBox(
-          width: 32,
-          height: 32,
-          child: CircularProgressIndicator(strokeWidth: 3, color: AppColors.accentGreen),
-        ),
-        const SizedBox(height: 24),
-        Text(
-          AppStrings.appVersion,
-          style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withValues(alpha: 0.5)),
-        ),
-        const SizedBox(height: 48),
       ],
     );
   }

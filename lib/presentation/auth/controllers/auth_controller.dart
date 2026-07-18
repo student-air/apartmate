@@ -25,6 +25,8 @@ class AuthController extends GetxController {
   final isConfirmPasswordVisible = false.obs;
 
   final isLoading = false.obs;
+  final loginShakeTrigger = 0.obs;
+  final loginError = RxnString();
 
   void togglePasswordVisibility() => isPasswordVisible.toggle();
   void toggleSignupPasswordVisibility() => isSignupPasswordVisible.toggle();
@@ -32,13 +34,18 @@ class AuthController extends GetxController {
 
   Future<void> login() async {
     if (usernameCtrl.text.trim().isEmpty || passwordCtrl.text.trim().isEmpty) {
-      AppSnackbar.error('Missing info', 'Please enter your username and password');
+      loginError.value = 'Please enter your username and password';
+      loginShakeTrigger.value++;
       return;
     }
     isLoading.value = true;
     try {
       await _authRepository.login(username: usernameCtrl.text.trim(), password: passwordCtrl.text);
+      loginError.value = null;
       Get.offAllNamed(AppRoutes.dashboard);
+    } catch (_) {
+      loginError.value = 'Incorrect username or password';
+      loginShakeTrigger.value++;
     } finally {
       isLoading.value = false;
     }
