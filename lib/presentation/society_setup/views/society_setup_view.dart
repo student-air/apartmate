@@ -38,9 +38,25 @@ class SocietySetupView extends GetView<SocietySetupController> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  '合',
+                  style: AppTextStyles.h1.copyWith(
+                    fontSize: 260,
+                    color: AppColors.primaryDark.withValues(alpha: 0.04),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              Expanded(
             child: Obx(() {
               if (controller.isLoading.value) return const AppLoading();
               return SingleChildScrollView(
@@ -88,14 +104,18 @@ class SocietySetupView extends GetView<SocietySetupController> {
                 color: AppColors.surface,
                 border: Border(top: BorderSide(color: AppColors.borderLight)),
               ),
-              child: AppPrimaryButton(
-                label: AppStrings.continueToStaffSetup,
-                backgroundColor: AppColors.primaryDark,
-                foregroundColor: Colors.white,
-                onPressed: controller.continueToNextStep,
+              child: Obx(
+                () => AppPrimaryButton(
+                  label: AppStrings.continueToStaffSetup,
+                  backgroundColor: AppColors.primaryDark,
+                  foregroundColor: Colors.white,
+                  onPressed: controller.hasConfiguredBuilding ? controller.continueToNextStep : null,
+                ),
               ),
             ),
           ),
+        ],
+      ),
         ],
       ),
     );
@@ -167,18 +187,40 @@ class SocietySetupView extends GetView<SocietySetupController> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Delete building?'),
-        content: Text('This will permanently remove "${building.name}" and its configuration.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              controller.deleteBuilding(building.id);
-            },
-            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
-            child: const Text('Delete'),
-          ),
-        ],
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('This will permanently remove "${building.name}" and its configuration.'),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                controller.deleteBuilding(building.id);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.danger,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                elevation: 0,
+              ),
+              icon: const Icon(Icons.delete_outline, size: 18),
+              label: const Text('Delete Building', style: TextStyle(fontWeight: FontWeight.w600)),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.textPrimary,
+                side: const BorderSide(color: AppColors.border),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
       ),
     );
   }

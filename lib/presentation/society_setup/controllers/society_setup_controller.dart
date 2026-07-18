@@ -11,6 +11,8 @@ class SocietySetupController extends GetxController {
   final isLoading = false.obs;
   final newBuildingName = ''.obs;
 
+  bool get hasConfiguredBuilding => buildings.any((b) => b.isConfigured);
+
   @override
   void onInit() {
     super.onInit();
