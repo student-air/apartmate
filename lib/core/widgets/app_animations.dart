@@ -147,46 +147,37 @@ class _AppSpinInIconState extends State<AppSpinInIcon> {
   }
 }
 
-/// A single building within a society.
-class BuildingModel {
-  final String id;
-  final String name;
-  final BuildingDetailsModel? details;
+/// Scales a child in from nothing with a springy bounce, once, when it
+/// first appears — optionally after a delay (for staggering multiple items).
+class AppPopIn extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
 
-  const BuildingModel({required this.id, required this.name, this.details});
+  const AppPopIn({super.key, required this.child, this.delay = Duration.zero});
 
-  bool get isConfigured => details != null;
-
-  BuildingModel copyWith({String? name, BuildingDetailsModel? details}) {
-    return BuildingModel(
-      id: id,
-      name: name ?? this.name,
-      details: details ?? this.details,
-    );
-  }
+  @override
+  State<AppPopIn> createState() => _AppPopInState();
 }
 
-/// Structural configuration for a building (floors, flat mix, parking...).
-class BuildingDetailsModel {
-  final int totalFloors;
-  final int flatsPerFloor;
-  final int oneBedroomFlats;
-  final int twoBedroomFlats;
-  final int threeBedroomFlats;
-  final bool hasParking;
-  final int parkingSlots;
-  final bool hasLift;
+class _AppPopInState extends State<AppPopIn> {
+  bool _started = false;
 
-  const BuildingDetailsModel({
-    this.totalFloors = 0,
-    this.flatsPerFloor = 0,
-    this.oneBedroomFlats = 0,
-    this.twoBedroomFlats = 0,
-    this.threeBedroomFlats = 0,
-    this.hasParking = false,
-    this.parkingSlots = 0,
-    this.hasLift = false,
-  });
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(widget.delay, () {
+      if (mounted) setState(() => _started = true);
+    });
+  }
 
-  int get totalApartments => totalFloors * flatsPerFloor;
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: _started ? 1.0 : 0.0),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutBack,
+      builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+      child: widget.child,
+    );
+  }
 }

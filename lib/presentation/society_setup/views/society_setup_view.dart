@@ -12,6 +12,7 @@ import 'package:apartmate/core/widgets/app_text_field.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/presentation/society_setup/controllers/society_setup_controller.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/widgets/app_animations.dart';
 
 class SocietySetupView extends GetView<SocietySetupController> {
   const SocietySetupView({super.key});
@@ -217,14 +218,16 @@ class _BuildingTile extends StatelessWidget {
       child: AppCard(
         child: Row(
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.primaryDark.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(14),
+           AppPopIn(
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryDark.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(Icons.apartment_outlined, color: AppColors.primaryDark, size: 22),
               ),
-              child: const Icon(Icons.apartment_outlined, color: AppColors.primaryDark, size: 22),
             ),
             const SizedBox(width: 16),
             Expanded(
