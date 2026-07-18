@@ -55,9 +55,7 @@ class SocietyRegisterController extends GetxController {
         ownerNameCtrl.text.trim().isEmpty ||
         addressCtrl.text.trim().isEmpty ||
         contactCtrl.text.trim().isEmpty ||
-        selectedCountry.value.isEmpty ||
-        selectedState.value.isEmpty ||
-        selectedCity.value.isEmpty) {
+        selectedCountry.value.isEmpty ) {
       AppSnackbar.info('Missing info', 'Please fill in all required fields');
       return;
     }
