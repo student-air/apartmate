@@ -17,12 +17,13 @@ class BuildingDetailView extends GetView<BuildingDetailController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        titleSpacing: 0,
+        titleSpacing: -10,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/images/logo.png', height: 28),
-            const SizedBox(width: 8),
+            Image.asset('assets/images/logo.png', 
+            height: 32, fit: BoxFit.cover),
+            const SizedBox(width: 2),
             Text(AppStrings.buildingConfiguration, style: AppTextStyles.h4.copyWith(color: Colors.white)),
           ],
         ),
