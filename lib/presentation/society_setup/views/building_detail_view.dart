@@ -38,19 +38,42 @@ class BuildingDetailView extends GetView<BuildingDetailController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextField(
-                      controller: controller.buildingNameCtrl,
-                      style: AppTextStyles.h2,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        filled: false,
-                        contentPadding: EdgeInsets.zero,
-                        hintText: 'Building name',
-                      ),
+                    _SectionCard(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: controller.buildingNameCtrl,
+                                  focusNode: controller.buildingNameFocusNode,
+                                  style: AppTextStyles.h4,
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    filled: false,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                    hintText: 'Building name',
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () => controller.buildingNameFocusNode.requestFocus(),
+                                icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.textSecondary),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: AppColors.surfaceMuted,
+                                  shape: const CircleBorder(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     Text(AppStrings.structure, style: AppTextStyles.h4),
                     const SizedBox(height: 12),
                     _SectionCard(

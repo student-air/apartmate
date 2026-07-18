@@ -73,7 +73,7 @@ class AppStrings {
   static const buildingName = 'Building Name';
   static const buildingNameHint = 'e.g. Building A, Tower 1, Block North…';
   static const saveBuilding = 'Save Building';
-  static const continueToStaffSetup = 'Continue to Staff Setup';
+  static const continueToStaffSetup = 'Save and Continue';
   static const detailsConfigured = '✓ Details configured';
   static const tapToAddDetails = 'Tap to add details';
 

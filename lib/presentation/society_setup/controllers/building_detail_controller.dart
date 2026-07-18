@@ -14,6 +14,7 @@ class BuildingDetailController extends GetxController {
   final bed3Ctrl = TextEditingController();
   final parkingSlotsCtrl = TextEditingController();
   final buildingNameCtrl = TextEditingController();
+  final buildingNameFocusNode = FocusNode();
 
   final hasParking = false.obs;
   final hasLift = false.obs;
@@ -78,5 +79,6 @@ Future<void> save() async {
     bed3Ctrl.dispose();
     parkingSlotsCtrl.dispose();
     super.onClose();
+    buildingNameFocusNode.dispose();
   }
 }
