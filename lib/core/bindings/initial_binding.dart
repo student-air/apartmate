@@ -7,7 +7,8 @@ import 'package:apartmate/data/repositories/local_staff_repository.dart';
 import 'package:apartmate/domain/repositories/i_staff_repository.dart';
 import 'package:apartmate/domain/repositories/i_dashboard_repository.dart';
 import 'package:apartmate/data/repositories/local_dashboard_repository.dart';
-
+import 'package:apartmate/data/repositories/local_notice_repository.dart';
+import 'package:apartmate/domain/repositories/i_notice_repository.dart';
 
 /// Wires every repository interface to its concrete implementation.
 ///
@@ -27,5 +28,6 @@ class InitialBinding extends Bindings {
       LocalDashboardRepository(Get.find<ISocietyRepository>(), Get.find<IStaffRepository>()),
       permanent: true,
     );
+    Get.put<INoticeRepository>(LocalNoticeRepository(), permanent: true);
   }
 }
