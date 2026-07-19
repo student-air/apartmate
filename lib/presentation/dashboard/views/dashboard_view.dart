@@ -18,8 +18,8 @@ class DashboardView extends GetView<DashboardController> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) return const AppLoading();
-          final s = controller.stats.value;
-          return SingleChildScrollView(
+           final s = controller.stats.value;
+           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
             child: AppResponsiveContainer(
               child: Column(
@@ -58,16 +58,16 @@ class DashboardView extends GetView<DashboardController> {
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
                     childAspectRatio: 1.7,
-                    children: [
+                    children:[
                       _StatCard(icon: Icons.location_city_outlined, label: 'Buildings', value: '${s?.buildings ?? 0}', onTap: controller.goToBuildings),
                       _StatCard(icon: Icons.home_outlined, label: 'Total Flats', value: '${s?.totalFlats ?? 0}'),
                       _StatCard(icon: Icons.people_outline, label: 'Mgmt Staff', value: '${s?.mgmtStaff ?? 0}', onTap: controller.goToStaff),
                       _StatCard(icon: Icons.hourglass_empty, label: 'Pending', value: '${s?.pendingRequests ?? 0}', accent: true),
-                    ],
+                    ]
                   ),
                   const SizedBox(height: 24),
                   Row(
-                    children: [
+                    children:[
                       Expanded(
                         child: _ActionCard(icon: Icons.location_city_outlined, label: 'Manage Buildings', onTap: controller.goToBuildings),
                       ),
@@ -93,6 +93,7 @@ class _StatCard extends StatelessWidget {
   final String value;
   final bool accent;
   final VoidCallback? onTap;
+
   const _StatCard({required this.icon, required this.label, required this.value, this.accent = false, this.onTap});
 
   @override
@@ -112,17 +113,18 @@ class _StatCard extends StatelessWidget {
             Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
           ],
         ),
-      ),
+      )
     );
   }
 }
 
-class _ActionCard extends StatelessWidget {
+class _ActionCard extends StatelessWidget{
   final IconData icon;
   final String label;
   final bool dark;
-  final VoidCallback onTap;
-  const _ActionCard({required this.icon, required this.label, required this.onTap, this.dark = false});
+  final VoidCallback? onTap;
+
+  const _ActionCard({required this.icon, required this.label, this.dark = false, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -141,10 +143,10 @@ class _ActionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, size: 22, color: dark ? AppColors.accentGreen : AppColors.primaryDark),
-            const SizedBox(height: 12),
-            Text(label, style: AppTextStyles.labelLarge.copyWith(color: dark ? Colors.white : AppColors.textPrimary)),
-          ],
-        ),
+            const SizedBox(height: 8),
+            Text(label, style: AppTextStyles.labelLarge.copyWith(color: dark ? Colors.white : AppColors.primaryDark)),
+          ] 
+        )
       ),
     );
   }
