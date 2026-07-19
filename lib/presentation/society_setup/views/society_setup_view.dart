@@ -20,24 +20,7 @@ class SocietySetupView extends GetView<SocietySetupController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        titleSpacing: 0,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/logo.png', height: 28),
-            const SizedBox(width: 8),
-            Text(AppStrings.societyBuildings, style: AppTextStyles.h4.copyWith(color: Colors.white)),
-          ],
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            onPressed: () => _showAddBuildingSheet(context),
-            icon: const Icon(Icons.add, color: Colors.white),
-          ),
-        ],
-      ),
+      
       body: Stack(
         children: [
           Positioned.fill(
@@ -54,46 +37,82 @@ class SocietySetupView extends GetView<SocietySetupController> {
               ),
             ),
           ),
+          Positioned.fill(
+          child: Obx(() => AppMilestoneCelebration(trigger: controller.celebrationTrigger.value)),
+        ),
           Column(
             children: [
               Expanded(
             child: Obx(() {
               if (controller.isLoading.value) return const AppLoading();
-              return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-                child: AppResponsiveContainer(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (controller.buildings.isEmpty)
-                        _EmptyBuildingsState()
-                      else
-                        ...controller.buildings.map(
-                          (b) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _BuildingTile(
-                              building: b,
-                              onTap: () => Get.toNamed(AppRoutes.buildingDetail, arguments: b),
-                              onDelete: () => _confirmDelete(context, b),
-                              justSaved: controller.justSavedBuildingId.value == b.id,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 8),
-                      OutlinedButton.icon(
+              return CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    elevation: 0,
+                    backgroundColor: AppColors.primaryDark,
+                    expandedHeight: 130,
+                    titleSpacing: 0,
+                    iconTheme: const IconThemeData(color: Colors.white),
+                    title: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset('assets/images/logo.png', height: 24),
+                        const SizedBox(width: 8),
+                        Text(AppStrings.societyBuildings, style: AppTextStyles.h4.copyWith(color: Colors.white)),
+                      ],
+                    ),
+                    actions: [
+                      IconButton(
                         onPressed: () => _showAddBuildingSheet(context),
-                        icon: const Icon(Icons.add, size: 20, color: AppColors.primaryDark),
-                        label: Text(AppStrings.addBuilding, style: AppTextStyles.labelLarge),
-                        style: OutlinedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(56),
-                          side: BorderSide(color: AppColors.primaryDark.withValues(alpha: 0.3), width: 1.4),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.radius2xl)),
-                          backgroundColor: AppColors.surface,
-                        ),
+                        icon: const Icon(Icons.add, color: Colors.white),
                       ),
                     ],
+                    flexibleSpace: FlexibleSpaceBar(
+                      titlePadding: const EdgeInsetsDirectional.only(start: 56, bottom: 16),
+                      title: Text(AppStrings.societyBuildings, style: AppTextStyles.h2.copyWith(color: Colors.white)),
+                      background: Container(color: AppColors.primaryDark),
+                    ),
                   ),
-                ),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+                    sliver: SliverToBoxAdapter(
+                      child: AppResponsiveContainer(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (controller.buildings.isEmpty)
+                              _EmptyBuildingsState()
+                            else
+                              ...controller.buildings.map(
+                                (b) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _BuildingTile(
+                                    building: b,
+                                    onTap: () => Get.toNamed(AppRoutes.buildingDetail, arguments: b),
+                                    onDelete: () => _confirmDelete(context, b),
+                                    justSaved: controller.justSavedBuildingId.value == b.id,
+                                  ),
+                                ),
+                              ),
+                            const SizedBox(height: 8),
+                            OutlinedButton.icon(
+                              onPressed: () => _showAddBuildingSheet(context),
+                              icon: const Icon(Icons.add, size: 20, color: AppColors.primaryDark),
+                              label: Text(AppStrings.addBuilding, style: AppTextStyles.labelLarge),
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size.fromHeight(56),
+                                side: BorderSide(color: AppColors.primaryDark.withValues(alpha: 0.3), width: 1.4),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.radius2xl)),
+                                backgroundColor: AppColors.surface,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               );
             }),
           ),
@@ -179,8 +198,10 @@ class SocietySetupView extends GetView<SocietySetupController> {
             ),
           ],
         ),
-      ),
-      isScrollControlled: true,
+      ), 
+        isScrollControlled: true,
+        //curve: Curves.easeOutBack,
+        enterBottomSheetDuration: const Duration(milliseconds: 400),
     );
   }
   void _confirmDelete(BuildContext context, BuildingModel building) {

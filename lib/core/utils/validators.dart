@@ -26,4 +26,9 @@ class Validators {
     final intl = RegExp(r'^\+92 \d{3} \d{7}$'); // +92 300 0000000
     return local.hasMatch(p) || intl.hasMatch(p);
 } 
+
+  static bool isValidCnic(String cnic) {
+    final c = cnic.trim();
+    return RegExp(r'^\d{5}-\d{7}-\d{1}$').hasMatch(c);
+  }
 }

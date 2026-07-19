@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
+import 'dart:math';
 
 /// Draws a success checkmark stroke-by-stroke, like it's being signed,
 /// then loops (pause, reset, redraw) for as long as it stays on screen.
@@ -159,6 +160,29 @@ class AppPopIn extends StatefulWidget {
   State<AppPopIn> createState() => _AppPopInState();
 }
 
+class _AppPopInState extends State<AppPopIn> {
+  bool _started = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(widget.delay, () {
+      if (mounted) setState(() => _started = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: _started ? 1.0 : 0.0),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutBack,
+      builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+      child: widget.child,
+    );
+  }
+}
+
 /// Fades and slides a child up into place, once, after an optional delay —
 /// used to sequence entrances (e.g. title, then description, then a card)
 /// instead of everything appearing simultaneously.
@@ -260,24 +284,238 @@ class _AppPulseDotState extends State<AppPulseDot> with SingleTickerProviderStat
   }
 }
 
-class _AppPopInState extends State<AppPopIn> {
-  bool _started = false;
+/// Scales a child in from slightly-smaller-than-normal up to full size with
+/// an overshooting "spring" curve, once, as soon as it's built — used to add
+/// a bouncy settle on top of a bottom sheet's (or any container's) entrance,
+/// independent of whatever transition the surrounding modal/route provides.
+class AppSpringIn extends StatefulWidget {
+  final Widget child;
+  final Alignment alignment;
+
+  const AppSpringIn({super.key, required this.child, this.alignment = Alignment.bottomCenter});
+
+  @override
+  State<AppSpringIn> createState() => _AppSpringInState();
+}
+
+class _AppSpringInState extends State<AppSpringIn> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scale;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(widget.delay, () {
-      if (mounted) setState(() => _started = true);
-    });
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
+    _scale = Tween<double>(begin: 0.94, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: _started ? 1.0 : 0.0),
-      duration: const Duration(milliseconds: 450),
-      curve: Curves.easeOutBack,
-      builder: (context, scale, child) => Transform.scale(scale: scale, child: child),
+    return AnimatedBuilder(
+      animation: _scale,
+      builder: (context, child) => Transform.scale(
+        scale: _scale.value,
+        alignment: widget.alignment,
+        child: child,
+      ),
+      child: widget.child,
+    );
+  }
+}
+
+class AppMilestoneCelebration extends StatefulWidget{
+  final int trigger;
+  final int particleCount;
+  final IconData icon;
+  final Color iconColor;
+  
+  const AppMilestoneCelebration({
+    super.key,
+    required this.trigger,
+    this.particleCount = 24,
+    this.icon = Icons.check,
+    this.iconColor = AppColors.successGreen,
+  });
+
+  @override
+  State<AppMilestoneCelebration> createState() => _AppMilestoneCelebrationState();
+}
+
+class _AppMilestoneCelebrationState extends State<AppMilestoneCelebration> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  List<_ConfettiParticle> _particles = [];
+  bool _visible = false;
+  final _random = Random();
+
+  static const _confettiColors = [
+    Color(0xFF34D399),
+    Color(0xFF60A5FA),
+    Color(0xFFFBBF24),
+    Color(0xFFF472B6),
+    Color(0xFFA78BFA),
+    Color.fromARGB(255, 207, 16, 16),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        setState(() => _visible = false);
+      }
+    });
+    if (widget.trigger != 0) _play();
+  }
+
+  @override
+  void didUpdateWidget(covariant AppMilestoneCelebration oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.trigger != oldWidget.trigger) _play();
+  }
+
+  void _play() {
+    _particles = List.generate(widget.particleCount, (i) {
+      final angle = _random.nextDouble() * 2 * pi;
+      final distance = 80 + _random.nextDouble() * 120;
+      return _ConfettiParticle(
+        dx: cos(angle) * distance,
+        dy: sin(angle) * distance - 30,
+        rotation: (_random.nextDouble() * 2 - 1) * 6,
+        color: _confettiColors[i % _confettiColors.length],
+        delay: _random.nextDouble() * 0.15,
+      );
+    });
+    setState(() => _visible = true);
+    _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_visible) return const SizedBox.shrink();
+
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) {
+          final iconT = Curves.easeOutBack.transform((_controller.value / 0.5).clamp(0.0, 1.0));
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              ..._particles.map((p) {
+                final local = ((_controller.value - p.delay) / (1 - p.delay)).clamp(0.0, 1.0);
+                final eased = Curves.easeOut.transform(local);
+                final opacity = (1 - local).clamp(0.0, 1.0);
+                return Transform.translate(
+                  offset: Offset(p.dx * eased, p.dy * eased),
+                  child: Transform.rotate(
+                    angle: p.rotation * eased,
+                    child: Opacity(
+                      opacity: opacity,
+                      child: Container(width: 8, height: 8, color: p.color),
+                    ),
+                  ),
+                );
+              }),
+              Transform.scale(
+                scale: iconT,
+                child: Container(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(color: widget.iconColor.withValues(alpha: 0.15), shape: BoxShape.circle),
+                  alignment: Alignment.center,
+                  child: Icon(widget.icon, size: 44, color: widget.iconColor),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ConfettiParticle {
+  final double dx;
+  final double dy;
+  final double rotation;
+  final Color color;
+  final double delay;
+
+  const _ConfettiParticle({
+    required this.dx,
+    required this.dy,
+    required this.rotation,
+    required this.color,
+    required this.delay,
+  });
+}
+
+/// Wraps a child and shakes it horizontally (a decaying oscillation) every
+/// time [trigger] changes value — pass an incrementing counter from an
+/// Rx/Obx at the call site. Used to signal "this form has a problem" (e.g.
+/// required fields left empty).
+class AppShakeOnTrigger extends StatefulWidget {
+  final Widget child;
+  final int trigger;
+
+  const AppShakeOnTrigger({super.key, required this.child, required this.trigger});
+
+  @override
+  State<AppShakeOnTrigger> createState() => _AppShakeOnTriggerState();
+}
+
+class _AppShakeOnTriggerState extends State<AppShakeOnTrigger> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _offset;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 450));
+    _offset = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: -10.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -10.0, end: 8.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 8.0, end: -6.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -6.0, end: 4.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 4.0, end: 0.0), weight: 1),
+    ]).animate(_controller);
+  }
+
+  @override
+  void didUpdateWidget(covariant AppShakeOnTrigger oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.trigger != oldWidget.trigger) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _offset,
+      builder: (context, child) => Transform.translate(offset: Offset(_offset.value, 0), child: child),
       child: widget.child,
     );
   }

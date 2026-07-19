@@ -230,6 +230,8 @@ class StaffView extends GetView<StaffController> {
         ),
       ),
       isScrollControlled: true,
+      //curve: Curves.easeOutBack,
+      enterBottomSheetDuration: const Duration(milliseconds: 400)
     );
   }
 

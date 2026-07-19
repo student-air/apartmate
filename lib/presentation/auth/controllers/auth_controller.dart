@@ -28,6 +28,10 @@ class AuthController extends GetxController {
   final loginShakeTrigger = 0.obs;
   final loginError = RxnString();
 
+  final signupShakeTrigger = 0.obs;
+  final emailError = RxnString();
+  final phoneError = RxnString();
+
   void togglePasswordVisibility() => isPasswordVisible.toggle();
   void toggleSignupPasswordVisibility() => isSignupPasswordVisible.toggle();
   void toggleConfirmPasswordVisibility() => isConfirmPasswordVisible.toggle();
@@ -124,4 +128,6 @@ class AuthController extends GetxController {
     confirmPasswordCtrl.dispose();
     super.onClose();
   }
+
+  
 }

@@ -13,6 +13,9 @@ class SocietySetupController extends GetxController {
   final justSavedBuildingId = RxnString();
   bool get hasConfiguredBuilding => buildings.any((b) => b.isConfigured);
 
+  final celebrationTrigger = 0.obs;
+  bool _hasCelebratedFirstBuilding = false; 
+
   @override
   void onInit() {
     super.onInit();
@@ -40,6 +43,8 @@ class SocietySetupController extends GetxController {
   }
 
   Future<void> saveBuildingDetails(String buildingId, BuildingDetailsModel details) async {
+    final wasFirstConfig = !hasConfiguredBuilding;
+
     final updated = await _societyRepository.saveBuildingDetails(buildingId, details);
     final index = buildings.indexWhere((b) => b.id == buildingId);
     if (index != -1) buildings[index] = updated;
@@ -48,6 +53,11 @@ class SocietySetupController extends GetxController {
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (justSavedBuildingId.value == buildingId) justSavedBuildingId.value = null;
     });
+
+    if (wasFirstConfig && hasConfiguredBuilding && !_hasCelebratedFirstBuilding) {
+      _hasCelebratedFirstBuilding = true;
+      celebrationTrigger.value++;
+    }
   }
   Future<void> renameBuilding(String buildingId, String newName) async {
     final updated = await _societyRepository.renameBuilding(buildingId, newName);
