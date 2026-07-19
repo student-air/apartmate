@@ -12,4 +12,6 @@ abstract class AppRoutes {
   static const societyBuildings = '/society-buildings';
   static const buildingDetail = '/building-detail';
   static const managementStaff = '/management-staff';  
+  static const notices = '/notices';
+  static const profile = '/profile';
 }
