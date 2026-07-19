@@ -13,6 +13,8 @@ import 'package:apartmate/presentation/society_setup/bindings/building_detail_bi
 import 'package:apartmate/presentation/society_setup/views/society_setup_view.dart';
 import 'package:apartmate/presentation/society_setup/views/building_detail_view.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/presentation/staff/bindings/staff_binding.dart';
+import 'package:apartmate/presentation/staff/views/staff_view.dart';
 
 class AppPages {
   AppPages._();
@@ -52,6 +54,11 @@ class AppPages {
       name: AppRoutes.buildingDetail,
       page: () => const BuildingDetailView(),
       binding: BuildingDetailBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.managementStaff,
+      page: () => const StaffView(),
+      binding: StaffBinding(),
     ),
   ];
 }

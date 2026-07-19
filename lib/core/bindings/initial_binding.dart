@@ -3,7 +3,8 @@ import 'package:apartmate/data/repositories/local_auth_repository.dart';
 import 'package:apartmate/data/repositories/local_society_repository.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
-
+import 'package:apartmate/data/repositories/local_staff_repository.dart';
+import 'package:apartmate/domain/repositories/i_staff_repository.dart';
 /// Wires every repository interface to its concrete implementation.
 ///
 /// This is the ONLY place that needs to change when a real backend
@@ -17,5 +18,6 @@ class InitialBinding extends Bindings {
   void dependencies() {
     Get.put<IAuthRepository>(LocalAuthRepository(), permanent: true);
     Get.put<ISocietyRepository>(LocalSocietyRepository(), permanent: true);
+    Get.put<IStaffRepository>(LocalStaffRepository(), permanent: true);
   }
 }

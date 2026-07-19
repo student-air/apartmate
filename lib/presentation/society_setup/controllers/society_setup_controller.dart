@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
-//import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/routes/app_routes.dart';
 
 class SocietySetupController extends GetxController {
   final ISocietyRepository _societyRepository;
@@ -56,7 +56,5 @@ class SocietySetupController extends GetxController {
     buildings.removeWhere((b) => b.id == buildingId);
   }
 
-  void continueToNextStep() {
-    // Placeholder — will point to Management Staff setup once that screen exists.
-  }
+  void continueToNextStep() => Get.toNamed(AppRoutes.managementStaff);
 }

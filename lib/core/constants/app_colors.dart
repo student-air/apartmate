@@ -45,4 +45,24 @@ class AppColors {
   static const Color pending = Color(0xFFEA580C);
   static const Color pendingBg = Color(0xFFFFF7ED);
   static const Color pendingBorder = Color(0xFFFFEDD5);
+
+  static const Color roleAdminBg = Color(0xFFDBEAFE);
+  static const Color roleAdminText = Color(0xFF1D4ED8);
+  static const Color roleAdminBorder = Color(0xFFBFDBFE);
+
+  static const Color roleReceptionBg = Color(0xFFFCE7F3);
+  static const Color roleReceptionText = Color(0xFFBE185D);
+  static const Color roleReceptionBorder = Color(0xFFFBCFE8);
+
+  static const Color roleElectricianBg = Color(0xFFFEF9C3);
+  static const Color roleElectricianText = Color(0xFFA16207);
+  static const Color roleElectricianBorder = Color(0xFFFEF08A);
+
+  static const Color rolePlumberBg = Color(0xFFDCFCE7);
+  static const Color rolePlumberText = Color(0xFF15803D);
+  static const Color rolePlumberBorder = Color(0xFFBBF7D0);
+
+  static const Color roleSecurityBg = Color(0xFFFEF3C7);
+  static const Color roleSecurityText = Color(0xFF92400E);
+  static const Color roleSecurityBorder = Color(0xFFFDE68A);
 }

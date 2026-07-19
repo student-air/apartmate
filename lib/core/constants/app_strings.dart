@@ -98,4 +98,15 @@ class AppStrings {
   static const elevatorLift = 'Elevator / Lift';
   static const elevatorLiftDesc = 'Passenger lift available';
   static const saveBuildingDetails = 'Save Building Details';
+  // Staff management
+  static const managementStaff = 'Management Staff';
+  static const noStaffAdded = 'No Staff Added Yet';
+  static const noStaffHint = 'Click the button below to add staff members.';
+  static const addStaff = 'Add Staff';
+  static const addStaffMember = 'Add Staff Member';
+  static const cnic = 'CNIC';
+  static const role = 'Role';
+  static const shift = 'Shift';
+  static const saveStaffMember = 'Save Staff Member';
+  static const saveAndGoToDashboard = 'Save & Go to Dashboard';
 }
