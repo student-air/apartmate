@@ -75,6 +75,7 @@ class SocietySetupView extends GetView<SocietySetupController> {
                               building: b,
                               onTap: () => Get.toNamed(AppRoutes.buildingDetail, arguments: b),
                               onDelete: () => _confirmDelete(context, b),
+                              justSaved: controller.justSavedBuildingId.value == b.id,
                             ),
                           ),
                         ),
@@ -312,94 +313,167 @@ class _EmptyBuildingsState extends StatelessWidget {
 //   }
   
 // }
-class _BuildingTile extends StatelessWidget {
+class _BuildingTile extends StatefulWidget {
   final BuildingModel building;
   final VoidCallback onTap;
   final VoidCallback onDelete;
-  const _BuildingTile({required this.building, required this.onTap, required this.onDelete});
+  final bool justSaved;
+
+  const _BuildingTile({
+    required this.building,
+    required this.onTap,
+    required this.onDelete,
+    this.justSaved = false,
+  });
+
+  @override
+  State<_BuildingTile> createState() => _BuildingTileState();
+}
+
+class _BuildingTileState extends State<_BuildingTile> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseController;
+  late final Animation<double> _scale;
+  late final Animation<double> _badgeOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    _scale = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.03), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 1.03, end: 1.0), weight: 1),
+    ]).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeOut));
+    _badgeOpacity = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 1),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 1),
+    ]).animate(_pulseController);
+
+    if (widget.justSaved) _pulseController.forward();
+  }
+
+  @override
+  void didUpdateWidget(covariant _BuildingTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.justSaved && !oldWidget.justSaved) {
+      _pulseController.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final building = widget.building;
     final details = building.details;
     final floors = details?.totalFloors ?? 0;
     final units = details?.totalApartments ?? 0;
     final isConfigured = building.isConfigured;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppDimens.radius2xl),
-      child: AppCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return AnimatedBuilder(
+      animation: _pulseController,
+      builder: (context, child) => Transform.scale(
+        scale: _scale.value,
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Row(
-              children: [
-                AppPopIn(
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryDark.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.villa_rounded, color: AppColors.primaryDark, size: 26),
-                  ),
+            child!,
+            Positioned(
+              top: -8,
+              right: -8,
+              child: Opacity(
+                opacity: _badgeOpacity.value,
+                child: Container(
+                  width: 26,
+                  height: 26,
+                  decoration: const BoxDecoration(color: AppColors.successGreenDark, shape: BoxShape.circle),
+                  child: const Icon(Icons.check, size: 14, color: Colors.white),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(building.name, style: AppTextStyles.h4),
-                      const SizedBox(height: 2),
-                      Text(
-                        isConfigured ? '$units units · $floors floors' : AppStrings.tapToAddDetails,
-                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: onTap,
-                  icon: const Icon(Icons.edit_sharp, size: 16, color: AppColors.textSecondary),
-                  style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
-                  visualDensity: VisualDensity.compact,
-                ),
-                const SizedBox(width: 6),
-                IconButton(
-                  onPressed: onDelete,
-                  icon: const Icon(Icons.delete_sharp, size: 16, color: AppColors.danger),
-                  style: IconButton.styleFrom(backgroundColor: AppColors.dangerBg, shape: const CircleBorder()),
-                  visualDensity: VisualDensity.compact,
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: isConfigured ? AppColors.successGreen.withValues(alpha: 0.1) : AppColors.warningBg,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isConfigured ? Icons.check_circle : Icons.hourglass_bottom,
-                    size: 12,
-                    color: isConfigured ? AppColors.successGreenDark : AppColors.warning,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    isConfigured ? AppStrings.detailsConfigured : AppStrings.buildingInProgress,
-                    style: AppTextStyles.labelSmall.copyWith(
-                      color: isConfigured ? AppColors.successGreenDark : AppColors.warning,
-                    ),
-                  ),
-                ],
               ),
             ),
           ],
+        ),
+      ),
+      child: InkWell(
+        onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(AppDimens.radius2xl),
+        child: AppCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  AppPopIn(
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryDark.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.villa_rounded, color: AppColors.primaryDark, size: 26),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(building.name, style: AppTextStyles.h4),
+                        const SizedBox(height: 2),
+                        Text(
+                          isConfigured ? '$units units · $floors floors' : AppStrings.tapToAddDetails,
+                          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: widget.onTap,
+                    icon: const Icon(Icons.edit_sharp, size: 16, color: AppColors.textSecondary),
+                    style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  const SizedBox(width: 6),
+                  IconButton(
+                    onPressed: widget.onDelete,
+                    icon: const Icon(Icons.delete_sharp, size: 16, color: AppColors.danger),
+                    style: IconButton.styleFrom(backgroundColor: AppColors.dangerBg, shape: const CircleBorder()),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isConfigured ? AppColors.successGreen.withValues(alpha: 0.1) : AppColors.warningBg,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isConfigured ? Icons.check_circle : Icons.hourglass_bottom,
+                      size: 12,
+                      color: isConfigured ? AppColors.successGreenDark : AppColors.warning,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isConfigured ? AppStrings.buildingComplete : AppStrings.buildingInProgress,
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: isConfigured ? AppColors.successGreenDark : AppColors.warning,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

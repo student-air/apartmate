@@ -10,7 +10,7 @@ class SocietySetupController extends GetxController {
   final buildings = <BuildingModel>[].obs;
   final isLoading = false.obs;
   final newBuildingName = ''.obs;
-
+  final justSavedBuildingId = RxnString();
   bool get hasConfiguredBuilding => buildings.any((b) => b.isConfigured);
 
   @override
@@ -43,8 +43,12 @@ class SocietySetupController extends GetxController {
     final updated = await _societyRepository.saveBuildingDetails(buildingId, details);
     final index = buildings.indexWhere((b) => b.id == buildingId);
     if (index != -1) buildings[index] = updated;
-  }
 
+    justSavedBuildingId.value = buildingId;
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (justSavedBuildingId.value == buildingId) justSavedBuildingId.value = null;
+    });
+  }
   Future<void> renameBuilding(String buildingId, String newName) async {
     final updated = await _societyRepository.renameBuilding(buildingId, newName);
     final index = buildings.indexWhere((b) => b.id == buildingId);

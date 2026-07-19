@@ -75,6 +75,7 @@ class StaffView extends GetView<StaffController> {
                                     _showStaffFormSheet(context);
                                   },
                                   onDelete: () => _confirmDelete(context, s),
+                                  justSaved: controller.justSavedStaffId.value == s.id,
                                 ),
                               ),
                             ),
@@ -269,14 +270,61 @@ class _EmptyStaffState extends StatelessWidget {
   }
 }
 
-class _StaffTile extends StatelessWidget {
+class _StaffTile extends StatefulWidget {
   final StaffModel staff;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
-  const _StaffTile({required this.staff, required this.onEdit, required this.onDelete});
+  final bool justSaved;
+
+  const _StaffTile({
+    required this.staff,
+    required this.onEdit,
+    required this.onDelete,
+    this.justSaved = false,
+  });
+
+  @override
+  State<_StaffTile> createState() => _StaffTileState();
+}
+
+class _StaffTileState extends State<_StaffTile> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulseController;
+  late final Animation<double> _scale;
+  late final Animation<double> _badgeOpacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    _scale = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.03), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 1.03, end: 1.0), weight: 1),
+    ]).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeOut));
+    _badgeOpacity = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 1),
+      TweenSequenceItem(tween: ConstantTween(1.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 1),
+    ]).animate(_pulseController);
+
+    if (widget.justSaved) _pulseController.forward();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StaffTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.justSaved && !oldWidget.justSaved) {
+      _pulseController.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
 
   ({Color bg, Color fg, Color border}) get _roleColors {
-    switch (staff.role) {
+    switch (widget.staff.role) {
       case StaffRole.admin:
         return (bg: AppColors.roleAdminBg, fg: AppColors.roleAdminText, border: AppColors.roleAdminBorder);
       case StaffRole.reception:
@@ -292,57 +340,83 @@ class _StaffTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final staff = widget.staff;
     final colors = _roleColors;
-    return AppCard(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(color: colors.bg, shape: BoxShape.circle, border: Border.all(color: colors.border)),
-            alignment: Alignment.center,
-            child: staff.photoPath != null
-                ? ClipOval(child: Image.file(File(staff.photoPath!), width: 48, height: 48, fit: BoxFit.cover))
-                : Text(staff.initials, style: AppTextStyles.labelLarge.copyWith(color: colors.fg, fontSize: 15)),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(staff.name, style: AppTextStyles.labelLarge),
-                const SizedBox(height: 2),
-                Text(staff.phone, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-                const SizedBox(height: 6),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: [
-                    _Badge(label: staff.role.label, bg: colors.bg, fg: colors.fg, border: colors.border),
-                    _Badge(label: staff.shift.shortLabel, bg: AppColors.surfaceMuted, fg: AppColors.textSecondary),
-                  ],
+
+    return AnimatedBuilder(
+      animation: _pulseController,
+      builder: (context, child) => Transform.scale(
+        scale: _scale.value,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            child!,
+            Positioned(
+              top: -8,
+              right: -8,
+              child: Opacity(
+                opacity: _badgeOpacity.value,
+                child: Container(
+                  width: 26,
+                  height: 26,
+                  decoration: const BoxDecoration(color: AppColors.successGreenDark, shape: BoxShape.circle),
+                  child: const Icon(Icons.check, size: 14, color: Colors.white),
                 ),
-              ],
+              ),
             ),
-          ),
-          IconButton(
-            onPressed: onEdit,
-            icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.textSecondary),
-            style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            onPressed: onDelete,
-            icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.danger),
-            style: IconButton.styleFrom(backgroundColor: AppColors.dangerBg, shape: const CircleBorder()),
-          ),
-        ],
+          ],
+        ),
+      ),
+      child: AppCard(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(color: colors.bg, shape: BoxShape.circle, border: Border.all(color: colors.border)),
+              alignment: Alignment.center,
+              child: staff.photoPath != null
+                  ? ClipOval(child: Image.file(File(staff.photoPath!), width: 48, height: 48, fit: BoxFit.cover))
+                  : Text(staff.initials, style: AppTextStyles.labelLarge.copyWith(color: colors.fg, fontSize: 15)),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(staff.name, style: AppTextStyles.labelLarge),
+                  const SizedBox(height: 2),
+                  Text(staff.phone, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: [
+                      _Badge(label: staff.role.label, bg: colors.bg, fg: colors.fg, border: colors.border),
+                      _Badge(label: staff.shift.shortLabel, bg: AppColors.surfaceMuted, fg: AppColors.textSecondary),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: widget.onEdit,
+              icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.textSecondary),
+              style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: widget.onDelete,
+              icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.danger),
+              style: IconButton.styleFrom(backgroundColor: AppColors.dangerBg, shape: const CircleBorder()),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-
 class _Badge extends StatelessWidget {
   final String label;
   final Color bg;

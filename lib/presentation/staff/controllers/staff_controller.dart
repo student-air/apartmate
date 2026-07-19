@@ -23,6 +23,8 @@ class StaffController extends GetxController {
   final photo = Rxn<File>();
   static const int maxPhotoSizeBytes = 3 * 1024 * 1024; // 3MB
 
+  final justSavedStaffId = RxnString();
+
   /// Non-null while editing an existing staff member; null while adding new.
   String? _editingStaffId;
   bool get isEditing => _editingStaffId != null;
@@ -75,6 +77,8 @@ class StaffController extends GetxController {
   Future<void> saveStaff() async {
     if (nameCtrl.text.trim().isEmpty) return;
 
+    String savedId;
+
     if (isEditing) {
       final index = staff.indexWhere((s) => s.id == _editingStaffId);
       final updated = staff[index].copyWith(
@@ -87,6 +91,7 @@ class StaffController extends GetxController {
       );
       final saved = await _staffRepository.updateStaff(updated);
       staff[index] = saved;
+      savedId = saved.id;
     } else {
       final newStaff = StaffModel(
         id: 's-${DateTime.now().millisecondsSinceEpoch}',
@@ -99,10 +104,16 @@ class StaffController extends GetxController {
       );
       final saved = await _staffRepository.addStaff(newStaff);
       staff.add(saved);
+      savedId = saved.id;
     }
 
     resetForm();
     Get.back();
+
+    justSavedStaffId.value = savedId;
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (justSavedStaffId.value == savedId) justSavedStaffId.value = null;
+    });
   }
 
   Future<void> deleteStaff(String staffId) async {

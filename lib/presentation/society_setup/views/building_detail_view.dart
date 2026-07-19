@@ -122,6 +122,17 @@ class BuildingDetailView extends GetView<BuildingDetailController> {
                         _NumberRow(title: '2-Bedroom Flats', subtitle: 'Double bedroom units', controller: controller.bed2Ctrl, hint: '0'),
                         const Divider(height: 1),
                         _NumberRow(title: '3-Bedroom Flats', subtitle: 'Three bedroom units', controller: controller.bed3Ctrl, hint: '0'),
+                        const Divider(height: 1),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Obx(
+                            () => _FlatTypeBar(
+                              bed1: controller.bed1Count.value,
+                              bed2: controller.bed2Count.value,
+                              bed3: controller.bed3Count.value,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -252,6 +263,71 @@ class _NumberRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _FlatTypeBar extends StatelessWidget {
+  final int bed1;
+  final int bed2;
+  final int bed3;
+  const _FlatTypeBar({required this.bed1, required this.bed2, required this.bed3});
+
+  @override
+  Widget build(BuildContext context) {
+    final total = bed1 + bed2 + bed3;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final w1 = total == 0 ? 0.0 : width * bed1 / total;
+        final w2 = total == 0 ? 0.0 : width * bed2 / total;
+        final w3 = total == 0 ? 0.0 : width * bed3 / total;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 14,
+              width: width,
+              decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(7)),
+              clipBehavior: Clip.antiAlias,
+              child: Row(
+                children: [
+                  AnimatedContainer(duration: const Duration(milliseconds: 300), width: w1, color: const Color(0xFF34D399)),
+                  AnimatedContainer(duration: const Duration(milliseconds: 300), width: w2, color: const Color(0xFF60A5FA)),
+                  AnimatedContainer(duration: const Duration(milliseconds: 300), width: w3, color: const Color(0xFFFBBF24)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _LegendDot(color: const Color(0xFF34D399), label: '1BR: $bed1'),
+                _LegendDot(color: const Color(0xFF60A5FA), label: '2BR: $bed2'),
+                _LegendDot(color: const Color(0xFFFBBF24), label: '3BR: $bed3'),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _LegendDot extends StatelessWidget {
+  final Color color;
+  final String label;
+  const _LegendDot({required this.color, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2))),
+        const SizedBox(width: 5),
+        Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+      ],
     );
   }
 }

@@ -21,6 +21,10 @@ class BuildingDetailController extends GetxController {
   final hasLift = false.obs;
   final totalApartments = 0.obs;
 
+  final bed1Count = 0.obs;
+  final bed2Count = 0.obs;
+  final bed3Count = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -38,8 +42,12 @@ class BuildingDetailController extends GetxController {
       hasLift.value = d.hasLift;
     }
     _recalculateTotal();
+    _recalculateBedCounts();
     totalFloorsCtrl.addListener(_recalculateTotal);
     flatsPerFloorCtrl.addListener(_recalculateTotal);
+    bed1Ctrl.addListener(_recalculateBedCounts);
+    bed2Ctrl.addListener(_recalculateBedCounts);
+    bed3Ctrl.addListener(_recalculateBedCounts);
   }
 
   void _recalculateTotal() {
@@ -47,30 +55,15 @@ class BuildingDetailController extends GetxController {
     final flats = int.tryParse(flatsPerFloorCtrl.text) ?? 0;
     totalApartments.value = floors * flats;
   }
+  
+  void _recalculateBedCounts() {
+    bed1Count.value = int.tryParse(bed1Ctrl.text) ?? 0;
+    bed2Count.value = int.tryParse(bed2Ctrl.text) ?? 0;
+    bed3Count.value = int.tryParse(bed3Ctrl.text) ?? 0;
+  }
 
   void toggleParking(bool value) => hasParking.value = value;
   void toggleLift(bool value) => hasLift.value = value;
-
-// Future<void> save() async {
-//     final newName = buildingNameCtrl.text.trim();
-//     if (newName.isNotEmpty && newName != building.name) {
-//       await Get.find<SocietySetupController>().renameBuilding(building.id, newName);
-//     }
-
-//     final details = BuildingDetailsModel(
-//       totalFloors: int.tryParse(totalFloorsCtrl.text) ?? 0,
-//       flatsPerFloor: int.tryParse(flatsPerFloorCtrl.text) ?? 0,
-//       oneBedroomFlats: int.tryParse(bed1Ctrl.text) ?? 0,
-//       twoBedroomFlats: int.tryParse(bed2Ctrl.text) ?? 0,
-//       threeBedroomFlats: int.tryParse(bed3Ctrl.text) ?? 0,
-//       hasParking: hasParking.value,
-//       parkingSlots: int.tryParse(parkingSlotsCtrl.text) ?? 0,
-//       hasLift: hasLift.value,
-//     );
-//     await Get.find<SocietySetupController>().saveBuildingDetails(building.id, details);
-//     AppSnackbar.success('Saved', 'Building details saved successfully');
-//     Get.offNamed(AppRoutes.societyBuildings); // Navigate back to the buildings list
-//   }
 
 Future<void> save() async {
     final newName = buildingNameCtrl.text.trim();
@@ -89,7 +82,7 @@ Future<void> save() async {
       hasLift: hasLift.value,
     );
     await Get.find<SocietySetupController>().saveBuildingDetails(building.id, details);
-    AppSnackbar.success('Saved', 'Building details saved successfully');
+    AppSnackbar.success('Done', ' Details saved successfully');
     Get.offNamed(AppRoutes.societyBuildings);
   }
 

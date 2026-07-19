@@ -31,15 +31,23 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
                   const SizedBox(height: 16),
                   const AppAnimatedCheckmark(),
                   const SizedBox(height: 24),
-                  Text(AppStrings.registrationSubmitted, style: AppTextStyles.h2, textAlign: TextAlign.center),
+                  AppFadeSlideIn(
+                    delay: const Duration(milliseconds: 500),
+                    child: Text(AppStrings.registrationSubmitted, style: AppTextStyles.h2, textAlign: TextAlign.center),
+                  ),
                   const SizedBox(height: 8),
-                  Text(
-                    AppStrings.registrationSubmittedDesc,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary, height: 1.5),
+                  AppFadeSlideIn(
+                    delay: const Duration(milliseconds: 650),
+                    child: Text(
+                      AppStrings.registrationSubmittedDesc,
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary, height: 1.5),
+                    ),
                   ),
                   const SizedBox(height: 32),
-                  AppCard(
+                  AppFadeSlideIn(
+                    delay: const Duration(milliseconds: 900),
+                    child: AppCard(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -59,9 +67,16 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
                                       color: AppColors.accentGreen.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                                     ),
-                                    child: Text(
-                                      AppStrings.pendingReview,
-                                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.accentGreenDark),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        AppPulseDot(color: AppColors.accentGreenDark),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          AppStrings.pendingReview,
+                                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.accentGreenDark),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -108,6 +123,7 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
                       ],
                     ),
                   ),
+                ),
                   const SizedBox(height: 32),
                   AppPrimaryButton(
                     label: AppStrings.continueSetup,

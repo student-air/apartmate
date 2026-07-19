@@ -4,7 +4,7 @@ class AppStrings {
   AppStrings._();
 
   // App
-  static const appName = 'ApartMate';
+  static const appName = 'Apart Mate';
   static const appTagline = 'Management at Your Fingertips';
   static const tapToContinue = 'Tap to continue';
   static const appVersion = 'v1.0.0';

@@ -31,7 +31,7 @@ class AppSnackbar {
     Get.snackbar(
       title,
       message,
-      snackPosition: SnackPosition.TOP,
+      snackPosition: SnackPosition.BOTTOM,
       backgroundColor: AppColors.surface,
       colorText: AppColors.textPrimary,
       titleText: Text(title, style: AppTextStyles.labelLarge.copyWith(color: AppColors.successGreenDark)),
@@ -39,7 +39,7 @@ class AppSnackbar {
       icon: const Icon(Icons.check_circle_outline_rounded, color: AppColors.successGreen),
       margin: const EdgeInsets.all(AppDimens.space16),
       borderRadius: AppDimens.radiusLg,
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 2),
       boxShadows: const [BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 4))],
     );
   }

@@ -159,6 +159,107 @@ class AppPopIn extends StatefulWidget {
   State<AppPopIn> createState() => _AppPopInState();
 }
 
+/// Fades and slides a child up into place, once, after an optional delay —
+/// used to sequence entrances (e.g. title, then description, then a card)
+/// instead of everything appearing simultaneously.
+class AppFadeSlideIn extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+
+  const AppFadeSlideIn({super.key, required this.child, this.delay = Duration.zero});
+
+  @override
+  State<AppFadeSlideIn> createState() => _AppFadeSlideInState();
+}
+
+class _AppFadeSlideInState extends State<AppFadeSlideIn> {
+  bool _started = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(widget.delay, () {
+      if (mounted) setState(() => _started = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: _started ? 1.0 : 0.0),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOut,
+      builder: (context, t, child) {
+        return Opacity(
+          opacity: t,
+          child: Transform.translate(offset: Offset(0, (1 - t) * 16), child: child),
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
+/// A small dot with a soft, looping pulse ring around it — signals "this is
+/// live/being tracked," used next to a pending/in-progress status label.
+class AppPulseDot extends StatefulWidget {
+  final Color color;
+  final double size;
+
+  const AppPulseDot({super.key, required this.color, this.size = 6});
+
+  @override
+  State<AppPulseDot> createState() => _AppPulseDotState();
+}
+
+class _AppPulseDotState extends State<AppPulseDot> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1600))..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final t = _controller.value;
+        return SizedBox(
+          width: widget.size + 12,
+          height: widget.size + 12,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Opacity(
+                opacity: (1 - t).clamp(0.0, 1.0) * 0.5,
+                child: Container(
+                  width: widget.size + (t * 12),
+                  height: widget.size + (t * 12),
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: widget.color),
+                ),
+              ),
+              Container(
+                width: widget.size,
+                height: widget.size,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: widget.color),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _AppPopInState extends State<AppPopIn> {
   bool _started = false;
 
