@@ -18,6 +18,8 @@ import 'package:apartmate/presentation/staff/views/staff_view.dart';
 import 'package:apartmate/presentation/dashboard/bindings/dashboard_binding.dart';
 import 'package:apartmate/presentation/dashboard/views/dashboard_view.dart'; 
 import 'package:apartmate/presentation/auth/views/signup_handoff_view.dart';
+import 'package:apartmate/presentation/notices/bindings/notices_binding.dart';
+import 'package:apartmate/presentation/notices/views/notices_view.dart';
 
 class AppPages {
   AppPages._();
@@ -71,6 +73,11 @@ class AppPages {
       name: AppRoutes.dashboard,
       page: () => const DashboardView(),
       binding: DashboardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.notices,
+      page: () => const NoticesView(),
+      binding: NoticesBinding(),
     ),
   ];
 }

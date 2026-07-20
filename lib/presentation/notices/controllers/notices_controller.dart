@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:apartmate/data/models/notice_model.dart';
-import 'package:apartmate/domain/repositories/i_notice_repository.dart';  
+import 'package:apartmate/domain/repositories/i_notice_repository.dart';
 
 class NoticesController extends GetxController {
   final INoticeRepository _noticeRepository;

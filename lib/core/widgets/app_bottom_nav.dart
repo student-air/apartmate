@@ -4,9 +4,6 @@ import 'package:apartmate/core/constants/app_text_styles.dart';
 
 enum AppTab { home, notices, requests, profile }
 
-/// Bottom tab bar shared by Dashboard, Notices, Requests, and Profile.
-/// Navigation is driven by the caller via [onTabSelected] so each screen's
-/// controller decides where taps go.
 class AppBottomNav extends StatelessWidget {
   final AppTab current;
   final ValueChanged<AppTab> onTabSelected;
