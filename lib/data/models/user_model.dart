@@ -13,4 +13,10 @@ class UserModel {
     required this.phone,
     required this.role,
   });
+
+  String get initials {
+    final parts = fullName.trim().split(RegExp(r'\s+'));
+    final letters = parts.take(2).map((e) => e.isNotEmpty ? e[0] : '').join();
+    return letters.isEmpty ? '?' : letters.toUpperCase();
+  }
 }

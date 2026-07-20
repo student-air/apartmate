@@ -17,6 +17,8 @@ import 'package:apartmate/presentation/staff/bindings/staff_binding.dart';
 import 'package:apartmate/presentation/staff/views/staff_view.dart';
 import 'package:apartmate/presentation/dashboard/bindings/dashboard_binding.dart';
 import 'package:apartmate/presentation/dashboard/views/dashboard_view.dart'; 
+import 'package:apartmate/presentation/auth/views/signup_handoff_view.dart';
+
 class AppPages {
   AppPages._();
 
@@ -35,6 +37,10 @@ class AppPages {
       name: AppRoutes.signup,
       page: () => const SignupView(),
       binding: AuthBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.signupHandoff,
+      page: () => const SignupHandoffView(),
     ),
     GetPage(
       name: AppRoutes.societyRegister,

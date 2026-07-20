@@ -85,7 +85,7 @@ class AuthController extends GetxController {
     isLoading.value = true;
     try {
       await _authRepository.loginWithGoogle();
-      Get.toNamed(AppRoutes.societyRegister);
+      Get.offNamed(AppRoutes.signupHandoff, arguments: 'Google');
     } finally {
       isLoading.value = false;
     }
@@ -95,7 +95,7 @@ class AuthController extends GetxController {
     isLoading.value = true;
     try {
       await _authRepository.loginWithApple();
-      Get.toNamed(AppRoutes.societyRegister);
+      Get.offNamed(AppRoutes.signupHandoff, arguments: 'Apple');
     } finally {
       isLoading.value = false;
     }
@@ -135,7 +135,7 @@ class AuthController extends GetxController {
         phone: phoneCtrl.text.trim(),
         password: signupPasswordCtrl.text,
       );
-      Get.toNamed(AppRoutes.societyRegister);
+      Get.toNamed(AppRoutes.signupHandoff, arguments: 'Email');
     } finally {
       isLoading.value = false;
     }

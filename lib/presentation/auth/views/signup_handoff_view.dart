@@ -4,7 +4,11 @@ import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/routes/app_routes.dart';
 
-
+/// A brief, wordless-ish handoff shown right after a successful Google/Apple
+/// signup — "Account created" fades/slides up and out while "Let's set up
+/// your society" slides in underneath, then auto-navigates to Society
+/// Register. Purely presentational: no controller/binding, self-contained
+/// like SplashView.
 class SignupHandoffView extends StatefulWidget {
   const SignupHandoffView({super.key});
 
@@ -24,25 +28,25 @@ class _SignupHandoffViewState extends State<SignupHandoffView> with SingleTicker
   void initState() {
     super.initState();
 
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
 
     _checkScale = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.15), weight: 1),
       TweenSequenceItem(tween: Tween(begin: 1.15, end: 1.0), weight: 1),
-    ]).animate(CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.25, curve: Curves.easeOutBack)));
+    ]).animate(CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.25, curve: Curves.easeOut)));
 
     _layer1Opacity = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.35, 0.55, curve: Curves.easeIn)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.4375, 0.5875, curve: Curves.easeIn)),
     );
     _layer1SlideY = Tween<double>(begin: 0, end: -24).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.35, 0.55, curve: Curves.easeIn)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.4375, 0.5875, curve: Curves.easeIn)),
     );
 
     _layer2Opacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.45, 0.85, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.4875, 0.7375, curve: Curves.easeOut)),
     );
     _layer2SlideY = Tween<double>(begin: 24, end: 0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.45, 0.85, curve: Curves.easeOut)),
+      CurvedAnimation(parent: _controller, curve: const Interval(0.4875, 0.7375, curve: Curves.easeOut)),
     );
 
     _controller.forward();
