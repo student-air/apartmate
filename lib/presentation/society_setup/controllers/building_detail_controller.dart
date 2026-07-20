@@ -25,6 +25,8 @@ class BuildingDetailController extends GetxController {
   final bed2Count = 0.obs;
   final bed3Count = 0.obs;
 
+  final shakeTrigger = 0.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -55,7 +57,7 @@ class BuildingDetailController extends GetxController {
     final flats = int.tryParse(flatsPerFloorCtrl.text) ?? 0;
     totalApartments.value = floors * flats;
   }
-  
+
   void _recalculateBedCounts() {
     bed1Count.value = int.tryParse(bed1Ctrl.text) ?? 0;
     bed2Count.value = int.tryParse(bed2Ctrl.text) ?? 0;
@@ -65,7 +67,13 @@ class BuildingDetailController extends GetxController {
   void toggleParking(bool value) => hasParking.value = value;
   void toggleLift(bool value) => hasLift.value = value;
 
-Future<void> save() async {
+  Future<void> save() async {
+    if (buildingNameCtrl.text.trim().isEmpty) {
+      shakeTrigger.value++;
+      AppSnackbar.error('Missing info', 'Please enter a building name');
+      return;
+    }
+
     final newName = buildingNameCtrl.text.trim();
     if (newName.isNotEmpty && newName != building.name) {
       await Get.find<SocietySetupController>().renameBuilding(building.id, newName);
@@ -86,7 +94,6 @@ Future<void> save() async {
     Get.offNamed(AppRoutes.societyBuildings);
   }
 
-  
   @override
   void onClose() {
     totalFloorsCtrl.dispose();
@@ -95,6 +102,7 @@ Future<void> save() async {
     bed2Ctrl.dispose();
     bed3Ctrl.dispose();
     parkingSlotsCtrl.dispose();
+    buildingNameCtrl.dispose();
     super.onClose();
     buildingNameFocusNode.dispose();
   }

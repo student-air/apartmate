@@ -16,12 +16,6 @@ class SplashView extends GetView<SplashController> {
   }
 }
 
-/// Two layers:
-/// - Bottom: a plain surface in `AppColors.background` — the same color
-///   LoginView's own Scaffold uses, so once the shutter slides away there's
-///   no color flash before the real LoginView appears underneath.
-/// - Top: the splash content (logo/title/tagline/hint), which slides
-///   straight up and off-screen on tap, revealing the layer beneath.
 class _ShutterSplash extends StatefulWidget {
   final VoidCallback onComplete;
   const _ShutterSplash({required this.onComplete});
@@ -199,11 +193,11 @@ class _ShutterSplashState extends State<_ShutterSplash> with TickerProviderState
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.touch_app_outlined, size: 16, color: Colors.white.withValues(alpha: 0.6)),
+                            Icon(Icons.touch_app_outlined, size: 16, color: AppColors.successGreen.withValues(alpha: 0.6)),
                             const SizedBox(width: 6),
                             Text(
                               AppStrings.tapToContinue,
-                              style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withValues(alpha: 0.6)),
+                              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.successGreen.withValues(alpha: 0.5)),
                             ),
                           ],
                         ),

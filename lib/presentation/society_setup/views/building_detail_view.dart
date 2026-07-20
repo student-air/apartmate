@@ -4,6 +4,7 @@ import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
+import 'package:apartmate/core/widgets/app_animations.dart';
 import 'package:apartmate/core/widgets/app_button.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/core/widgets/app_toggle.dart';
@@ -38,40 +39,45 @@ class BuildingDetailView extends GetView<BuildingDetailController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _SectionCard(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: controller.buildingNameCtrl,
-                                  focusNode: controller.buildingNameFocusNode,
-                                  style: AppTextStyles.h4,
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    filled: false,
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.zero,
-                                    hintText: 'Building name',
+                    Obx(
+                      () => AppShakeOnTrigger(
+                        trigger: controller.shakeTrigger.value,
+                        child: _SectionCard(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TextField(
+                                      controller: controller.buildingNameCtrl,
+                                      focusNode: controller.buildingNameFocusNode,
+                                      style: AppTextStyles.h4,
+                                      decoration: const InputDecoration(
+                                        border: InputBorder.none,
+                                        enabledBorder: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                        filled: false,
+                                        isDense: true,
+                                        contentPadding: EdgeInsets.zero,
+                                        hintText: 'Building name',
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  IconButton(
+                                    onPressed: () => controller.buildingNameFocusNode.requestFocus(),
+                                    icon: const Icon(Icons.edit_sharp, size: 18, color: AppColors.textSecondary),
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: AppColors.surfaceMuted,
+                                      shape: const CircleBorder(),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              IconButton(
-                                onPressed: () => controller.buildingNameFocusNode.requestFocus(),
-                                icon: const Icon(Icons.edit_sharp, size: 18, color: AppColors.textSecondary),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: AppColors.surfaceMuted,
-                                  shape: const CircleBorder(),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Text(AppStrings.structure, style: AppTextStyles.h4),

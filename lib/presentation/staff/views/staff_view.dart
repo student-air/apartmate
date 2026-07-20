@@ -5,6 +5,7 @@ import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
+import 'package:apartmate/core/widgets/app_animations.dart';
 import 'package:apartmate/core/widgets/app_button.dart';
 import 'package:apartmate/core/widgets/app_card.dart';
 import 'package:apartmate/core/widgets/app_confirm_delete_dialog.dart';
@@ -137,101 +138,137 @@ class StaffView extends GetView<StaffController> {
           ),
           child: SingleChildScrollView(
             controller: scrollController,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: Container(
-                    width: 48,
-                    height: 6,
-                    decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(3)),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Obx(
+              () => AppShakeOnTrigger(
+                trigger: controller.staffShakeTrigger.value,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      controller.isEditing ? 'Edit Staff Member' : AppStrings.addStaffMember,
-                      style: AppTextStyles.h3,
+                    Center(
+                      child: Container(
+                        width: 48,
+                        height: 6,
+                        decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(3)),
+                      ),
                     ),
-                    IconButton(
-                      onPressed: Get.back,
-                      icon: const Icon(Icons.close, size: 18),
-                      style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          controller.isEditing ? 'Edit Staff Member' : AppStrings.addStaffMember,
+                          style: AppTextStyles.h3,
+                        ),
+                        IconButton(
+                          onPressed: Get.back,
+                          icon: const Icon(Icons.close, size: 18),
+                          style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Obx(() {
+                        final file = controller.photo.value;
+                        return GestureDetector(
+                          onTap: controller.pickPhoto,
+                          child: Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryDark.withValues(alpha: 0.05),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.primaryDark.withValues(alpha: 0.3), width: 2),
+                            ),
+                            child: file != null
+                                ? ClipOval(child: Image.file(file, fit: BoxFit.cover))
+                                : Icon(Icons.camera_alt_outlined, size: 24, color: AppColors.primaryDark.withValues(alpha: 0.5)),
+                          ),
+                        );
+                      }),
+                    ),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: Text('Add Photo (Optional)', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+                    ),
+                    const SizedBox(height: 20),
+                    AppTextField(label: AppStrings.fullName, hint: AppStrings.fullNameHint, controller: controller.nameCtrl),
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      label: AppStrings.phoneNumber,
+                      hint: AppStrings.phoneHint,
+                      controller: controller.phoneCtrl,
+                      keyboardType: TextInputType.phone,
+                    ),
+                    Obx(() {
+                      final error = controller.phoneError.value;
+                      if (error == null) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, size: 14, color: AppColors.danger),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(error, style: AppTextStyles.bodySmall.copyWith(color: AppColors.danger)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 16),
+                    AppTextField(label: AppStrings.cnic, hint: AppStrings.cnicHint, controller: controller.cnicCtrl),
+                    Obx(() {
+                      final error = controller.cnicError.value;
+                      if (error == null) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.error_outline, size: 14, color: AppColors.danger),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(error, style: AppTextStyles.bodySmall.copyWith(color: AppColors.danger)),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 16),
+                    Obx(
+                      () => AppDropdownField<StaffRole>(
+                        label: AppStrings.role,
+                        value: controller.selectedRole.value,
+                        items: StaffRole.values,
+                        labelBuilder: (r) => r.label,
+                        onChanged: controller.setRole,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Obx(
+                      () => AppDropdownField<StaffShift>(
+                        label: AppStrings.shift,
+                        value: controller.selectedShift.value,
+                        items: StaffShift.values,
+                        labelBuilder: (s) => s.label,
+                        onChanged: controller.setShift,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    AppPrimaryButton(
+                      label: controller.isEditing ? 'Save Changes' : AppStrings.saveStaffMember,
+                      icon: Icons.check,
+                      onPressed: controller.saveStaff,
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Center(
-                  child: Obx(() {
-                    final file = controller.photo.value;
-                    return GestureDetector(
-                      onTap: controller.pickPhoto,
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryDark.withValues(alpha: 0.05),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.primaryDark.withValues(alpha: 0.3), width: 2),
-                        ),
-                        child: file != null
-                            ? ClipOval(child: Image.file(file, fit: BoxFit.cover))
-                            : Icon(Icons.camera_alt_outlined, size: 24, color: AppColors.primaryDark.withValues(alpha: 0.5)),
-                      ),
-                    );
-                  }),
-                ),
-                const SizedBox(height: 8),
-                Center(
-                  child: Text('Add Photo (Optional)', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-                ),
-                const SizedBox(height: 20),
-                AppTextField(label: AppStrings.fullName, hint: 'e.g. Muhammad Ali', controller: controller.nameCtrl),
-                const SizedBox(height: 16),
-                AppTextField(
-                  label: AppStrings.phoneNumber,
-                  hint: AppStrings.phoneHint,
-                  controller: controller.phoneCtrl,
-                  keyboardType: TextInputType.phone,
-                ),
-                const SizedBox(height: 16),
-                AppTextField(label: AppStrings.cnic, hint: 'XXXXX-XXXXXXX-X', controller: controller.cnicCtrl),
-                const SizedBox(height: 16),
-                Obx(
-                  () => AppDropdownField<StaffRole>(
-                    label: AppStrings.role,
-                    value: controller.selectedRole.value,
-                    items: StaffRole.values,
-                    labelBuilder: (r) => r.label,
-                    onChanged: controller.setRole,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Obx(
-                  () => AppDropdownField<StaffShift>(
-                    label: AppStrings.shift,
-                    value: controller.selectedShift.value,
-                    items: StaffShift.values,
-                    labelBuilder: (s) => s.label,
-                    onChanged: controller.setShift,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                AppPrimaryButton(
-                  label: controller.isEditing ? 'Save Changes' : AppStrings.saveStaffMember,
-                  icon: Icons.check,
-                  onPressed: controller.saveStaff,
-                ),
-              ],
+              ),
             ),
           ),
         ),
       ),
       isScrollControlled: true,
-      //curve: Curves.easeOutBack,
-      enterBottomSheetDuration: const Duration(milliseconds: 400)
+      enterBottomSheetDuration: const Duration(milliseconds: 400),
     );
   }
 
@@ -419,6 +456,7 @@ class _StaffTileState extends State<_StaffTile> with SingleTickerProviderStateMi
     );
   }
 }
+
 class _Badge extends StatelessWidget {
   final String label;
   final Color bg;

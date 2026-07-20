@@ -32,7 +32,7 @@ class AppStrings {
   static const email = 'Email';
   static const emailHint = 'Enter your email';
   static const phoneNumber = 'Phone Number';
-  static const phoneHint = '+923001234567';
+  static const phoneHint = '+92 300 1234567';
   static const createPasswordHint = 'Create a strong password';
   static const confirmPassword = 'Confirm Password';
   static const confirmPasswordHint = 'Re-enter your password';
@@ -52,7 +52,7 @@ class AppStrings {
   static const country = 'Country';
   static const countryHint = 'Select country';
   static const contactNumber = 'Contact Number';
-  static const contactNumberHint = '+923001234567';
+  static const contactNumberHint = '+92 300 1234567';
   static const descriptionOptional = 'Description (Optional)';
   static const descriptionHint = 'Brief description about the society...';
   static const submitRegistration = 'Submit Registration';
@@ -105,6 +105,7 @@ class AppStrings {
   static const addStaff = 'Add Staff';
   static const addStaffMember = 'Add Staff Member';
   static const cnic = 'CNIC';
+  static const cnicHint = 'e.g. 35202-1234567-8';
   static const role = 'Role';
   static const shift = 'Shift';
   static const saveStaffMember = 'Save Staff Member';

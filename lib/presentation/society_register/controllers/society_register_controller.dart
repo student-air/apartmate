@@ -8,8 +8,6 @@ import 'package:apartmate/routes/app_routes.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
 import 'package:apartmate/core/utils/validators.dart';
 
-
-
 class SocietyRegisterController extends GetxController {
   final ISocietyRepository _societyRepository;
 
@@ -35,6 +33,15 @@ class SocietyRegisterController extends GetxController {
   final ownerPhoto = Rxn<File>();
   final isSubmitting = false.obs;
 
+  final registerShakeTrigger = 0.obs;
+  final phoneError = RxnString();
+
+  @override
+  void onInit() {
+    super.onInit();
+    contactCtrl.addListener(() => phoneError.value = null);
+  }
+
   Future<void> pickOwnerPhotoFromCamera() => _pickFrom(ImageSource.camera);
   Future<void> pickOwnerPhotoFromGallery() => _pickFrom(ImageSource.gallery);
 
@@ -45,22 +52,23 @@ class SocietyRegisterController extends GetxController {
     final sizeInBytes = await file.length();
     if (sizeInBytes > maxFileSizeBytes) {
       AppSnackbar.error('File too large', 'Owner photo must be under 3MB');
-    return;
-  }
+      return;
+    }
     ownerPhoto.value = file;
-}
+  }
 
   Future<void> submit() async {
     if (societyNameCtrl.text.trim().isEmpty ||
         ownerNameCtrl.text.trim().isEmpty ||
         addressCtrl.text.trim().isEmpty ||
         contactCtrl.text.trim().isEmpty ||
-        selectedCountry.value.isEmpty ) {
+        selectedCountry.value.isEmpty) {
+      registerShakeTrigger.value++;
       AppSnackbar.info('Missing info', 'Please fill in all required fields');
       return;
     }
     if (!Validators.isValidPhone(contactCtrl.text)) {
-      AppSnackbar.info('Invalid phone', 'Use format 03XXXXXXXXX or\n+92 3XX XXXXXXX');
+      phoneError.value = 'Use format 03XXXXXXXXX or +92 3XX XXXXXXX';
       return;
     }
     isSubmitting.value = true;
@@ -78,7 +86,7 @@ class SocietyRegisterController extends GetxController {
           submittedAt: DateTime.now(),
         ),
       );
-        Get.toNamed(AppRoutes.registrationStatus);
+      Get.toNamed(AppRoutes.registrationStatus);
     } finally {
       isSubmitting.value = false;
     }

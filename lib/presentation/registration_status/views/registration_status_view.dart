@@ -110,7 +110,7 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
                         _InfoRow(
                           icon: Icons.location_on_outlined,
                           label: 'Location',
-                          value: society != null ? '${society.city}, ${society.country}' : '—',
+                          value: society != null ? '${society.city} ${society.country}': '—',
                           delay: const Duration(milliseconds: 240),
                         ),
                         const SizedBox(height: 16),

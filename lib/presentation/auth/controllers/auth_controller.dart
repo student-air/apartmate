@@ -4,7 +4,6 @@ import 'package:apartmate/core/utils/validators.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
-//import 'package:apartmate/core/utils/validators.dart';
 
 class AuthController extends GetxController {
   final IAuthRepository _authRepository;
@@ -31,6 +30,13 @@ class AuthController extends GetxController {
   final signupShakeTrigger = 0.obs;
   final emailError = RxnString();
   final phoneError = RxnString();
+
+  @override
+  void onInit() {
+    super.onInit();
+    emailCtrl.addListener(() => emailError.value = null);
+    phoneCtrl.addListener(() => phoneError.value = null);
+  }
 
   void togglePasswordVisibility() => isPasswordVisible.toggle();
   void toggleSignupPasswordVisibility() => isSignupPasswordVisible.toggle();
@@ -75,20 +81,41 @@ class AuthController extends GetxController {
     }
   }
 
+  Future<void> signUpWithGoogle() async {
+    isLoading.value = true;
+    try {
+      await _authRepository.loginWithGoogle();
+      Get.toNamed(AppRoutes.societyRegister);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> signUpWithApple() async {
+    isLoading.value = true;
+    try {
+      await _authRepository.loginWithApple();
+      Get.toNamed(AppRoutes.societyRegister);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> signUp() async {
     if (fullNameCtrl.text.trim().isEmpty ||
         emailCtrl.text.trim().isEmpty ||
         phoneCtrl.text.trim().isEmpty ||
         signupPasswordCtrl.text.isEmpty) {
+      signupShakeTrigger.value++;
       AppSnackbar.error('Missing info', 'Please fill in all required fields');
       return;
     }
     if (!Validators.isValidEmail(emailCtrl.text)) {
-      AppSnackbar.error('Invalid email', 'Use a valid email address');
+      emailError.value = 'Enter a valid email address';
       return;
     }
     if (!Validators.isValidPhone(phoneCtrl.text)) {
-      AppSnackbar.error('Invalid phone', 'Use format 03XXXXXXXXX or\n +92 3XX XXXXXXX');
+      phoneError.value = 'Use format 03XXXXXXXXX or +92 3XX XXXXXXX';
       return;
     }
     if (signupPasswordCtrl.text != confirmPasswordCtrl.text) {
@@ -128,6 +155,4 @@ class AuthController extends GetxController {
     confirmPasswordCtrl.dispose();
     super.onClose();
   }
-
-  
 }

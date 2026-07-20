@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:apartmate/data/models/staff_model.dart';
 import 'package:apartmate/domain/repositories/i_staff_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/utils/validators.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:apartmate/core/utils/app_snackbar.dart';
 
 class StaffController extends GetxController {
   final IStaffRepository _staffRepository;
@@ -25,6 +27,10 @@ class StaffController extends GetxController {
 
   final justSavedStaffId = RxnString();
 
+  final staffShakeTrigger = 0.obs;
+  final phoneError = RxnString();
+  final cnicError = RxnString();
+
   /// Non-null while editing an existing staff member; null while adding new.
   String? _editingStaffId;
   bool get isEditing => _editingStaffId != null;
@@ -33,6 +39,8 @@ class StaffController extends GetxController {
   void onInit() {
     super.onInit();
     _loadStaff();
+    phoneCtrl.addListener(() => phoneError.value = null);
+    cnicCtrl.addListener(() => cnicError.value = null);
   }
 
   Future<void> _loadStaff() async {
@@ -61,6 +69,8 @@ class StaffController extends GetxController {
     selectedRole.value = StaffRole.securityGuard;
     selectedShift.value = StaffShift.morning;
     photo.value = null;
+    phoneError.value = null;
+    cnicError.value = null;
   }
 
   /// Pre-fills the form with an existing staff member's data, ready for editing.
@@ -72,10 +82,25 @@ class StaffController extends GetxController {
     selectedRole.value = member.role;
     selectedShift.value = member.shift;
     photo.value = member.photoPath != null ? File(member.photoPath!) : null;
+    phoneError.value = null;
+    cnicError.value = null;
   }
 
   Future<void> saveStaff() async {
-    if (nameCtrl.text.trim().isEmpty) return;
+    if (nameCtrl.text.trim().isEmpty || phoneCtrl.text.trim().isEmpty || cnicCtrl.text.trim().isEmpty) {
+      staffShakeTrigger.value++;
+      AppSnackbar.error('Missing info', 'Please fill in all required fields');
+      //Get.snackbar('Missing info', 'Please fill in all required fields');
+      return;
+    }
+    if (!Validators.isValidPhone(phoneCtrl.text)) {
+      phoneError.value = 'Use format 03XXXXXXXXX or +92 3XX XXXXXXX';
+      return;
+    }
+    if (!Validators.isValidCnic(cnicCtrl.text)) {
+      cnicError.value = 'Use format 35202-1234567-8';
+      return;
+    }
 
     String savedId;
 

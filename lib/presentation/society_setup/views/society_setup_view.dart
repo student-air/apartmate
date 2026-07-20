@@ -51,7 +51,6 @@ class SocietySetupView extends GetView<SocietySetupController> {
                     pinned: true,
                     elevation: 0,
                     backgroundColor: AppColors.primaryDark,
-                    expandedHeight: 130,
                     titleSpacing: 0,
                     iconTheme: const IconThemeData(color: Colors.white),
                     title: Row(
@@ -68,11 +67,6 @@ class SocietySetupView extends GetView<SocietySetupController> {
                         icon: const Icon(Icons.add, color: Colors.white),
                       ),
                     ],
-                    flexibleSpace: FlexibleSpaceBar(
-                      titlePadding: const EdgeInsetsDirectional.only(start: 56, bottom: 16),
-                      title: Text(AppStrings.societyBuildings, style: AppTextStyles.h2.copyWith(color: Colors.white)),
-                      background: Container(color: AppColors.primaryDark),
-                    ),
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
