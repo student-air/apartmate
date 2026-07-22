@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
+import 'package:apartmate/core/widgets/app_bottom_nav.dart';
 import 'package:apartmate/core/widgets/app_loading.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
@@ -15,55 +16,19 @@ class DashboardView extends GetView<DashboardController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.black,
-        elevation: 30,
+      floatingActionButton: AppAddFab(
         onPressed: () {
           // TODO: hook up the action for this button once it's decided what it opens
         },
-        child: const Icon(Icons.add, color: AppColors.accentGreen, size: 30),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: AppColors.surface,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8,
-        child: SizedBox(
-          height: 60,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(
-                icon: Icons.home_rounded,
-                label: 'Home',
-                isActive: true,
-                onTap: () {
-                  // TODO: navigate to Home
-                },
-              ),
-              _NavItem(
-                icon: Icons.campaign_rounded,
-                label: 'Updates',
-                isActive: false,
-                onTap: controller.goToUpdatesFeed,
-              ),
-              const SizedBox(width: 40), // space reserved for the notch/FAB
-              _NavItem(
-                icon: Icons.assignment_rounded,
-                label: 'Requests',
-                isActive: false,
-                onTap: () {
-                  // TODO: navigate to Requests
-                },
-              ),
-              _NavItem(
-                icon: Icons.person_rounded,
-                label: 'Profile',
-                isActive: false,
-                onTap: controller.goToProfile,
-              ),
-            ],
-          ),
-        ),
+      bottomNavigationBar: AppBottomNav(
+        activeTab: AppNavTab.home,
+        onHome: () {}, // already here
+        onUpdates: controller.goToUpdates,
+        onRequests: () {
+          // TODO: navigate to Requests once that screen exists
+        },
+        onProfile: controller.goToProfile,
       ),
       body: SafeArea(
         bottom: false,
@@ -204,40 +169,6 @@ class DashboardView extends GetView<DashboardController> {
             ),
           );
         }),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-  const _NavItem({required this.icon, required this.label, required this.isActive, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final Color color = isActive ? AppColors.primaryDarkGradientEnd : AppColors.textMuted;
-    return InkWell(
-      onTap: onTap,
-      customBorder: const CircleBorder(),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: AppTextStyles.bodySmall.copyWith(
-                color: color,
-                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

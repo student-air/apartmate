@@ -25,5 +25,6 @@ class UpdatesController extends GetxController {
     }
   }
 
+  @override
   Future<void> refresh() => loadUpdates();
 }

@@ -4,6 +4,7 @@ import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_dashboard_repository.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/presentation/dashboard/widgets/edit_society_sheet.dart';
 
 class DashboardController extends GetxController {
   final IDashboardRepository _dashboardRepository;
@@ -62,10 +63,13 @@ class DashboardController extends GetxController {
     society.value = await _societyRepository.getCurrentSociety();
   }
 
-  void goToEditSociety() => Get.toNamed(AppRoutes.societyRegister); // TODO: point to a dedicated edit-society screen if you build one
+  /// Called by EditSocietyController after a successful save, so the
+  /// header greeting/society name update immediately without a full reload.
+  Future<void> refreshSociety() => _loadSociety();
+
+  void goToEditSociety() => showEditSocietySheet();
   void goToAddStaff() => Get.toNamed(AppRoutes.managementStaff);
-  void goToUpdates() => Get.toNamed(AppRoutes.sendUpdate);
+  void goToUpdates() => Get.toNamed(AppRoutes.updates);
   void goToProfile() => Get.toNamed(AppRoutes.profile);
-  void goToUpdatesFeed() => Get.toNamed(AppRoutes.updates);
   void goToBuildings() => Get.toNamed(AppRoutes.societyBuildings);
 }
