@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:country_state_city_picker/country_state_city_picker.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_strings.dart';
@@ -16,7 +15,7 @@ import 'package:apartmate/presentation/dashboard/controllers/edit_society_contro
 /// currently showing, instead of pushing a full new route. Call this from
 /// DashboardController.goToEditSociety().
 Future<void> showEditSocietySheet() {
-  final controller = Get.put(
+  Get.put(
     EditSocietyController(Get.find<ISocietyRepository>()),
     tag: 'editSociety',
   );
@@ -25,7 +24,10 @@ Future<void> showEditSocietySheet() {
     isScrollControlled: true,
     enableDrag: false,
     backgroundColor: Colors.transparent,
-  ).whenComplete(() => Get.delete<EditSocietyController>(tag: 'editSociety'));
+  ).whenComplete(() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    Get.delete<EditSocietyController>(tag: 'editSociety');
+  });
 }
 
 class EditSocietySheet extends StatelessWidget {
@@ -35,12 +37,25 @@ class EditSocietySheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<EditSocietyController>(tag: 'editSociety');
     final maxHeight = MediaQuery.of(context).size.height * 0.88;
-  
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: maxHeight),
-        child: Container(
+    // Keyboard height. This is applied further down as extra bottom padding
+    // *inside* the scrollview, not as a Padding wrapping the whole sheet.
+    // Wrapping the whole (opaque) card in an outer Padding pushes the card
+    // up but leaves the padding's own space transparent/unpainted — that
+    // transparent gap between the card and the keyboard is exactly what was
+    // showing the dashboard bleeding through in the recording.
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+
+    void closeSheet() {
+      FocusManager.instance.primaryFocus?.unfocus();
+      Get.back();
+    }
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: maxHeight),
+      child: Container(
+          // This Container now sits at the outermost layer, so its white
+          // background fills the entire height of the sheet — including
+          // the strip that used to be transparent padding.
           decoration: const BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.only(
@@ -70,7 +85,7 @@ class EditSocietySheet extends StatelessWidget {
                     children: [
                       Expanded(child: Text('Edit Society', style: AppTextStyles.h4)),
                       IconButton(
-                        onPressed: Get.back,
+                        onPressed: closeSheet,
                         icon: const Icon(Icons.close_rounded, color: AppColors.textMuted),
                       ),
                     ],
@@ -78,7 +93,11 @@ class EditSocietySheet extends StatelessWidget {
                 ),
                 Flexible(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+                    // The keyboard inset is added here instead of on an
+                    // outer Padding, so scrolling — not an invisible gap —
+                    // is what makes room for the keyboard. The card's
+                    // background keeps covering the full sheet height.
+                    padding: EdgeInsets.fromLTRB(20, 4, 20, 24 + bottomInset),
                     child: AppShakeOnTrigger(
                       trigger: controller.shakeTrigger.value,
                       child: Column(
@@ -101,27 +120,6 @@ class EditSocietySheet extends StatelessWidget {
                             hint: AppStrings.addressHint,
                             controller: controller.addressCtrl,
                             maxLines: 2,
-                          ),
-                          const SizedBox(height: AppDimens.space16),
-                          Text('Country, State & City', style: AppTextStyles.labelLarge),
-                          const SizedBox(height: AppDimens.space6),
-                          SizedBox(
-                            width: double.infinity,
-                            child: SelectState(
-                              showFlag: true,
-                              showSearch: true,
-                              countryHint: 'Select Country',
-                              stateHint: 'Select State',
-                              cityHint: 'Select City',
-                              onCountryChanged: controller.setCountry,
-                              onStateChanged: controller.setState,
-                              onCityChanged: controller.setCity,
-                            ),
-                          ),
-                          const SizedBox(height: AppDimens.space6),
-                          Text(
-                            'Currently set to: ${controller.currentLocationLabel}',
-                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
                           ),
                           const SizedBox(height: AppDimens.space16),
                           AppTextField(
@@ -161,8 +159,7 @@ class EditSocietySheet extends StatelessWidget {
                                 label: 'Save Changes',
                                 isLoading: controller.isSaving.value,
                                 onPressed: controller.save,
-                              )
-                            ),
+                              )),
                         ],
                       ),
                     ),
@@ -172,7 +169,6 @@ class EditSocietySheet extends StatelessWidget {
             );
           }),
         ),
-      ),
-    );
+      );
   }
 }

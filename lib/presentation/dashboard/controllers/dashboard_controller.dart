@@ -3,16 +3,20 @@ import 'package:apartmate/data/models/dashboard_stats_model.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_dashboard_repository.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
+import 'package:apartmate/domain/repositories/i_update_repository.dart';
+import 'package:apartmate/data/models/update_model.dart';
 import 'package:apartmate/routes/app_routes.dart';
 import 'package:apartmate/presentation/dashboard/widgets/edit_society_sheet.dart';
 
 class DashboardController extends GetxController {
   final IDashboardRepository _dashboardRepository;
   final ISocietyRepository _societyRepository;
-  DashboardController(this._dashboardRepository, this._societyRepository);
+  final IUpdateRepository _updateRepository;
+  DashboardController(this._dashboardRepository, this._societyRepository, this._updateRepository);
 
   final stats = Rxn<DashboardStatsModel>();
   final society = Rxn<SocietyModel>();
+  final complaintsCount = 0.obs;
   final isLoading = false.obs;
 
   static String get greeting {
@@ -48,6 +52,7 @@ class DashboardController extends GetxController {
     super.onInit();
     _loadStats();
     _loadSociety();
+    _loadComplaintsCount();
   }
 
   Future<void> _loadStats() async {
@@ -63,6 +68,11 @@ class DashboardController extends GetxController {
     society.value = await _societyRepository.getCurrentSociety();
   }
 
+  Future<void> _loadComplaintsCount() async {
+    final updates = await _updateRepository.getUpdates();
+    complaintsCount.value = updates.where((u) => u.type == UpdateType.complaint).length;
+  }
+
   /// Called by EditSocietyController after a successful save, so the
   /// header greeting/society name update immediately without a full reload.
   Future<void> refreshSociety() => _loadSociety();
@@ -72,4 +82,5 @@ class DashboardController extends GetxController {
   void goToUpdates() => Get.toNamed(AppRoutes.updates);
   void goToProfile() => Get.toNamed(AppRoutes.profile);
   void goToBuildings() => Get.toNamed(AppRoutes.societyBuildings);
+  void goToComplaints() => Get.toNamed(AppRoutes.complaints);
 }

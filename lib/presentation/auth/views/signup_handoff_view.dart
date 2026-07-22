@@ -148,7 +148,7 @@ class _SetUpSocietyLayer extends StatelessWidget {
             borderRadius: BorderRadius.circular(18),
           ),
           alignment: Alignment.center,
-          child: const Icon(Icons.location_city_outlined, size: 32, color: AppColors.primaryDark),
+          child: const Icon(Icons.villa_rounded, size: 32, color: AppColors.primaryDark),
         ),
         const SizedBox(height: 16),
         Text("Let's set up your society", style: AppTextStyles.h3),

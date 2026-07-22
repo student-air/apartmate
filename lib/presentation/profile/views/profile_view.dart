@@ -21,7 +21,7 @@ class ProfileView extends GetView<ProfileController> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+                  padding: const EdgeInsets.fromLTRB(40, 56, 40, 80),
                   decoration: const BoxDecoration(
                     color: AppColors.primaryDark,
                     borderRadius: BorderRadius.only(
@@ -30,13 +30,14 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                   ),
                   child: Center(
-                    child: Text('My Profile', style: AppTextStyles.h3.copyWith(color: Colors.white)),
+                    //asset: Image(image: image)
+                    child: Text('My Profile', style: AppTextStyles.h1.copyWith(color: Colors.white)),
                   ),
                 ),
                 Transform.translate(
-                  offset: const Offset(0, -32),
+                  offset: const Offset(0, -52),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -49,6 +50,7 @@ class ProfileView extends GetView<ProfileController> {
                             boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 12, offset: Offset(0, 4))],
                           ),
                           child: Stack(
+                            alignment: Alignment.topCenter,
                             children: [
                               Column(
                                 children: [
@@ -68,7 +70,7 @@ class ProfileView extends GetView<ProfileController> {
                                                 fit: BoxFit.cover,
                                               ),
                                             )
-                                          : Text(controller.initials, style: AppTextStyles.h1.copyWith(color: Colors.white)),
+                                          : Text(controller.initials, style: AppTextStyles.h1.copyWith(color: AppColors.accentGreen)),
                                     );
                                   }),
                                   const SizedBox(height: 14),
@@ -105,9 +107,9 @@ class ProfileView extends GetView<ProfileController> {
                         _SectionCard(
                           title: 'Contact Information',
                           children: [
-                            _InfoRow(icon: Icons.phone_outlined, label: 'Phone Number', value: controller.phone),
+                            _InfoRow(icon: Icons.phone_rounded, label: 'Phone Number', value: controller.phone),
                             const SizedBox(height: 14),
-                            _InfoRow(icon: Icons.email_outlined, label: 'Email Address', value: controller.email),
+                            _InfoRow(icon: Icons.email_rounded, label: 'Email Address', value: controller.email),
                           ],
                         ),
                         const SizedBox(height: 16),
@@ -118,7 +120,7 @@ class ProfileView extends GetView<ProfileController> {
                             title: 'Society Assignment',
                             children: [
                               _InfoRow(
-                                icon: Icons.location_on_outlined,
+                                icon: Icons.location_on_rounded,
                                 label: controller.societyName.value.isEmpty ? 'No society yet' : controller.societyName.value,
                                 value: controller.societyAddress.value,
                                 labelIsTitle: true,
@@ -130,28 +132,28 @@ class ProfileView extends GetView<ProfileController> {
 
                         // Menu
                         _MenuTile(
-                          icon: Icons.notifications_outlined,
+                          icon: Icons.notifications_rounded,
                           iconColor: const Color(0xFF3B82F6),
                           label: 'Notification Preferences',
                           onTap: () => controller.showComingSoon('Notification Preferences'),
                         ),
                         const SizedBox(height: 10),
                         _MenuTile(
-                          icon: Icons.shield_outlined,
-                          iconColor: const Color(0xFF8B5CF6),
+                          icon: Icons.shield_rounded,
+                          iconColor: AppColors.danger,
                           label: 'Privacy & Security',
                           onTap: () => controller.showComingSoon('Privacy & Security'),
                         ),
                         const SizedBox(height: 10),
                         _MenuTile(
-                          icon: Icons.help_outline,
+                          icon: Icons.help_rounded,
                           iconColor: AppColors.accentGreenDark,
                           label: 'Help & Support',
                           onTap: () => controller.showComingSoon('Help & Support'),
                         ),
                         const SizedBox(height: 10),
                         _MenuTile(
-                          icon: Icons.description_outlined,
+                          icon: Icons.description_rounded,
                           iconColor: AppColors.textSecondary,
                           label: 'Terms of Service',
                           onTap: () => controller.showComingSoon('Terms of Service'),
@@ -228,9 +230,9 @@ class _InfoRow extends StatelessWidget {
         Container(
           width: 36,
           height: 36,
-          decoration: BoxDecoration(color: AppColors.accentGreen.withValues(alpha: 0.1), shape: BoxShape.circle),
+          decoration: BoxDecoration(color: AppColors.primaryDarkGradientEnd.withValues(alpha: 0.1), shape: BoxShape.circle),
           alignment: Alignment.center,
-          child: Icon(icon, size: 16, color: AppColors.accentGreenDark),
+          child: Icon(icon, size: 16, color: AppColors.primaryDarkGradientEnd),
         ),
         const SizedBox(width: 12),
         Expanded(

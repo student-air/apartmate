@@ -151,10 +151,11 @@ class DashboardView extends GetView<DashboardController> {
                           onTap: controller.goToBuildings,
                         ),
                         _StatCard(
-                          icon: Icons.grid_view_rounded,
-                          label: 'Total Flats',
-                          value: '${controller.stats.value?.totalFlats ?? 0}',
-                          color: const Color(0xFFFFC107),
+                          icon: Icons.report_problem_rounded,
+                          label: 'Complaints',
+                          value: '${controller.complaintsCount.value}',
+                          color: AppColors.danger,
+                          onTap: controller.goToComplaints,
                         ),
                         _StatCard(
                           icon: Icons.people_rounded,
@@ -167,23 +168,21 @@ class DashboardView extends GetView<DashboardController> {
                           icon: Icons.hourglass_bottom_rounded,
                           label: 'Pending',
                           value: '${controller.stats.value?.pendingRequests ?? 0}',
-                          color: AppColors.pending,
+                          color: AppColors.warning,
                         ),
                       ],
                     ),
                   ),
-                    const SizedBox(height: 24),
-                  ],
-                ),
+                  const SizedBox(height: 24),
+                ],
               ),
-            );
-          }
-        ),
+            ),
+          );
+        }),
       ),
     );
   }
 }
-
 class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
