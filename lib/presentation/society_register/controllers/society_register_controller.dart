@@ -39,6 +39,7 @@ class SocietyRegisterController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _prefillIfEditing();
     contactCtrl.addListener(() => phoneError.value = null);
   }
 
@@ -55,6 +56,16 @@ class SocietyRegisterController extends GetxController {
       return;
     }
     ownerPhoto.value = file;
+  }
+
+  Future<void> _prefillIfEditing() async {
+    final existing = await _societyRepository.getCurrentSociety();
+    if (existing == null) return;
+    societyNameCtrl.text = existing.name;
+    ownerNameCtrl.text = existing.ownerName;
+    addressCtrl.text = existing.address;
+    contactCtrl.text = existing.contactNumber;
+    descriptionCtrl.text = existing.description ?? '';
   }
 
   Future<void> submit() async {

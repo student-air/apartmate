@@ -109,7 +109,7 @@ class DashboardView extends GetView<DashboardController> {
                             GestureDetector(
                               onTap: controller.goToProfile,
                               child: Container(
-                                width: 84,
+                                width: 44,
                                 height: 44,
                                  decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
                                 alignment: Alignment.center,

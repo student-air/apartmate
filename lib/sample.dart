@@ -100,7 +100,7 @@ class DashboardView extends GetView<DashboardController> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    controller.societyName.value,
+                                    controller.societyNameTex,
                                     style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.7)),
                                   ),
                                 ],
