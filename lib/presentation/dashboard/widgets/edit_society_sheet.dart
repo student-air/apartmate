@@ -161,7 +161,8 @@ class EditSocietySheet extends StatelessWidget {
                                 label: 'Save Changes',
                                 isLoading: controller.isSaving.value,
                                 onPressed: controller.save,
-                              )),
+                              )
+                            ),
                         ],
                       ),
                     ),

@@ -42,54 +42,63 @@ class DashboardView extends GetView<DashboardController> {
                   Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(30, 28, 30, 60),
-                        decoration: const BoxDecoration(
-                          color: AppColors.primaryDark,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(AppDimens.headerRadius),
-                            bottomRight: Radius.circular(AppDimens.headerRadius),
+                      Padding(
+                        // The bottom padding here isn't visual spacing — it
+                        // reserves room so the Stack's own layout size
+                        // includes the quick-action cards below, which is
+                        // what makes their lower half tappable. Flutter only
+                        // forwards taps to positions within a Stack's own
+                        // size, even with clipBehavior: Clip.none.
+                        padding: const EdgeInsets.only(bottom: 74),
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(30, 28, 30, 60),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primaryDark,
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(AppDimens.headerRadius),
+                              bottomRight: Radius.circular(AppDimens.headerRadius),
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Obx(() =>Text(
-                                    '${DashboardController.greeting} \n${controller.ownerFirstName}',
-                                    style: AppTextStyles.h2.copyWith(color: Colors.white),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Obx(() =>Text(
+                                      '${DashboardController.greeting} \n${controller.ownerFirstName}',
+                                      style: AppTextStyles.h2.copyWith(color: Colors.white),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Obx(() =>Text(
-                                    controller.societyNameText,
-                                    style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.7)),
+                                    const SizedBox(height: 2),
+                                    Obx(() =>Text(
+                                      controller.societyNameText,
+                                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.7)),
+                                    )),
+                                  ],
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: controller.goToProfile,
+                                child: Container(
+                                  width: 44,
+                                  height: 44,
+                                   decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
+                                  alignment: Alignment.center,
+                                  child: Obx(() =>Text(
+                                    controller.ownerInitials,
+                                    style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryDark),
                                   )),
-                                ],
+                                ),
                               ),
-                            ),
-                            GestureDetector(
-                              onTap: controller.goToProfile,
-                              child: Container(
-                                width: 44,
-                                height: 44,
-                                 decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
-                                alignment: Alignment.center,
-                                child: Obx(() =>Text(
-                                  controller.ownerInitials,
-                                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryDark),
-                                )),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                       Positioned(
                         left: 30,
                         right: 30,
-                        bottom: -74,
+                        bottom: 0,
                         child: Row(
                           children: [
                             Expanded(
@@ -123,7 +132,7 @@ class DashboardView extends GetView<DashboardController> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 90),
+                  const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: GridView.count(
@@ -174,46 +183,6 @@ class DashboardView extends GetView<DashboardController> {
   }
 }
 
-// class _QuickAction extends StatelessWidget {
-//   final IconData icon;
-//   final String label;
-//   final Color color;
-//   final VoidCallback onTap;
-//   const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return InkWell(
-//       onTap: onTap,
-//       borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-//       child: Container(
-//         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-//         decoration: BoxDecoration(
-//           color: AppColors.surface,
-//           borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-//           alignment: Alignment.center,
-//           boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
-//         ),
-//         child: Column(
-//           children: [
-//             Container(
-//               width: 36,
-//               height: 36,
-//               decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
-//               child: Icon(icon, size: 24, color: color),
-//             ),
-//             const SizedBox(height: 24),
-//             Text(
-//               label,
-//               textAlign: TextAlign.center,
-//               style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w700, color: color),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
