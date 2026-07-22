@@ -1,4 +1,3 @@
-/// Summary counts shown on the Dashboard's stat cards.
 class DashboardStatsModel {
   final int buildings;
   final int totalFlats;

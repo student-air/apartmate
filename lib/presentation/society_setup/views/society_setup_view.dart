@@ -479,7 +479,7 @@ class _BuildingTileState extends State<_BuildingTile> with SingleTickerProviderS
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      isConfigured ? AppStrings.buildingComplete : AppStrings.buildingInProgress,
+                      isConfigured ? AppStrings.detailsConfigured : AppStrings.buildingInProgress,
                       style: AppTextStyles.labelSmall.copyWith(
                         color: isConfigured ? AppColors.successGreenDark : AppColors.warning,
                       ),

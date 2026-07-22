@@ -1,156 +1,247 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
+import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
-import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/widgets/app_loading.dart';
+import 'package:apartmate/core/widgets/app_responsive_container.dart';
+import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
 
-
-class SignupHandoffView extends StatefulWidget {
-  const SignupHandoffView({super.key});
-
-  @override
-  State<SignupHandoffView> createState() => _SignupHandoffViewState();
-}
-
-class _SignupHandoffViewState extends State<SignupHandoffView> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _checkScale;
-  late final Animation<double> _layer1Opacity;
-  late final Animation<double> _layer1SlideY;
-  late final Animation<double> _layer2Opacity;
-  late final Animation<double> _layer2SlideY;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
-
-    _checkScale = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.15), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: 1.15, end: 1.0), weight: 1),
-    ]).animate(CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.25, curve: Curves.easeOutBack)));
-
-    _layer1Opacity = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.35, 0.55, curve: Curves.easeIn)),
-    );
-    _layer1SlideY = Tween<double>(begin: 0, end: -24).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.35, 0.55, curve: Curves.easeIn)),
-    );
-
-    _layer2Opacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.45, 0.85, curve: Curves.easeOut)),
-    );
-    _layer2SlideY = Tween<double>(begin: 24, end: 0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.45, 0.85, curve: Curves.easeOut)),
-    );
-
-    _controller.forward();
-
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      if (mounted) Get.offNamed(AppRoutes.societyRegister);
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class DashboardView extends GetView<DashboardController> {
+  const DashboardView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final provider = Get.arguments is String ? Get.arguments as String : null;
-
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, _) {
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  Opacity(
-                    opacity: _layer1Opacity.value,
-                    child: Transform.translate(
-                      offset: Offset(0, _layer1SlideY.value),
-                      child: _AccountCreatedLayer(scale: _checkScale.value, provider: provider),
-                    ),
-                  ),
-                  Opacity(
-                    opacity: _layer2Opacity.value,
-                    child: Transform.translate(
-                      offset: Offset(0, _layer2SlideY.value),
-                      child: const _SetUpSocietyLayer(),
-                    ),
-                  ),
-                ],
-              );
-            },
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
+        elevation: 3,
+        onPressed: () {
+          // TODO: hook up the action for this button once it's decided what it opens
+        },
+        child: const Icon(Icons.add, color: AppColors.accentGreen, size: 28),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: AppColors.surface,
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8,
+        child: SizedBox(
+          height: 60,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavItem(
+                icon: Icons.home_rounded,
+                label: 'Home',
+                isActive: true,
+                onTap: () {
+                  // TODO: navigate to Home
+                },
+              ),
+              _NavItem(
+                icon: Icons.campaign_rounded,
+                label: 'Updates',
+                isActive: false,
+                onTap: () {
+                  // TODO: navigate to Notices
+                },
+              ),
+              const SizedBox(width: 40), // space reserved for the notch/FAB
+              _NavItem(
+                icon: Icons.assignment_outlined,
+                label: 'Requests',
+                isActive: false,
+                onTap: () {
+                  // TODO: navigate to Requests
+                },
+              ),
+              _NavItem(
+                icon: Icons.person_outline,
+                label: 'Profile',
+                isActive: false,
+                onTap: controller.goToProfile,
+              ),
+            ],
           ),
+        ),
+      ),
+      body: SafeArea(
+        bottom: false,
+        child: Obx(() {
+          if (controller.isLoading.value) return const AppLoading();
+          return SingleChildScrollView(
+            child: AppResponsiveContainer(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(30, 28, 30, 60),
+                        decoration: const BoxDecoration(
+                          color: AppColors.primaryDark,
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(AppDimens.headerRadius),
+                            bottomRight: Radius.circular(AppDimens.headerRadius),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${DashboardController.greeting} \n${controller.ownerFirstName}',
+                                    style: AppTextStyles.h2.copyWith(color: Colors.white),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    controller.societyName.value,
+                                    style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.7)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: controller.goToProfile,
+                              child: Container(
+                                width: 84,
+                                height: 44,
+                                 decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  controller.ownerInitials,
+                                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryDark),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        left: 30,
+                        right: 30,
+                        bottom: -64,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _QuickAction(
+                                icon: Icons.edit_rounded,
+                                label: 'Edit Society',
+                                color: AppColors.primaryDarkGradientEnd,
+                                onTap: controller.goToEditSociety,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _QuickAction(
+                                icon: Icons.people_rounded,
+                                label: 'Add Staff',
+                                color: AppColors.primaryDarkGradientEnd,
+                                onTap: controller.goToAddStaff,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _QuickAction(
+                                icon: Icons.campaign_rounded,
+                                label: 'Updates',
+                                color: AppColors.accentGreen,
+                                onTap: controller.goToUpdates,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  // extra space so the overlapping cards don't collide with
+                  // whatever content comes next in the scroll view
+                  const SizedBox(height: 50),
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+  const _NavItem({required this.icon, required this.label, required this.isActive, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color = isActive ? AppColors.primaryDarkGradientEnd : AppColors.textMuted;
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 22, color: color),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: color,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _AccountCreatedLayer extends StatelessWidget {
-  final double scale;
-  final String? provider;
-  const _AccountCreatedLayer({required this.scale, this.provider});
+class _QuickAction extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Transform.scale(
-          scale: scale,
-          child: Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(color: AppColors.successGreen.withValues(alpha: 0.15), shape: BoxShape.circle),
-            alignment: Alignment.center,
-            child: const Icon(Icons.check, size: 34, color: AppColors.successGreenDark),
-          ),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+          boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
         ),
-        const SizedBox(height: 16),
-        Text('Account created', style: AppTextStyles.h3),
-        const SizedBox(height: 4),
-        Text(
-          provider != null ? 'Signed in with $provider' : 'Signed in successfully',
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+        child: Column(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+              child: Icon(icon, size: 18, color: color),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w700, color: color),
+            ),
+          ],
         ),
-      ],
-    );
-  }
-}
-
-class _SetUpSocietyLayer extends StatelessWidget {
-  const _SetUpSocietyLayer();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            color: AppColors.primaryDark.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          alignment: Alignment.center,
-          child: const Icon(Icons.location_city_outlined, size: 32, color: AppColors.primaryDark),
-        ),
-        const SizedBox(height: 16),
-        Text("Let's set up your society", style: AppTextStyles.h3),
-        const SizedBox(height: 4),
-        Text('Just a few details to get started', style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-      ],
+      ),
     );
   }
 }

@@ -18,7 +18,7 @@ class LocalDashboardRepository implements IDashboardRepository {
       buildings: buildings.length,
       totalFlats: totalFlats,
       mgmtStaff: staff.length,
-      pendingRequests: 0, // wired once Tenant Requests exists
+      pendingRequests: 2,
     );
   }
 }

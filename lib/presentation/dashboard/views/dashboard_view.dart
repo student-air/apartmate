@@ -1,10 +1,169 @@
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:apartmate/core/constants/app_colors.dart';
+// import 'package:apartmate/core/constants/app_dimens.dart';
+// import 'package:apartmate/core/constants/app_text_styles.dart';
+// import 'package:apartmate/core/widgets/app_loading.dart';
+// import 'package:apartmate/core/widgets/app_responsive_container.dart';
+// import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
+
+// class DashboardView extends GetView<DashboardController> {
+//   const DashboardView({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: AppColors.background,
+//       body: SafeArea(
+//         bottom: false,
+//         child: Obx(() {
+//           if (controller.isLoading.value) return const AppLoading();
+//           return SingleChildScrollView(
+//             child: AppResponsiveContainer(
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.stretch,
+//                 children: [
+//                   Stack(
+//                     clipBehavior: Clip.none,
+//                     children: [
+//                       Container(
+//                         padding: const EdgeInsets.fromLTRB(30, 28, 30, 60),
+//                         decoration: const BoxDecoration(
+//                           color: AppColors.primaryDark,
+//                           borderRadius: BorderRadius.only(
+//                             bottomLeft: Radius.circular(AppDimens.headerRadius),
+//                             bottomRight: Radius.circular(AppDimens.headerRadius),
+//                           ),
+//                         ),
+//                         child: Row(
+//                           children: [
+//                             Expanded(
+//                               child: Column(
+//                                 crossAxisAlignment: CrossAxisAlignment.start,
+//                                 children: [
+//                                   Text(
+//                                     '${DashboardController.greeting} \n${controller.ownerFirstName}',
+//                                     style: AppTextStyles.h2.copyWith(color: Colors.white),
+//                                   ),
+//                                   const SizedBox(height: 2),
+//                                   Text(
+//                                     controller.societyName.value,
+//                                     style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.7)),
+//                                   ),
+//                                 ],
+//                               ),
+//                             ),
+//                             GestureDetector(
+//                               onTap: controller.goToProfile,
+//                               child: Container(
+//                                 width: 84,
+//                                 height: 44,
+//                                  decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
+//                                 alignment: Alignment.center,
+//                                 child: Text(
+//                                   controller.ownerInitials,
+//                                   style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryDark),
+//                                 ),
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                       Positioned(
+//                         left: 30,
+//                         right: 30,
+//                         bottom: -64,
+//                         child: Row(
+//                           children: [
+//                             Expanded(
+//                               child: _QuickAction(
+//                                 icon: Icons.edit_rounded,
+//                                 label: 'Edit Society',
+//                                 color: AppColors.primaryDarkGradientEnd,
+//                                 onTap: controller.goToEditSociety,
+//                               ),
+//                             ),
+//                             const SizedBox(width: 12),
+//                             Expanded(
+//                               child: _QuickAction(
+//                                 icon: Icons.people_rounded,
+//                                 label: 'Add Staff',
+//                                 color: AppColors.primaryDarkGradientEnd,
+//                                 onTap: controller.goToAddStaff,
+//                               ),
+//                             ),
+//                             const SizedBox(width: 12),
+//                             Expanded(
+//                               child: _QuickAction(
+//                                 icon: Icons.campaign_rounded,
+//                                 label: 'Updates',
+//                                 color: AppColors.accentGreen,
+//                                 onTap: controller.goToUpdates,
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                   // extra space so the overlapping cards don't collide with
+//                   // whatever content comes next in the scroll view
+//                   const SizedBox(height: 50),
+//                 ],
+//               ),
+//             ),
+//           );
+//         }),
+//       ),
+//     );
+//   }
+// }
+
+// class _QuickAction extends StatelessWidget {
+//   final IconData icon;
+//   final String label;
+//   final Color color;
+//   final VoidCallback onTap;
+//   const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return InkWell(
+//       onTap: onTap,
+//       borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+//       child: Container(
+//         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+//         decoration: BoxDecoration(
+//           color: AppColors.surface,
+//           borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+//           boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
+//         ),
+//         child: Column(
+//           children: [
+//             Container(
+//               width: 36,
+//               height: 36,
+//               decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+//               child: Icon(icon, size: 18, color: color),
+//             ),
+//             const SizedBox(height: 8),
+//             Text(
+//               label,
+//               textAlign: TextAlign.center,
+//               style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w700, color: color),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
-import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
-import 'package:apartmate/core/widgets/app_card.dart';
 import 'package:apartmate/core/widgets/app_loading.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
@@ -16,68 +175,154 @@ class DashboardView extends GetView<DashboardController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
+        elevation: 30,
+        onPressed: () {
+          // TODO: hook up the action for this button once it's decided what it opens
+        },
+        child: const Icon(Icons.add, color: AppColors.accentGreen, size: 30),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: AppColors.surface,
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8,
+        child: SizedBox(
+          height: 60,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavItem(
+                icon: Icons.home_rounded,
+                label: 'Home',
+                isActive: true,
+                onTap: () {
+                  // TODO: navigate to Home
+                },
+              ),
+              _NavItem(
+                icon: Icons.campaign_rounded,
+                label: 'Updates',
+                isActive: false,
+                onTap: () {
+                  // TODO: navigate to Notices
+                },
+              ),
+              const SizedBox(width: 40), // space reserved for the notch/FAB
+              _NavItem(
+                icon: Icons.assignment_rounded,
+                label: 'Requests',
+                isActive: false,
+                onTap: () {
+                  // TODO: navigate to Requests
+                },
+              ),
+              _NavItem(
+                icon: Icons.person_rounded,
+                label: 'Profile',
+                isActive: false,
+                onTap: controller.goToProfile,
+              ),
+            ],
+          ),
+        ),
+      ),
       body: SafeArea(
+        bottom: false,
         child: Obx(() {
           if (controller.isLoading.value) return const AppLoading();
-          final s = controller.stats.value;
           return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
             child: AppResponsiveContainer(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
+                  Stack(
+                    clipBehavior: Clip.none,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(30, 28, 30, 60),
+                        decoration: const BoxDecoration(
+                          color: AppColors.primaryDark,
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(AppDimens.headerRadius),
+                            bottomRight: Radius.circular(AppDimens.headerRadius),
+                          ),
+                        ),
+                        child: Row(
                           children: [
-                            Text(DashboardController.greeting,
-                                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
-                            const SizedBox(height: 2),
-                            Text(AppStrings.ownerName, style: AppTextStyles.h2),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${DashboardController.greeting} \n${controller.ownerFirstName}',
+                                    style: AppTextStyles.h2.copyWith(color: Colors.white),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    controller.societyName.value,
+                                    style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.7)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: controller.goToProfile,
+                              child: Container(
+                                width: 84,
+                                height: 44,
+                                 decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  controller.ownerInitials,
+                                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryDark),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                      GestureDetector(
-                        onTap: controller.goToProfile,
-                        child: Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(color: AppColors.primaryDark, borderRadius: BorderRadius.circular(16)),
-                          alignment: Alignment.center,
-                          child: Text('A', style: AppTextStyles.h4.copyWith(color: AppColors.accentGreen)),
+                      Positioned(
+                        left: 30,
+                        right: 30,
+                        bottom: -64,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _QuickAction(
+                                icon: Icons.edit_rounded,
+                                label: 'Edit Society',
+                                color: AppColors.primaryDarkGradientEnd,
+                                onTap: controller.goToEditSociety,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _QuickAction(
+                                icon: Icons.people_rounded,
+                                label: 'Add Staff',
+                                color: AppColors.primaryDarkGradientEnd,
+                                onTap: controller.goToAddStaff,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _QuickAction(
+                                icon: Icons.campaign_rounded,
+                                label: 'Updates',
+                                color: AppColors.accentGreen,
+                                onTap: controller.goToUpdates,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1.7,
-                    children: [
-                      _StatCard(icon: Icons.location_city_outlined, label: 'Buildings', value: '${s?.buildings ?? 0}', onTap: controller.goToBuildings),
-                      _StatCard(icon: Icons.home_outlined, label: 'Total Flats', value: '${s?.totalFlats ?? 0}'),
-                      _StatCard(icon: Icons.people_outline, label: 'Mgmt Staff', value: '${s?.mgmtStaff ?? 0}', onTap: controller.goToStaff),
-                      _StatCard(icon: Icons.hourglass_empty, label: 'Pending', value: '${s?.pendingRequests ?? 0}', accent: true),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _ActionCard(icon: Icons.location_city_outlined, label: 'Manage Buildings', onTap: controller.goToBuildings),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _ActionCard(icon: Icons.notifications_outlined, label: 'Notices', dark: true, onTap: controller.goToNotices),
-                      ),
-                    ],
-                  ),
+                  // extra space so the overlapping cards don't collide with
+                  // whatever content comes next in the scroll view
+                  const SizedBox(height: 50),
                 ],
               ),
             ),
@@ -88,29 +333,33 @@ class DashboardView extends GetView<DashboardController> {
   }
 }
 
-class _StatCard extends StatelessWidget {
+class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  final String value;
-  final bool accent;
-  final VoidCallback? onTap;
-  const _StatCard({required this.icon, required this.label, required this.value, this.accent = false, this.onTap});
+  final bool isActive;
+  final VoidCallback onTap;
+  const _NavItem({required this.icon, required this.label, required this.isActive, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final Color color = isActive ? AppColors.primaryDarkGradientEnd : AppColors.textMuted;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppDimens.radius2xl),
-      child: AppCard(
-        padding: const EdgeInsets.all(14),
+      customBorder: const CircleBorder(),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 18, color: accent ? AppColors.pending : AppColors.primaryDark),
-            const SizedBox(height: 8),
-            Text(value, style: AppTextStyles.h3),
-            Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+            Icon(icon, size: 22, color: color),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: color,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ),
@@ -118,32 +367,39 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-class _ActionCard extends StatelessWidget {
+class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
-  final bool dark;
+  final Color color;
   final VoidCallback onTap;
-  const _ActionCard({required this.icon, required this.label, required this.onTap, this.dark = false});
+  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppDimens.radius2xl),
+      borderRadius: BorderRadius.circular(AppDimens.radiusLg),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         decoration: BoxDecoration(
-          color: dark ? AppColors.primaryDark : AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimens.radius2xl),
-          border: dark ? null : Border.all(color: AppColors.borderLight),
-          boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2))],
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+          boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, size: 22, color: dark ? AppColors.accentGreen : AppColors.primaryDark),
-            const SizedBox(height: 12),
-            Text(label, style: AppTextStyles.labelLarge.copyWith(color: dark ? Colors.white : AppColors.textPrimary)),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+              child: Icon(icon, size: 18, color: color),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w700, color: color),
+            ),
           ],
         ),
       ),

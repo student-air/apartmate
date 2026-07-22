@@ -12,13 +12,8 @@ abstract class AppRoutes {
   static const societyBuildings = '/society-buildings';
   static const buildingDetail = '/building-detail';
   static const managementStaff = '/management-staff';  
-  //static const notices = '/notices';
-  //static const sendNotice = '/send-notice';
-  //static const requests = '/requests';
-  //static const profile = '/profile';
   static const dashboard = '/dashboard';
   static const sendNotice = '/send-notice';
   static const notices = '/notices';
-  static const requests = '/requests';
   static const profile = '/profile';
 }
