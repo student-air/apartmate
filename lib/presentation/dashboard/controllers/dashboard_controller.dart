@@ -66,4 +66,5 @@ class DashboardController extends GetxController {
   void goToAddStaff() => Get.toNamed(AppRoutes.managementStaff);
   void goToUpdates() => Get.toNamed(AppRoutes.sendNotice);
   void goToProfile() => Get.toNamed(AppRoutes.profile);
+  void goToBuildings() => Get.toNamed(AppRoutes.societyBuildings);
 }

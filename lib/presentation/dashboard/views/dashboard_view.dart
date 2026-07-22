@@ -94,15 +94,16 @@ class DashboardView extends GetView<DashboardController> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  Obx(() =>Text(
                                     '${DashboardController.greeting} \n${controller.ownerFirstName}',
                                     style: AppTextStyles.h2.copyWith(color: Colors.white),
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
-                                  Text(
+                                  Obx(() =>Text(
                                     controller.societyNameText,
                                     style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.7)),
-                                  ),
+                                  )),
                                 ],
                               ),
                             ),
@@ -113,10 +114,10 @@ class DashboardView extends GetView<DashboardController> {
                                 height: 44,
                                  decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
                                 alignment: Alignment.center,
-                                child: Text(
+                                child: Obx(() =>Text(
                                   controller.ownerInitials,
                                   style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryDark),
-                                ),
+                                )),
                               ),
                             ),
                           ],
@@ -125,7 +126,7 @@ class DashboardView extends GetView<DashboardController> {
                       Positioned(
                         left: 30,
                         right: 30,
-                        bottom: -64,
+                        bottom: -74,
                         child: Row(
                           children: [
                             Expanded(
@@ -159,9 +160,47 @@ class DashboardView extends GetView<DashboardController> {
                       ),
                     ],
                   ),
-                  // extra space so the overlapping cards don't collide with
-                  // whatever content comes next in the scroll view
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 90),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 1.6,
+                      children: [
+                        _StatCard(
+                          icon: Icons.villa_rounded,
+                          label: 'Buildings',
+                          value: '${controller.stats.value?.buildings ?? 0}',
+                          color: AppColors.primaryDarkGradientEnd,
+                          onTap: controller.goToBuildings,
+                        ),
+                        _StatCard(
+                          icon: Icons.grid_view_rounded,
+                          label: 'Total Flats',
+                          value: '${controller.stats.value?.totalFlats ?? 0}',
+                          color: const Color(0xFFFFC107),
+                        ),
+                        _StatCard(
+                          icon: Icons.people_rounded,
+                          label: 'Staff Info',
+                          value: '${controller.stats.value?.mgmtStaff ?? 0}',
+                          color: const Color(0xFF8B5CF6),
+                          onTap: controller.goToAddStaff,
+                        ),
+                        _StatCard(
+                          icon: Icons.hourglass_bottom_rounded,
+                          label: 'Pending',
+                          value: '${controller.stats.value?.pendingRequests ?? 0}',
+                          color: AppColors.pending,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -206,6 +245,46 @@ class _NavItem extends StatelessWidget {
   }
 }
 
+// class _QuickAction extends StatelessWidget {
+//   final IconData icon;
+//   final String label;
+//   final Color color;
+//   final VoidCallback onTap;
+//   const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return InkWell(
+//       onTap: onTap,
+//       borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+//       child: Container(
+//         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+//         decoration: BoxDecoration(
+//           color: AppColors.surface,
+//           borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+//           alignment: Alignment.center,
+//           boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
+//         ),
+//         child: Column(
+//           children: [
+//             Container(
+//               width: 36,
+//               height: 36,
+//               decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+//               child: Icon(icon, size: 24, color: color),
+//             ),
+//             const SizedBox(height: 24),
+//             Text(
+//               label,
+//               textAlign: TextAlign.center,
+//               style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w700, color: color),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -231,9 +310,10 @@ class _QuickAction extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
-              child: Icon(icon, size: 18, color: color),
+              alignment: Alignment.center,
+              child: Icon(icon, size: 24, color: color),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 28),
             Text(
               label,
               textAlign: TextAlign.center,
@@ -241,6 +321,52 @@ class _QuickAction extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+  final VoidCallback? onTap;
+  const _StatCard({required this.icon, required this.label, required this.value, required this.color, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+          boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
+        ),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+            alignment: Alignment.center,
+            child: Icon(icon, size: 28, color: color),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(value, style: AppTextStyles.h3),
+                const SizedBox(height: 6),
+                Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted)),
+              ],
+            ),
+          ),
+        ],
+      ),
       ),
     );
   }
