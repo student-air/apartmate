@@ -10,6 +10,7 @@ class SocietyModel {
   final String country;
   final String contactNumber;
   final String? description;
+  final String? ownerPhotoPath; 
   final SocietyRegistrationStatus registrationStatus;
   final DateTime submittedAt;
 
@@ -22,6 +23,7 @@ class SocietyModel {
     required this.country,
     required this.contactNumber,
     this.description,
+    this.ownerPhotoPath,
     this.registrationStatus = SocietyRegistrationStatus.pendingReview,
     required this.submittedAt,
   });

@@ -82,6 +82,7 @@ class SocietyRegisterController extends GetxController {
       phoneError.value = 'Use format 03XXXXXXXXX or +92 3XX XXXXXXX';
       return;
     }
+    
     isSubmitting.value = true;
     try {
       await _societyRepository.registerSociety(
@@ -95,12 +96,14 @@ class SocietyRegisterController extends GetxController {
           contactNumber: contactCtrl.text.trim(),
           description: descriptionCtrl.text.trim(),
           submittedAt: DateTime.now(),
+          ownerPhotoPath: ownerPhoto.value?.path,
         ),
       );
       Get.toNamed(AppRoutes.registrationStatus);
     } finally {
       isSubmitting.value = false;
     }
+    
   }
 
   @override

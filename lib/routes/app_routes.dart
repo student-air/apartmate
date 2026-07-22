@@ -16,4 +16,5 @@ abstract class AppRoutes {
   static const updates = '/updates'; // was: notices
   static const sendUpdate = '/send-updates'; // was: send-notice
   static const profile = '/profile';
+  static const editProfile = '/edit-profile';
 }

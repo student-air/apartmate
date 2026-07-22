@@ -172,12 +172,13 @@ class DashboardView extends GetView<DashboardController> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
-                ],
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
-            ),
-          );
-        }),
+            );
+          }
+        ),
       ),
     );
   }

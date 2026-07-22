@@ -20,6 +20,8 @@ import 'package:apartmate/presentation/dashboard/views/dashboard_view.dart';
 import 'package:apartmate/presentation/auth/views/signup_handoff_view.dart';
 import 'package:apartmate/presentation/updates/bindings/updates_binding.dart';
 import 'package:apartmate/presentation/updates/views/updates_view.dart';
+import 'package:apartmate/presentation/profile/bindings/profile_binding.dart';
+import 'package:apartmate/presentation/profile/views/profile_view.dart';
 
 class AppPages {
   AppPages._();
@@ -79,5 +81,15 @@ class AppPages {
   page: () => const UpdatesView(),
   binding: UpdatesBinding(),
     ),
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileView(),
+      binding: ProfileBinding(),
+    ),
+    // GetPage(
+    //   name: AppRoutes.editProfile,
+    //   page: () => const EditProfileView(),
+    //   binding: EditProfileBinding(),
+    // ),
   ];
 }

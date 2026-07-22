@@ -35,7 +35,7 @@ class EditSocietySheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<EditSocietyController>(tag: 'editSociety');
     final maxHeight = MediaQuery.of(context).size.height * 0.88;
-
+  
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: ConstrainedBox(

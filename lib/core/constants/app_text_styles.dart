@@ -21,6 +21,12 @@ class AppTextStyles {
       height: height,
     );
   }
+  static TextStyle overline = _base(
+    size: 11,
+    weight: FontWeight.w700,
+    color: AppColors.textMuted,
+    letterSpacing: 0.8,
+  );
 
   // Display / headings
   static TextStyle h1 = _base(size: 32, weight: FontWeight.w700, letterSpacing: -0.5);
