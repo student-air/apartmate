@@ -64,7 +64,8 @@ class DashboardController extends GetxController {
 
   void goToEditSociety() => Get.toNamed(AppRoutes.societyRegister); // TODO: point to a dedicated edit-society screen if you build one
   void goToAddStaff() => Get.toNamed(AppRoutes.managementStaff);
-  void goToUpdates() => Get.toNamed(AppRoutes.sendNotice);
+  void goToUpdates() => Get.toNamed(AppRoutes.sendUpdate);
   void goToProfile() => Get.toNamed(AppRoutes.profile);
+  void goToUpdatesFeed() => Get.toNamed(AppRoutes.updates);
   void goToBuildings() => Get.toNamed(AppRoutes.societyBuildings);
 }

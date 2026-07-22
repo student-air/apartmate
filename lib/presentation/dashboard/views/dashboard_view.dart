@@ -44,9 +44,7 @@ class DashboardView extends GetView<DashboardController> {
                 icon: Icons.campaign_rounded,
                 label: 'Updates',
                 isActive: false,
-                onTap: () {
-                  // TODO: navigate to Notices
-                },
+                onTap: controller.goToUpdatesFeed,
               ),
               const SizedBox(width: 40), // space reserved for the notch/FAB
               _NavItem(

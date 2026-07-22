@@ -13,7 +13,7 @@ abstract class AppRoutes {
   static const buildingDetail = '/building-detail';
   static const managementStaff = '/management-staff';  
   static const dashboard = '/dashboard';
-  static const sendNotice = '/send-notice';
-  static const notices = '/notices';
+  static const updates = '/updates'; // was: notices
+  static const sendUpdate = '/send-updates'; // was: send-notice
   static const profile = '/profile';
 }

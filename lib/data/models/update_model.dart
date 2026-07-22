@@ -1,13 +1,13 @@
-enum NoticeType { notice, complaint, announcement }
+enum UpdateType { general, complaint, announcement }
 
-class NoticeModel {
+class UpdateModel {
   final String id;
-  final NoticeType type;
+  final UpdateType type;
   final String title;
   final String description;
   final DateTime postedAt;
 
-  const NoticeModel({
+  const UpdateModel({
     required this.id,
     required this.type,
     required this.title,
