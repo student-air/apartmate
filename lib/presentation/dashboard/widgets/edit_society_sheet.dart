@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:country_state_city_picker/country_state_city_picker.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_strings.dart';

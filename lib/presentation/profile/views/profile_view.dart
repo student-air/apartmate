@@ -30,7 +30,6 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                   ),
                   child: Center(
-                    //asset: Image(image: image)
                     child: Text('My Profile', style: AppTextStyles.h1.copyWith(color: Colors.white)),
                   ),
                 ),

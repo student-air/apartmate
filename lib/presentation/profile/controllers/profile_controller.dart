@@ -4,6 +4,7 @@ import 'package:apartmate/data/models/user_model.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/utils/app_snackbar.dart ';
 
 class ProfileController extends GetxController {
   final IAuthRepository _authRepository;
@@ -44,7 +45,7 @@ class ProfileController extends GetxController {
   void goToEditProfile() => Get.toNamed(AppRoutes.editProfile);
 
   void showComingSoon(String feature) {
-    Get.snackbar('Coming soon', '$feature isn\'t available yet');
+    AppSnackbar.info('Coming soon', '$feature isn\'t available yet');
   }
 
   Future<void> logout() async {

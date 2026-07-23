@@ -110,4 +110,6 @@ class AppStrings {
   static const shift = 'Shift';
   static const saveStaffMember = 'Save Staff Member';
   static const saveAndGoToDashboard = 'Save & Go to Dashboard';
+
+  static const flatNumberHint = 'e.g. E-101, A-202, A-1, B-2…';
 }

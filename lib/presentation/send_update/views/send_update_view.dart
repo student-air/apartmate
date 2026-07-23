@@ -7,61 +7,24 @@ import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_bottom_nav.dart';
 import 'package:apartmate/core/widgets/app_loading.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
-import 'package:apartmate/core/widgets/send_update_sheet.dart';
 import 'package:apartmate/data/models/update_model.dart';
 import 'package:apartmate/presentation/updates/controllers/updates_controller.dart';
+import 'package:apartmate/core/widgets/send_update_sheet.dart';
 import 'package:apartmate/routes/app_routes.dart';
 
 class UpdatesView extends GetView<UpdatesController> {
   const UpdatesView({super.key});
-
-  Future<void> _confirmClearAll(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Clear all updates?'),
-        content: const Text('This will remove every update from this list. This can\'t be undone.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Clear All', style: TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
-    );
-    if (confirmed == true) {
-      controller.clearAll();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        titleSpacing: -10,
+        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
+        title: Text('Updates', style: AppTextStyles.h3),
         centerTitle: false,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/logo.png', height: 32, fit: BoxFit.cover),
-            const SizedBox(width: 2),
-            Text('Updates', style: AppTextStyles.h3.copyWith(color: Colors.white)),
-          ],
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          Obx(() {
-            if (controller.updates.isEmpty) return const SizedBox.shrink();
-            return TextButton(
-              onPressed: () => _confirmClearAll(context),
-              child: const Text('Clear All', style: TextStyle(color: Colors.white)),
-            );
-          }),
-        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AppAddFab(
@@ -94,21 +57,7 @@ class UpdatesView extends GetView<UpdatesController> {
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final update = controller.updates[index];
-                  return Dismissible(
-                    key: ValueKey(update.id),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: AppColors.danger,
-                        borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-                      ),
-                      child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
-                    ),
-                    onDismissed: (_) => controller.deleteUpdate(update.id),
-                    child: _UpdateCard(update: update),
-                  );
+                  return _UpdateCard(update: update);
                 },
               ),
             ),
@@ -124,14 +73,15 @@ class _UpdateCard extends StatelessWidget {
   const _UpdateCard({required this.update});
 
   ({Color bg, Color text, Color border, String label}) get _typeStyle {
-    switch (update.type) {
-      case UpdateType.complaint:
-        return (bg: AppColors.dangerBg, text: AppColors.danger, border: AppColors.dangerBorder, label: 'Complaint');
-      case UpdateType.announcement:
-        return (bg: AppColors.roleAdminBg, text: AppColors.roleAdminText, border: AppColors.roleAdminBorder, label: 'Announcement');
-      case UpdateType.general:
-        return (bg: AppColors.warningBg, text: AppColors.warning, border: AppColors.warningBorder, label: 'Update');
-    }
+    final fallback = switch (update.type) {
+      UpdateType.complaint => (bg: AppColors.dangerBg, text: AppColors.danger, border: AppColors.dangerBorder, label: 'Complaint'),
+      UpdateType.announcement => (bg: AppColors.roleAdminBg, text: AppColors.roleAdminText, border: AppColors.roleAdminBorder, label: 'Announcement'),
+      UpdateType.general => (bg: AppColors.warningBg, text: AppColors.warning, border: AppColors.warningBorder, label: 'Update'),
+    };
+    // Prefer the specific preset picked at compose time (e.g. "Maintenance
+    // Alert") over the coarse type label, but keep the coarse type's color.
+    if (update.category == null || update.category!.isEmpty) return fallback;
+    return (bg: fallback.bg, text: fallback.text, border: fallback.border, label: update.category!);
   }
 
   @override

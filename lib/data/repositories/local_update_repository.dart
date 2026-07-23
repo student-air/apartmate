@@ -17,4 +17,16 @@ class LocalUpdateRepository implements IUpdateRepository {
     _updates.add(update);
     return update;
   }
+
+  @override
+  Future<void> deleteUpdate(String id) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    _updates.removeWhere((u) => u.id == id);
+  }
+
+  @override
+  Future<void> clearAll() async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    _updates.clear();
+  }
 }

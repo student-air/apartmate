@@ -7,6 +7,7 @@ import 'package:apartmate/core/widgets/app_bottom_nav.dart';
 import 'package:apartmate/core/widgets/app_loading.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
+import 'package:apartmate/core/widgets/send_update_sheet.dart';
 
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
@@ -17,9 +18,7 @@ class DashboardView extends GetView<DashboardController> {
       backgroundColor: AppColors.background,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AppAddFab(
-        onPressed: () {
-          // TODO: hook up the action for this button once it's decided what it opens
-        },
+        onPressed: showSendUpdateSheet,
       ),
       bottomNavigationBar: AppBottomNav(
         activeTab: AppNavTab.home,
@@ -168,7 +167,7 @@ class DashboardView extends GetView<DashboardController> {
                           icon: Icons.hourglass_bottom_rounded,
                           label: 'Pending',
                           value: '${controller.stats.value?.pendingRequests ?? 0}',
-                          color: AppColors.warning,
+                          color: AppColors.pending,
                         ),
                       ],
                     ),
