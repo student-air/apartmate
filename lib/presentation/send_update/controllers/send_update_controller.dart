@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
+import 'package:apartmate/presentation/updates/controllers/updates_badge_controller.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/data/models/update_model.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
@@ -163,6 +164,9 @@ class SendUpdateController extends GetxController {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Get.back();
       AppSnackbar.success('Sent', 'Your notice has been sent');
+      if (Get.isRegistered<UpdatesBadgeController>()) {
+        Get.find<UpdatesBadgeController>().increment();
+      }
     });
   }
 

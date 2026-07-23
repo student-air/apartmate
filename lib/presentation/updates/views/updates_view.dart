@@ -58,7 +58,7 @@ class UpdatesView extends GetView<UpdatesController> {
             if (controller.updates.isEmpty) return const SizedBox.shrink();
             return TextButton(
               onPressed: () => _confirmClearAll(context),
-              child: const Text('Clear All', style: TextStyle(color: Colors.white)),
+              child: const Text('Clear All', style: TextStyle(color: AppColors.accentGreen)),
             );
           }),
         ],

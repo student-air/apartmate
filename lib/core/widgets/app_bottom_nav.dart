@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
+import 'package:apartmate/presentation/updates/controllers/updates_badge_controller.dart';
 
 /// Which tab is currently highlighted in [AppBottomNav]. Use [none] for
 /// secondary screens (e.g. Complaints) that are reached from elsewhere and
@@ -65,6 +67,7 @@ class AppBottomNav extends StatelessWidget {
               label: 'Updates',
               isActive: activeTab == AppNavTab.updates,
               onTap: onUpdates,
+              showBadge: true,
             ),
             const SizedBox(width: 40), // space reserved for the notch/FAB
             _NavItem(
@@ -91,7 +94,53 @@ class _NavItem extends StatelessWidget {
   final String label;
   final bool isActive;
   final VoidCallback onTap;
-  const _NavItem({required this.icon, required this.label, required this.isActive, required this.onTap});
+  final bool showBadge;
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+    this.showBadge = false,
+  });
+
+  /// The plain icon, optionally overlaid with a small "new" count badge.
+  /// The badge only ever appears when [showBadge] is true, the tab is NOT
+  /// currently active (no badge while you're already looking at Updates),
+  /// and there's actually an unread count to show.
+  Widget _iconWithBadge(Color color) {
+    final baseIcon = Icon(icon, size: 22, color: color);
+    if (!showBadge || isActive) return baseIcon;
+    if (!Get.isRegistered<UpdatesBadgeController>()) return baseIcon;
+
+    return Obx(() {
+      final count = Get.find<UpdatesBadgeController>().unreadCount.value;
+      if (count <= 0) return baseIcon;
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          baseIcon,
+          Positioned(
+            right: -6,
+            top: -4,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+              decoration: BoxDecoration(
+                color: AppColors.danger,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.surface, width: 1.5),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                count > 9 ? '9+' : '$count',
+                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700, height: 1),
+              ),
+            ),
+          ),
+        ],
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +153,7 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 22, color: color),
+            _iconWithBadge(color),
             const SizedBox(height: 2),
             Text(
               label,

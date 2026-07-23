@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:apartmate/presentation/updates/controllers/updates_badge_controller.dart';
 import 'package:apartmate/data/models/update_model.dart';
 import 'package:apartmate/domain/repositories/i_update_repository.dart';
 
@@ -13,6 +15,18 @@ class UpdatesController extends GetxController {
   void onInit() {
     super.onInit();
     loadUpdates();
+    // GetX's onReady() turned out not to reliably defer past the current
+    // build in this project's GetX version — it still raced the badge
+    // Obx, just with a smaller window. WidgetsBinding.addPostFrameCallback
+    // is a Flutter-level guarantee (not a GetX assumption): it only runs
+    // after the current frame's build/layout/paint is fully finished, so
+    // mutating unreadCount here is always safe, regardless of GetX's
+    // internal lifecycle timing.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isRegistered<UpdatesBadgeController>()) {
+        Get.find<UpdatesBadgeController>().markSeen();
+      }
+    });
   }
 
   Future<void> loadUpdates() async {

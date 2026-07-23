@@ -102,6 +102,7 @@ class EditSocietyController extends GetxController {
         await Get.find<DashboardController>().refreshSociety();
       }
 
+      FocusManager.instance.primaryFocus?.unfocus();
       Get.back(); // close the sheet
       AppSnackbar.success('Saved', 'Society details updated');
     } finally {
