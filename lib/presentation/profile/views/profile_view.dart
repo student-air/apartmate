@@ -21,7 +21,7 @@ class ProfileView extends GetView<ProfileController> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                  padding: const EdgeInsets.fromLTRB(40, 56, 40, 80),
+                  padding: const EdgeInsets.fromLTRB(40, 36, 40, 80),
                   decoration: const BoxDecoration(
                     color: AppColors.primaryDark,
                     borderRadius: BorderRadius.only(
@@ -30,7 +30,22 @@ class ProfileView extends GetView<ProfileController> {
                     ),
                   ),
                   child: Center(
-                    child: Text('My Profile', style: AppTextStyles.h1.copyWith(color: Colors.white)),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text('My Profile', style: AppTextStyles.h1.copyWith(color: Colors.white)),
+                      ],
+                    ),
                   ),
                 ),
                 Transform.translate(

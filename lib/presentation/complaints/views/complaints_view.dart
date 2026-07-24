@@ -10,6 +10,7 @@ import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/data/models/update_model.dart';
 import 'package:apartmate/presentation/complaints/controllers/complaints_controller.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/widgets/send_update_sheet.dart';
 
 class ComplaintsView extends GetView<ComplaintsController> {
   const ComplaintsView({super.key});
@@ -27,17 +28,13 @@ class ComplaintsView extends GetView<ComplaintsController> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AppAddFab(
-        onPressed: () {
-          // TODO: hook up the action for this button once it's decided what it opens
-        },
+        onPressed: showSendUpdateSheet,
       ),
       bottomNavigationBar: AppBottomNav(
         activeTab: AppNavTab.none, // Complaints is opened from a dashboard card, not one of the 4 main tabs
         onHome: () => Get.offNamed(AppRoutes.dashboard),
         onUpdates: () => Get.offNamed(AppRoutes.updates),
-        onRequests: () {
-          // TODO: navigate to Requests once that screen exists
-        },
+        onRequests: () => Get.offNamed(AppRoutes.requests),
         onProfile: () => Get.toNamed(AppRoutes.profile),
       ),
       body: SafeArea(
@@ -94,7 +91,10 @@ class _ComplaintCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppDimens.radiusFull),
                   border: Border.all(color: AppColors.dangerBorder),
                 ),
-                child: Text('Complaint', style: AppTextStyles.labelSmall.copyWith(color: AppColors.danger)),
+                child: Text(
+                  complaint.category?.isNotEmpty == true ? complaint.category! : 'Complaint',
+                  style: AppTextStyles.labelSmall.copyWith(color: AppColors.danger),
+                ),
               ),
               const Spacer(),
               Text(

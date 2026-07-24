@@ -7,79 +7,42 @@ import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_bottom_nav.dart';
 import 'package:apartmate/core/widgets/app_loading.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
+import 'package:apartmate/data/models/request_model.dart';
+import 'package:apartmate/presentation/requests/controllers/requests_controller.dart';
 import 'package:apartmate/core/widgets/send_update_sheet.dart';
-import 'package:apartmate/data/models/update_model.dart';
-import 'package:apartmate/presentation/updates/controllers/updates_controller.dart';
 import 'package:apartmate/routes/app_routes.dart';
 
-class UpdatesView extends GetView<UpdatesController> {
-  const UpdatesView({super.key});
-
-  Future<void> _confirmClearAll(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Clear all updates?'),
-        content: const Text('This will remove every update from this list. This can\'t be undone.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Clear All', style: TextStyle(color: AppColors.danger)),
-          ),
-        ],
-      ),
-    );
-    if (confirmed == true) {
-      controller.clearAll();
-    }
-  }
+class RequestsView extends GetView<RequestsController> {
+  const RequestsView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        titleSpacing: -10,
+        backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
+        title: Text('Requests', style: AppTextStyles.h3),
         centerTitle: false,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/logo.png', height: 32, fit: BoxFit.cover),
-            const SizedBox(width: 2),
-            Text('Updates', style: AppTextStyles.h3.copyWith(color: Colors.white)),
-          ],
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          Obx(() {
-            if (controller.updates.isEmpty) return const SizedBox.shrink();
-            return TextButton(
-              onPressed: () => _confirmClearAll(context),
-              child: const Text('Clear All', style: TextStyle(color: AppColors.accentGreen)),
-            );
-          }),
-        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AppAddFab(
         onPressed: showSendUpdateSheet,
       ),
       bottomNavigationBar: AppBottomNav(
-        activeTab: AppNavTab.updates,
+        activeTab: AppNavTab.requests,
         onHome: () => Get.offNamed(AppRoutes.dashboard),
-        onUpdates: () {}, // already here
-        onRequests: () => Get.offNamed(AppRoutes.requests),
+        onUpdates: () => Get.offNamed(AppRoutes.updates),
+        onRequests: () {}, // already here
         onProfile: () => Get.toNamed(AppRoutes.profile),
       ),
       body: SafeArea(
         child: Obx(() {
-          if (controller.isLoading.value && controller.updates.isEmpty) {
+          if (controller.isLoading.value && controller.requests.isEmpty) {
             return const AppLoading();
           }
-          if (controller.updates.isEmpty) {
+          if (controller.requests.isEmpty) {
             return _EmptyState(onRefresh: controller.refresh);
           }
           return RefreshIndicator(
@@ -88,25 +51,11 @@ class UpdatesView extends GetView<UpdatesController> {
             child: AppResponsiveContainer(
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-                itemCount: controller.updates.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemCount: controller.requests.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  final update = controller.updates[index];
-                  return Dismissible(
-                    key: ValueKey(update.id),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: AppColors.danger,
-                        borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-                      ),
-                      child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
-                    ),
-                    onDismissed: (_) => controller.deleteUpdate(update.id),
-                    child: _UpdateCard(update: update),
-                  );
+                  final request = controller.requests[index];
+                  return _RequestCard(request: request);
                 },
               ),
             ),
@@ -117,24 +66,29 @@ class UpdatesView extends GetView<UpdatesController> {
   }
 }
 
-class _UpdateCard extends StatelessWidget {
-  final UpdateModel update;
-  const _UpdateCard({required this.update});
+class _RequestCard extends StatelessWidget {
+  final RequestModel request;
+  const _RequestCard({required this.request});
 
-  ({Color bg, Color text, Color border, String label}) get _typeStyle {
-    switch (update.type) {
-      case UpdateType.complaint:
-        return (bg: AppColors.dangerBg, text: AppColors.danger, border: AppColors.dangerBorder, label: 'Complaint');
-      case UpdateType.announcement:
-        return (bg: AppColors.roleAdminBg, text: AppColors.roleAdminText, border: AppColors.roleAdminBorder, label: 'Announcement');
-      case UpdateType.general:
-        return (bg: AppColors.warningBg, text: AppColors.warning, border: AppColors.warningBorder, label: 'Update');
+  ({Color bg, Color text, Color border, String label}) get _statusStyle {
+    switch (request.status) {
+      case RequestStatus.pending:
+        return (bg: AppColors.warningBg, text: AppColors.warning, border: AppColors.warningBorder, label: 'Pending');
+      case RequestStatus.inProgress:
+        return (bg: AppColors.roleAdminBg, text: AppColors.roleAdminText, border: AppColors.roleAdminBorder, label: 'In Progress');
+      case RequestStatus.resolved:
+        return (
+          bg: AppColors.successGreen.withValues(alpha: 0.12),
+          text: AppColors.successGreenDark,
+          border: AppColors.successGreen.withValues(alpha: 0.4),
+          label: 'Resolved',
+        );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final style = _typeStyle;
+    final style = _statusStyle;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -154,25 +108,29 @@ class _UpdateCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppDimens.radiusFull),
                   border: Border.all(color: style.border),
                 ),
-                child: Text(
-                  style.label,
-                  style: AppTextStyles.labelSmall.copyWith(color: style.text),
-                ),
+                child: Text(style.label, style: AppTextStyles.labelSmall.copyWith(color: style.text)),
               ),
               const Spacer(),
               Text(
-                _formatDate(update.postedAt),
+                _formatDate(request.submittedAt),
                 style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          Text(update.title, style: AppTextStyles.h4),
+          Text(request.title, style: AppTextStyles.h4),
           const SizedBox(height: 4),
           Text(
-            update.description,
+            request.description,
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
           ),
+          if (request.raisedBy != null && request.raisedBy!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Raised by ${request.raisedBy}',
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+            ),
+          ],
         ],
       ),
     );
@@ -209,13 +167,13 @@ class _EmptyState extends StatelessWidget {
                     height: 72,
                     decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
                     alignment: Alignment.center,
-                    child: const Icon(Icons.campaign_rounded, size: 32, color: AppColors.textMuted),
+                    child: const Icon(Icons.assignment_rounded, size: 32, color: AppColors.textMuted),
                   ),
                   const SizedBox(height: 16),
-                  Text('No updates yet', style: AppTextStyles.h4),
+                  Text('No requests', style: AppTextStyles.h4),
                   const SizedBox(height: 6),
                   Text(
-                    'Updates and announcements will show up here.',
+                    'Service and maintenance requests from residents will show up here.',
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                   ),

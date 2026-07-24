@@ -4,7 +4,9 @@ import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_dashboard_repository.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/domain/repositories/i_update_repository.dart';
+import 'package:apartmate/domain/repositories/i_request_repository.dart';
 import 'package:apartmate/data/models/update_model.dart';
+import 'package:apartmate/data/models/request_model.dart';
 import 'package:apartmate/routes/app_routes.dart';
 import 'package:apartmate/presentation/dashboard/widgets/edit_society_sheet.dart';
 
@@ -12,11 +14,18 @@ class DashboardController extends GetxController {
   final IDashboardRepository _dashboardRepository;
   final ISocietyRepository _societyRepository;
   final IUpdateRepository _updateRepository;
-  DashboardController(this._dashboardRepository, this._societyRepository, this._updateRepository);
+  final IRequestRepository _requestRepository;
+  DashboardController(
+    this._dashboardRepository,
+    this._societyRepository,
+    this._updateRepository,
+    this._requestRepository,
+  );
 
   final stats = Rxn<DashboardStatsModel>();
   final society = Rxn<SocietyModel>();
   final complaintsCount = 0.obs;
+  final pendingRequestsCount = 0.obs;
   final isLoading = false.obs;
 
   static String get greeting {
@@ -53,6 +62,7 @@ class DashboardController extends GetxController {
     _loadStats();
     _loadSociety();
     _loadComplaintsCount();
+    _loadPendingRequestsCount();
   }
 
   Future<void> _loadStats() async {
@@ -73,6 +83,11 @@ class DashboardController extends GetxController {
     complaintsCount.value = updates.where((u) => u.type == UpdateType.complaint).length;
   }
 
+  Future<void> _loadPendingRequestsCount() async {
+    final requests = await _requestRepository.getRequests();
+    pendingRequestsCount.value = requests.where((r) => r.status == RequestStatus.pending).length;
+  }
+
   /// Called by EditSocietyController after a successful save, so the
   /// header greeting/society name update immediately without a full reload.
   Future<void> refreshSociety() => _loadSociety();
@@ -83,4 +98,5 @@ class DashboardController extends GetxController {
   void goToProfile() => Get.toNamed(AppRoutes.profile);
   void goToBuildings() => Get.toNamed(AppRoutes.societyBuildings);
   void goToComplaints() => Get.toNamed(AppRoutes.complaints);
+  void goToRequests() => Get.toNamed(AppRoutes.requests);
 }

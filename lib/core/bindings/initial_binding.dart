@@ -10,6 +10,8 @@ import 'package:apartmate/data/repositories/local_dashboard_repository.dart';
 import 'package:apartmate/data/repositories/local_update_repository.dart';
 import 'package:apartmate/domain/repositories/i_update_repository.dart';
 import 'package:apartmate/presentation/updates/controllers/updates_badge_controller.dart';
+import 'package:apartmate/data/repositories/local_request_repository.dart';
+import 'package:apartmate/domain/repositories/i_request_repository.dart';
 
 /// Wires every repository interface to its concrete implementation.
 ///
@@ -31,5 +33,6 @@ class InitialBinding extends Bindings {
     );
     Get.put<IUpdateRepository>(LocalUpdateRepository(), permanent: true);
     Get.put<UpdatesBadgeController>(UpdatesBadgeController(), permanent: true);
+    Get.put<IRequestRepository>(LocalRequestRepository(), permanent: true);
   }
 }

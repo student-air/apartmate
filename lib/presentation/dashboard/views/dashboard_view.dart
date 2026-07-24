@@ -24,9 +24,7 @@ class DashboardView extends GetView<DashboardController> {
         activeTab: AppNavTab.home,
         onHome: () {}, // already here
         onUpdates: controller.goToUpdates,
-        onRequests: () {
-          // TODO: navigate to Requests once that screen exists
-        },
+        onRequests: controller.goToRequests,
         onProfile: controller.goToProfile,
       ),
       body: SafeArea(
@@ -166,8 +164,9 @@ class DashboardView extends GetView<DashboardController> {
                         _StatCard(
                           icon: Icons.hourglass_bottom_rounded,
                           label: 'Pending',
-                          value: '${controller.stats.value?.pendingRequests ?? 0}',
+                          value: '${controller.pendingRequestsCount.value}',
                           color: AppColors.pending,
+                          onTap: controller.goToRequests,
                         ),
                       ],
                     ),
