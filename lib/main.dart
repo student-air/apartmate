@@ -6,7 +6,8 @@ import 'package:apartmate/core/theme/app_theme.dart';
 import 'package:apartmate/routes/app_pages.dart';
 import 'package:apartmate/routes/app_routes.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const ApartMateApp());
 }
 
@@ -22,6 +23,11 @@ class ApartMateApp extends StatelessWidget {
       initialBinding: InitialBinding(),
       initialRoute: AppRoutes.splash,
       getPages: AppPages.pages,
+      builder: (context, child) {
+        // Precache once when the first frame has a real context
+        precacheImage(const AssetImage('assets/images/logo.png'), context);
+        return child ?? const SizedBox.shrink();
+      },
     );
   }
 }

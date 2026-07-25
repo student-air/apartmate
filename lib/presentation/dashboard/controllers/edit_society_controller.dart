@@ -4,6 +4,7 @@ import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
 import 'package:apartmate/core/utils/validators.dart';
+import 'package:apartmate/presentation/profile/controllers/profile_controller.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
 
 /// Backs the "Edit Society" bottom sheet opened from the Dashboard.
@@ -101,6 +102,10 @@ class EditSocietyController extends GetxController {
       if (Get.isRegistered<DashboardController>()) {
         await Get.find<DashboardController>().refreshSociety();
       }
+
+      if (Get.isRegistered<ProfileController>()) {
+        await Get.find<ProfileController>().refreshSociety();
+}
 
       FocusManager.instance.primaryFocus?.unfocus();
       Get.back(); // close the sheet

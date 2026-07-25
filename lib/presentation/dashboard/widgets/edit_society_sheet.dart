@@ -25,9 +25,13 @@ Future<void> showEditSocietySheet() {
     enableDrag: false,
     backgroundColor: Colors.transparent,
   ).whenComplete(() {
-    FocusManager.instance.primaryFocus?.unfocus();
-    Get.delete<EditSocietyController>(tag: 'editSociety');
+  FocusManager.instance.primaryFocus?.unfocus();
+  Future.delayed(const Duration(milliseconds: 300), () {
+    if (Get.isRegistered<EditSocietyController>(tag: 'editSociety')) {
+      Get.delete<EditSocietyController>(tag: 'editSociety');
+    }
   });
+});
 }
 
 class EditSocietySheet extends StatelessWidget {

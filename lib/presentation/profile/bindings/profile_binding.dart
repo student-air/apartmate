@@ -8,6 +8,8 @@ class ProfileBinding extends Bindings {
   void dependencies() {
     Get.lazyPut<ProfileController>(
       () => ProfileController(Get.find<IAuthRepository>(), Get.find<ISocietyRepository>()),
+      fenix: true,
     );
-  }
+ 
+ }
 }
