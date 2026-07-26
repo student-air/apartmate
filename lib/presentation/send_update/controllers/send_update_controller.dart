@@ -44,6 +44,25 @@ class SendUpdateController extends GetxController {
     _loadBuildings();
   }
 
+  /// Prefills the sheet for a specific flat — used when opened from a
+  /// Resident card. Waits for buildings to finish loading (if still in
+  /// flight) so the building/floor lookups below don't race the initial
+  /// _loadBuildings() call from onInit().
+  Future<void> prefillForFlat({
+    required String buildingName,
+    required int floor,
+    required String flatNumber,
+  }) async {
+    while (isLoadingBuildings.value) {
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
+    sendTo.value = 'Flat';
+    final match = buildings.firstWhereOrNull((b) => b.name == buildingName);
+    selectedBuilding.value = match;
+    selectedFloor.value = floor;
+    flatNumberCtrl.text = flatNumber;
+  }
+
   Future<void> _loadBuildings() async {
     isLoadingBuildings.value = true;
     try {

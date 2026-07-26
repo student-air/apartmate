@@ -22,4 +22,16 @@ class LocalResidentRepository implements IResidentRepository {
     await Future.delayed(const Duration(milliseconds: 300));
     _residents.removeWhere((r) => r.id == residentId);
   }
+
+  @override
+  Future<ResidentModel> updatePaymentStatus(String residentId, {bool? rentPaid, bool? maintenancePaid}) async {
+    await Future.delayed(const Duration(milliseconds: 250));
+    final index = _residents.indexWhere((r) => r.id == residentId);
+    if (index == -1) {
+      throw StateError('Resident not found: $residentId');
+    }
+    final updated = _residents[index].copyWith(rentPaid: rentPaid, maintenancePaid: maintenancePaid);
+    _residents[index] = updated;
+    return updated;
+  }
 }

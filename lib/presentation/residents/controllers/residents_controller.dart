@@ -1,3 +1,4 @@
+
 import 'package:get/get.dart';
 import 'package:apartmate/data/models/resident_model.dart';
 import 'package:apartmate/domain/repositories/i_resident_repository.dart';
@@ -16,6 +17,13 @@ class ResidentsController extends GetxController {
       map.putIfAbsent(r.buildingName, () => []).add(r);
     }
     return map;
+  }
+
+  /// Tracks which resident card is currently expanded (only one at a time).
+  final expandedResidentId = Rxn<String>();
+
+  void toggleExpanded(String residentId) {
+    expandedResidentId.value = expandedResidentId.value == residentId ? null : residentId;
   }
 
   @override

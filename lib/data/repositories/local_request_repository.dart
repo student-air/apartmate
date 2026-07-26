@@ -4,6 +4,81 @@ import 'package:apartmate/domain/repositories/i_request_repository.dart';
 class LocalRequestRepository implements IRequestRepository {
   final List<RequestModel> _requests = [];
 
+  LocalRequestRepository() {
+    _seedSampleRequests();
+  }
+
+  void _seedSampleRequests() {
+    final now = DateTime.now();
+    _requests.addAll([
+      RequestModel(
+        id: 'req-sample-1',
+        buildingId: 'bldg-sample-1',
+        buildingName: 'Building B',
+        floor: 2,
+        flatNumber: 'Flat 204',
+        flatType: '2-Bedroom',
+        tenantName: 'Zain Ahmed',
+        cnic: '42101-8765432-1',
+        phone: '+92 312 9876543',
+        email: 'zain@email.com',
+        residentsCount: 4,
+        allotmentDate: DateTime(2025, 11, 1),
+        leaseDurationMonths: 12,
+        rent: 45000,
+        profession: 'Software Engineer',
+        employerCompany: 'TechSoft Pvt Ltd, Karachi',
+        previousAddress: 'Block 5, Gulshan-e-Iqbal, Karachi',
+        emergencyContact: '+92 300 1112233 (Brother)',
+        status: RequestStatus.pending,
+        submittedAt: now.subtract(const Duration(hours: 3)),
+      ),
+      RequestModel(
+        id: 'req-sample-2',
+        buildingId: 'bldg-sample-1',
+        buildingName: 'Fortune Tower A',
+        floor: 5,
+        flatNumber: 'Flat 5A',
+        flatType: '3-Bedroom',
+        tenantName: 'Sara Khan',
+        cnic: '42201-1234567-8',
+        phone: '+92 300 9876543',
+        email: 'sara.khan@example.com',
+        residentsCount: 2,
+        allotmentDate: now.add(const Duration(days: 10)),
+        leaseDurationMonths: 6,
+        rent: 38000,
+        profession: 'Doctor',
+        employerCompany: 'Aga Khan Hospital',
+        previousAddress: 'DHA Phase 5, Karachi',
+        emergencyContact: '+92 321 4445566 (Spouse)',
+        status: RequestStatus.pending,
+        submittedAt: now.subtract(const Duration(days: 1)),
+      ),
+      RequestModel(
+        id: 'req-sample-3',
+        buildingId: 'bldg-sample-2',
+        buildingName: 'Fortune Tower B',
+        floor: 2,
+        flatNumber: 'Flat 2C',
+        flatType: '1-Bedroom',
+        tenantName: 'Bilal Sheikh',
+        cnic: '35201-9988776-5',
+        phone: '+92 333 5551234',
+        email: 'bilal.sheikh@example.com',
+        residentsCount: 3,
+        allotmentDate: now.add(const Duration(days: 2)),
+        leaseDurationMonths: 12,
+        rent: 52000,
+        profession: 'Marketing Manager',
+        employerCompany: 'Unilever Pakistan',
+        previousAddress: 'North Nazimabad, Karachi',
+        emergencyContact: '+92 345 7778899 (Father)',
+        status: RequestStatus.pending,
+        submittedAt: now.subtract(const Duration(days: 2)),
+      ),
+    ]);
+  }
   @override
   Future<List<RequestModel>> getRequests() async {
     await Future.delayed(const Duration(milliseconds: 400));

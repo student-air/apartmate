@@ -49,12 +49,19 @@ class RequestsController extends GetxController {
           buildingName: request.buildingName,
           floor: request.floor,
           flatNumber: request.flatNumber,
+          flatType: request.flatType,
           name: request.tenantName,
+          cnic: request.cnic,
           phone: request.phone,
           email: request.email,
           residentsCount: request.residentsCount,
           allotmentDate: request.allotmentDate,
+          leaseDurationMonths: request.leaseDurationMonths,
           rent: request.rent,
+          profession: request.profession,
+          employerCompany: request.employerCompany,
+          previousAddress: request.previousAddress,
+          emergencyContact: request.emergencyContact,
         ),
       );
 
@@ -67,7 +74,6 @@ class RequestsController extends GetxController {
       AppSnackbar.error('Failed', 'Could not accept request: $e');
     }
   }
-
   Future<void> ignore(RequestModel request) async {
     try {
       await _requestRepository.deleteRequest(request.id);

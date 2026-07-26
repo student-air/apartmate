@@ -7,6 +7,7 @@ import 'package:apartmate/core/widgets/app_bottom_nav.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
 import 'package:apartmate/core/widgets/send_update_sheet.dart';
+import 'package:lottie/lottie.dart';
 import 'package:apartmate/core/widgets/app_skeletons.dart';
 
 class DashboardView extends GetView<DashboardController> {
@@ -142,30 +143,78 @@ class DashboardView extends GetView<DashboardController> {
                       children: [
                         _StatCard(
                           icon: Icons.villa_rounded,
+                          iconWidget: ClipOval(
+                            child: Transform.scale(
+                              scale: 1.8, // increase if there's still visible padding, decrease if it crops too tight
+                              child: Lottie.asset(
+                                'assets/lottie/building.json',
+                                width: 56,
+                                height: 56,
+                                fit: BoxFit.cover,
+                                repeat: false,
+                              ),
+                            ),
+                          ),
                           label: 'Buildings',
                           value: '${controller.stats.value?.buildings ?? 0}',
                           color: AppColors.primaryDarkGradientEnd,
                           onTap: controller.goToBuildings,
                         ),
                         _StatCard(
-                          icon: Icons.report_problem_rounded,
-                          label: 'Complaints',
+                          icon: Icons.villa_rounded,
+                          iconWidget: ClipOval(
+                            child: Transform.scale(
+                              scale: 1.8, // increase if there's still visible padding, decrease if it crops too tight
+                              child: Lottie.asset(
+                                'assets/lottie/complaint.json',
+                                width: 46,
+                                height: 46,
+                                fit: BoxFit.cover,
+                                repeat:false,
+                              ),
+                            ),
+                          ),
+                          label: 'Complaint',
                           value: '${controller.complaintsCount.value}',
-                          color: AppColors.danger,
+                          color: AppColors.primaryDarkGradientEnd,
                           onTap: controller.goToComplaints,
                         ),
                         _StatCard(
-                          icon: Icons.people_rounded,
-                          label: 'Staff Info',
+                          icon: Icons.villa_rounded,
+                          iconWidget: ClipOval(
+                            child: Transform.scale(
+                              scale: 1.8, // increase if there's still visible padding, decrease if it crops too tight
+                              child: Lottie.asset(
+                                'assets/lottie/staff_dashboard.json',
+                                width: 56,
+                                height: 56,
+                                fit: BoxFit.cover,
+                                repeat: true,
+                              ),
+                            ),
+                          ),
+                          label: 'Staff',
                           value: '${controller.stats.value?.mgmtStaff ?? 0}',
-                          color: const Color(0xFF8B5CF6),
+                          color: AppColors.primaryDarkGradientEnd,
                           onTap: controller.goToAddStaff,
                         ),
                         _StatCard(
-                          icon: Icons.hourglass_bottom_rounded,
+                          icon: Icons.villa_rounded,
+                          iconWidget: ClipOval(
+                            child: Transform.scale(
+                              scale: 1.5, // increase if there's still visible padding, decrease if it crops too tight
+                              child: Lottie.asset(
+                                'assets/lottie/pending.json',
+                                width: 46,
+                                height: 46,
+                                fit: BoxFit.cover,
+                                repeat: false,
+                              ),
+                            ),
+                          ),
                           label: 'Pending',
-                          value: '${controller.pendingRequestsCount.value}',
-                          color: AppColors.pending,
+                          value: '${controller.stats.value?.pendingRequests ?? 0}',
+                          color: AppColors.primaryDarkGradientEnd,
                           onTap: controller.goToRequests,
                         ),
                       ],
@@ -223,11 +272,19 @@ class _QuickAction extends StatelessWidget {
 }
 class _StatCard extends StatelessWidget {
   final IconData icon;
+  final Widget? iconWidget;
   final String label;
   final String value;
   final Color color;
   final VoidCallback? onTap;
-  const _StatCard({required this.icon, required this.label, required this.value, required this.color, this.onTap});
+  const _StatCard({
+    required this.icon,
+    this.iconWidget,
+    required this.label,
+    required this.value,
+    required this.color,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -244,11 +301,11 @@ class _StatCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(shape: BoxShape.circle),
             alignment: Alignment.center,
-            child: Icon(icon, size: 28, color: color),
+            child: iconWidget ?? Icon(icon, size: 28, color: color),
           ),
           const SizedBox(width: 16),
           Expanded(

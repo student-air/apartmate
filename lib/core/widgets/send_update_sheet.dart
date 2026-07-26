@@ -13,11 +13,24 @@ import 'package:apartmate/presentation/send_update/controllers/send_update_contr
 
 /// Opens the "Send Notice" compose form as a bottom sheet. Call this from
 /// the '+' FAB wherever AppAddFab is used (Dashboard, Updates, Complaints).
-Future<void> showSendUpdateSheet() {
-  Get.put(
+Future<void> showSendUpdateSheet({
+  String? prefillBuildingName,
+  int? prefillFloor,
+  String? prefillFlatNumber,
+}) async {
+  final controller = Get.put(
     SendUpdateController(Get.find<IUpdateRepository>(), Get.find<ISocietyRepository>()),
     tag: 'sendUpdate',
   );
+
+  if (prefillBuildingName != null && prefillFloor != null && prefillFlatNumber != null) {
+    await controller.prefillForFlat(
+      buildingName: prefillBuildingName,
+      floor: prefillFloor,
+      flatNumber: prefillFlatNumber,
+    );
+  }
+
   return Get.bottomSheet(
     const SendUpdateSheet(),
     isScrollControlled: true,
@@ -28,7 +41,6 @@ Future<void> showSendUpdateSheet() {
     Get.delete<SendUpdateController>(tag: 'sendUpdate');
   });
 }
-
 class SendUpdateSheet extends StatelessWidget {
   const SendUpdateSheet({super.key});
 
