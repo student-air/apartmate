@@ -19,6 +19,21 @@ class LocalSocietyRepository implements ISocietyRepository {
   }
 
   @override
+  Future<SocietyModel> updateOwnerProfile({required String ownerName, String? ownerPhotoPath}) async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    final current = _society;
+    if (current == null) {
+      throw StateError('No society registered yet');
+    }
+    final updated = current.copyWith(
+      ownerName: ownerName,
+      ownerPhotoPath: ownerPhotoPath,
+    );
+    _society = updated;
+    return updated;
+  }
+
+  @override
   Future<List<BuildingModel>> getBuildings() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return List.unmodifiable(_buildings);
@@ -32,7 +47,7 @@ class LocalSocietyRepository implements ISocietyRepository {
     return building;
   }
 
- @override
+  @override
   Future<BuildingModel> saveBuildingDetails(String buildingId, BuildingDetailsModel details) async {
     await Future.delayed(const Duration(milliseconds: 400));
     final index = _buildings.indexWhere((b) => b.id == buildingId);

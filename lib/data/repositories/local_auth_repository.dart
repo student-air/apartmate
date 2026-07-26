@@ -16,8 +16,8 @@ class LocalAuthRepository implements IAuthRepository {
     await Future.delayed(const Duration(milliseconds: 700));
     _currentUser = const UserModel(
       id: 'u-1',
-      fullName: 'Ahmed Khan',
-      email: 'ahmed.khan@example.com',
+      fullName: '',
+      email: 'sample@example.com',
       phone: '+92 321 1234567',
       role: 'Society Owner',
     );
@@ -29,8 +29,8 @@ class LocalAuthRepository implements IAuthRepository {
     await Future.delayed(const Duration(milliseconds: 700));
     _currentUser = const UserModel(
       id: 'u-1',
-      fullName: 'Ahmed Khan',
-      email: 'ahmed.khan@example.com',
+      fullName: '',
+      email: 'sample@example.com',
       phone: '+92 321 1234567',
       role: 'Society Owner',
     );
@@ -56,6 +56,12 @@ class LocalAuthRepository implements IAuthRepository {
       role: 'Society Owner',
     );
     return _currentUser!;
+  }
+  @override
+  Future<UserModel> updateProfile(UserModel updated) async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    _currentUser = updated;
+    return updated;
   }
 
   @override

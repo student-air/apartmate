@@ -26,7 +26,8 @@ import 'package:apartmate/presentation/complaints/bindings/complaints_binding.da
 import 'package:apartmate/presentation/complaints/views/complaints_view.dart';
 import 'package:apartmate/presentation/requests/bindings/requests_binding.dart';
 import 'package:apartmate/presentation/requests/views/requests_view.dart';
-
+import 'package:apartmate/presentation/edit_profile/bindings/edit_profile_binding.dart';
+import 'package:apartmate/presentation/edit_profile/views/edit_profile_view.dart';
 
 class AppPages {
   AppPages._();
@@ -91,11 +92,11 @@ class AppPages {
       page: () => const ProfileView(),
       binding: ProfileBinding(),
     ),
-    // GetPage(
-    //   name: AppRoutes.editProfile,
-    //   page: () => const EditProfileView(),
-    //   binding: EditProfileBinding(),
-    // ),
+    GetPage(
+      name: AppRoutes.editProfile,
+      page: () => const EditProfileView(),
+      binding: EditProfileBinding(),
+    ),
     GetPage(
   name: AppRoutes.requests,
   page: () => const RequestsView(),

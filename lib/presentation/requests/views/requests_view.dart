@@ -20,12 +20,21 @@ class RequestsView extends GetView<RequestsController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        titleSpacing: -10,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: Text('Requests', style: AppTextStyles.h3),
         centerTitle: false,
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/images/logo.png', height: 32, fit: BoxFit.cover),
+            const SizedBox(width: 2),
+            Text('Requests', style: AppTextStyles.h3.copyWith(color: Colors.white)),
+          ],
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
+
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AppAddFab(
         onPressed: showSendUpdateSheet,

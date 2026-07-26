@@ -6,6 +6,7 @@ import 'package:apartmate/data/models/society_model.dart';
 abstract class ISocietyRepository {
   Future<SocietyModel> registerSociety(SocietyModel society);
   Future<SocietyModel?> getCurrentSociety();
+  Future<SocietyModel> updateOwnerProfile({required String ownerName, String? ownerPhotoPath});
 
   Future<List<BuildingModel>> getBuildings();
   Future<BuildingModel> addBuilding(String name);

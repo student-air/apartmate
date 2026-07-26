@@ -27,6 +27,32 @@ class SocietyModel {
     this.registrationStatus = SocietyRegistrationStatus.pendingReview,
     required this.submittedAt,
   });
+
+  SocietyModel copyWith({
+  String? name,
+  String? ownerName,
+  String? address,
+  String? city,
+  String? country,
+  String? contactNumber,
+  String? description,
+  String? ownerPhotoPath,
+  SocietyRegistrationStatus? registrationStatus,
+}) {
+  return SocietyModel(
+    id: id,
+    name: name ?? this.name,
+    ownerName: ownerName ?? this.ownerName,
+    address: address ?? this.address,
+    city: city ?? this.city,
+    country: country ?? this.country,
+    contactNumber: contactNumber ?? this.contactNumber,
+    description: description ?? this.description,
+    ownerPhotoPath: ownerPhotoPath ?? this.ownerPhotoPath,
+    registrationStatus: registrationStatus ?? this.registrationStatus,
+    submittedAt: submittedAt,
+  );
+}
 }
 
 /// A single building within a society.

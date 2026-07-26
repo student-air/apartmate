@@ -88,7 +88,7 @@ class ProfileView extends GetView<ProfileController> {
                                     );
                                   }),
                                   const SizedBox(height: 14),
-                                  Obx(() => Text(controller.ownerName.value, style: AppTextStyles.h3)),
+                                  Obx(() => Text(controller.fullName, style: AppTextStyles.h3)),
                                   const SizedBox(height: 6),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
