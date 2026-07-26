@@ -19,4 +19,5 @@ abstract class AppRoutes {
   static const editProfile = '/edit-profile';
   static const complaints = '/complaints';
   static const requests = '/requests';
+  static const residents = '/residents';
 }

@@ -160,7 +160,7 @@ class _EmptyState extends StatelessWidget {
                   Text('No complaints', style: AppTextStyles.h4),
                   const SizedBox(height: 6),
                   Text(
-                    'Complaints raised by residents will show up here.',
+                    'Complaints raised by residents\n will show up here.',
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                   ),

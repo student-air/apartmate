@@ -28,6 +28,8 @@ import 'package:apartmate/presentation/requests/bindings/requests_binding.dart';
 import 'package:apartmate/presentation/requests/views/requests_view.dart';
 import 'package:apartmate/presentation/edit_profile/bindings/edit_profile_binding.dart';
 import 'package:apartmate/presentation/edit_profile/views/edit_profile_view.dart';
+import 'package:apartmate/presentation/residents/bindings/residents_binding.dart';
+import 'package:apartmate/presentation/residents/views/residents_view.dart';
 
 class AppPages {
   AppPages._();
@@ -107,5 +109,11 @@ class AppPages {
   page: () => const ComplaintsView(),
   binding: ComplaintsBinding(),
 ),
+
+GetPage(
+      name: AppRoutes.residents,
+      page: () => const ResidentsView(),
+      binding: ResidentsBinding(),
+    ),
   ];
 }

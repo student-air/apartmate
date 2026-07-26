@@ -4,10 +4,10 @@ import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_bottom_nav.dart';
-import 'package:apartmate/core/widgets/app_loading.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
 import 'package:apartmate/core/widgets/send_update_sheet.dart';
+import 'package:apartmate/core/widgets/app_skeletons.dart';
 
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
@@ -30,7 +30,7 @@ class DashboardView extends GetView<DashboardController> {
       body: SafeArea(
         bottom: false,
         child: Obx(() {
-          if (controller.isLoading.value) return const AppLoading();
+          if (controller.isLoading.value) return const AppSkeletonList(itemBuilder: StaffTileSkeleton.new);
           return SingleChildScrollView(
             child: AppResponsiveContainer(
               child: Column(
@@ -109,10 +109,10 @@ class DashboardView extends GetView<DashboardController> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: _QuickAction(
-                                icon: Icons.people_rounded,
-                                label: 'Add Staff',
+                                icon: Icons.groups_rounded,
+                                label: 'Residents',
                                 color: AppColors.primaryDarkGradientEnd,
-                                onTap: controller.goToAddStaff,
+                                onTap: controller.goToResidents,
                               ),
                             ),
                             const SizedBox(width: 12),

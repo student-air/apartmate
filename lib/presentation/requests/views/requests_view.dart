@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_bottom_nav.dart';
-import 'package:apartmate/core/widgets/app_loading.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/data/models/request_model.dart';
 import 'package:apartmate/presentation/requests/controllers/requests_controller.dart';
 import 'package:apartmate/core/widgets/send_update_sheet.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/widgets/app_skeletons.dart';
 
 class RequestsView extends GetView<RequestsController> {
   const RequestsView({super.key});
@@ -34,7 +35,6 @@ class RequestsView extends GetView<RequestsController> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AppAddFab(
         onPressed: showSendUpdateSheet,
@@ -49,7 +49,7 @@ class RequestsView extends GetView<RequestsController> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value && controller.requests.isEmpty) {
-            return const AppLoading();
+            return const AppSkeletonList(itemBuilder: UpdateCardSkeleton.new);
           }
           if (controller.requests.isEmpty) {
             return _EmptyState(onRefresh: controller.refresh);
@@ -79,70 +79,104 @@ class _RequestCard extends StatelessWidget {
   final RequestModel request;
   const _RequestCard({required this.request});
 
-  ({Color bg, Color text, Color border, String label}) get _statusStyle {
-    switch (request.status) {
-      case RequestStatus.pending:
-        return (bg: AppColors.warningBg, text: AppColors.warning, border: AppColors.warningBorder, label: 'Pending');
-      case RequestStatus.inProgress:
-        return (bg: AppColors.roleAdminBg, text: AppColors.roleAdminText, border: AppColors.roleAdminBorder, label: 'In Progress');
-      case RequestStatus.resolved:
-        return (
-          bg: AppColors.successGreen.withValues(alpha: 0.12),
-          text: AppColors.successGreenDark,
-          border: AppColors.successGreen.withValues(alpha: 0.4),
-          label: 'Resolved',
-        );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final style = _statusStyle;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-        boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: style.bg,
-                  borderRadius: BorderRadius.circular(AppDimens.radiusFull),
-                  border: Border.all(color: style.border),
+    final controller = Get.find<RequestsController>();
+    return Obx(() {
+      final isExpanded = controller.expandedRequestId.value == request.id;
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+          boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.warningBg,
+                    borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                    border: Border.all(color: AppColors.warningBorder),
+                  ),
+                  child: Text('Pending', style: AppTextStyles.labelSmall.copyWith(color: AppColors.warning)),
                 ),
-                child: Text(style.label, style: AppTextStyles.labelSmall.copyWith(color: style.text)),
+                const Spacer(),
+                Text(
+                  _formatDate(request.submittedAt),
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(request.tenantName, style: AppTextStyles.h4),
+            const SizedBox(height: 4),
+            Text(
+              'Flat ${request.flatNumber} · Floor ${request.floor} · ${request.buildingName}',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+            ),
+            if (isExpanded) ...[
+              const SizedBox(height: 14),
+              const Divider(height: 1),
+              const SizedBox(height: 14),
+              _DetailRow(label: 'Phone', value: request.phone),
+              _DetailRow(label: 'Email', value: request.email),
+              _DetailRow(label: 'Residents', value: '${request.residentsCount}'),
+              _DetailRow(label: 'Allotment Date', value: DateFormat('MMM d, yyyy').format(request.allotmentDate)),
+              _DetailRow(label: 'Rent', value: 'Rs ${request.rent.toStringAsFixed(0)}'),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => controller.ignore(request),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                        side: const BorderSide(color: AppColors.dangerBorder),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                        ),
+                      ),
+                      child: Text('Ignore', style: AppTextStyles.labelLarge.copyWith(color: AppColors.danger)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => controller.accept(request),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(48),
+                        backgroundColor: AppColors.primaryDark,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                        ),
+                      ),
+                      child: Text('Accept', style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
+                    ),
+                  ),
+                ],
               ),
-              const Spacer(),
-              Text(
-                _formatDate(request.submittedAt),
-                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+            ] else ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => controller.toggleExpanded(request.id),
+                  child: Text(
+                    'Details',
+                    style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryDark),
+                  ),
+                ),
               ),
             ],
-          ),
-          const SizedBox(height: 10),
-          Text(request.title, style: AppTextStyles.h4),
-          const SizedBox(height: 4),
-          Text(
-            request.description,
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-          ),
-          if (request.raisedBy != null && request.raisedBy!.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(
-              'Raised by ${request.raisedBy}',
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
-            ),
           ],
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 
   String _formatDate(DateTime date) {
@@ -150,6 +184,28 @@ class _RequestCard extends StatelessWidget {
     final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
     if (isToday) return DateFormat('h:mm a').format(date);
     return DateFormat('MMM d').format(date);
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _DetailRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 110,
+            child: Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted)),
+          ),
+          Expanded(child: Text(value, style: AppTextStyles.bodyMedium)),
+        ],
+      ),
+    );
   }
 }
 
@@ -171,18 +227,19 @@ class _EmptyState extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.assignment_rounded, size: 32, color: AppColors.textMuted),
+                  // Lottie animation
+                  Lottie.asset(
+                    'assets/lottie/requests.json',
+                    width: 320,
+                    height: 280,
+                    fit: BoxFit.contain,
+                    repeat: true,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Text('No requests', style: AppTextStyles.h4),
                   const SizedBox(height: 6),
                   Text(
-                    'Service and maintenance requests from residents will show up here.',
+                    'Requests from new residents\nwill show up here.',
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                   ),

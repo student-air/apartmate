@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_bottom_nav.dart';
-import 'package:apartmate/core/widgets/app_loading.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/core/widgets/send_update_sheet.dart';
 import 'package:apartmate/data/models/update_model.dart';
 import 'package:apartmate/presentation/updates/controllers/updates_controller.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/widgets/app_skeletons.dart';
 
 class UpdatesView extends GetView<UpdatesController> {
   const UpdatesView({super.key});
@@ -77,7 +78,7 @@ class UpdatesView extends GetView<UpdatesController> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value && controller.updates.isEmpty) {
-            return const AppLoading();
+            return const AppSkeletonList(itemBuilder: UpdateCardSkeleton.new);
           }
           if (controller.updates.isEmpty) {
             return _EmptyState(onRefresh: controller.refresh);
@@ -89,7 +90,7 @@ class UpdatesView extends GetView<UpdatesController> {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
                 itemCount: controller.updates.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final update = controller.updates[index];
                   return Dismissible(
@@ -204,18 +205,19 @@ class _EmptyState extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.campaign_rounded, size: 32, color: AppColors.textMuted),
+                  // Lottie animation
+                  Lottie.asset(
+                    'assets/lottie/updates.json',
+                    width: 320,
+                    height: 280,
+                    fit: BoxFit.contain,
+                    repeat: true,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Text('No updates yet', style: AppTextStyles.h4),
                   const SizedBox(height: 6),
                   Text(
-                    'Updates and announcements will show up here.',
+                    'Updates and announcements\nwill show up here.',
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                   ),
