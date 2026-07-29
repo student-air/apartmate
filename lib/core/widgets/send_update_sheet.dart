@@ -126,6 +126,29 @@ class SendUpdateSheet extends StatelessWidget {
                             final showFloor =
                                 controller.sendTo.value == 'Floor' || controller.sendTo.value == 'Flat';
 
+                            if (controller.isLocationLocked.value) {
+                              // Prefilled from a Resident card — show fixed, non-editable values.
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  const SizedBox(height: AppDimens.space16),
+                                  Text('Building', style: AppTextStyles.labelLarge),
+                                  const SizedBox(height: AppDimens.space6),
+                                  _LockedField(value: controller.selectedBuilding.value?.name ?? '—'),
+                                  if (showFloor) ...[
+                                    const SizedBox(height: AppDimens.space16),
+                                    Text('Floor', style: AppTextStyles.labelLarge),
+                                    const SizedBox(height: AppDimens.space6),
+                                    _LockedField(
+                                      value: controller.selectedFloor.value != null
+                                          ? SendUpdateController.floorLabel(controller.selectedFloor.value!)
+                                          : '—',
+                                    ),
+                                  ],
+                                ],
+                              );
+                            }
+
                             Widget buildingField() {
                               if (controller.isLoadingBuildings.value) {
                                 return const Padding(
@@ -172,8 +195,6 @@ class SendUpdateSheet extends StatelessWidget {
                                           child: Text(SendUpdateController.floorLabel(f)),
                                         ))
                                     .toList(),
-                                // Disabled until a building with floors is picked — same
-                                // bordered look as the enabled state, just non-interactive.
                                 onChanged: (!hasBuilding || floors.isEmpty) ? null : controller.setFloor,
                                 style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
                               );
@@ -216,6 +237,17 @@ class SendUpdateSheet extends StatelessWidget {
                           }),
                           Obx(() {
                             if (controller.sendTo.value != 'Flat') return const SizedBox.shrink();
+                            if (controller.isLocationLocked.value) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  const SizedBox(height: AppDimens.space16),
+                                  Text('Flat', style: AppTextStyles.labelLarge),
+                                  const SizedBox(height: AppDimens.space6),
+                                  _LockedField(value: controller.flatNumberCtrl.text),
+                                ],
+                              );
+                            }
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
@@ -228,15 +260,8 @@ class SendUpdateSheet extends StatelessWidget {
                                 ),
                               ],
                             );
-                          }),
-                          // ── end cascading selectors ──
+                          }),// ── end cascading selectors ──
 
-                          const SizedBox(height: AppDimens.space16),
-                          AppTextField(
-                            label: 'Title',
-                            hint: 'e.g. Water Supply Interruption',
-                            controller: controller.titleCtrl,
-                          ),
                           const SizedBox(height: AppDimens.space16),
                           AppTextField(
                             label: 'Description',
@@ -359,6 +384,31 @@ class _SendButton extends StatelessWidget {
                   Text('Send Notice', style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentGreen)),
                 ],
               ),
+      ),
+    );
+  }
+}
+
+class _LockedField extends StatelessWidget {
+  final String value;
+  const _LockedField({required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.lock_outline_rounded, size: 15, color: AppColors.textMuted),
+          const SizedBox(width: 8),
+          Expanded(child: Text(value, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary))),
+        ],
       ),
     );
   }

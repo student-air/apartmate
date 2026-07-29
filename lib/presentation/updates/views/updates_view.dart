@@ -168,7 +168,10 @@ class _UpdateCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Text(update.title, style: AppTextStyles.h4),
+          Text(
+            update.category ?? 'Update',
+            style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w800, color: AppColors.primaryDark),
+          ),
           const SizedBox(height: 4),
           Text(
             update.description,
@@ -205,7 +208,6 @@ class _EmptyState extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Lottie animation
                   Lottie.asset(
                     'assets/lottie/updates.json',
                     width: 320,

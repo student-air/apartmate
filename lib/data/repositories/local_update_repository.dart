@@ -4,6 +4,7 @@ import 'package:apartmate/domain/repositories/i_update_repository.dart';
 class LocalUpdateRepository implements IUpdateRepository {
   final List<UpdateModel> _updates = [];
 
+
   @override
   Future<List<UpdateModel>> getUpdates() async {
     await Future.delayed(const Duration(milliseconds: 400));
@@ -17,6 +18,7 @@ class LocalUpdateRepository implements IUpdateRepository {
     _updates.add(update);
     return update;
   }
+
 
   @override
   Future<void> deleteUpdate(String id) async {

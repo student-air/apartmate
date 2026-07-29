@@ -7,14 +7,22 @@ import 'package:apartmate/core/widgets/app_bottom_nav.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
 import 'package:apartmate/core/widgets/send_update_sheet.dart';
-import 'package:lottie/lottie.dart';
 import 'package:apartmate/core/widgets/app_skeletons.dart';
+
 
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Refresh counts every time Dashboard is actually built/shown — this
+    // is the safety net so Pending/Residents/Complaints stay correct even
+    // if a screen that mutated them (e.g. Requests after Accept) couldn't
+    // find a live DashboardController to notify directly.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.refreshRequestCounts();
+    });
+
     return Scaffold(
       backgroundColor: AppColors.background,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -23,7 +31,7 @@ class DashboardView extends GetView<DashboardController> {
       ),
       bottomNavigationBar: AppBottomNav(
         activeTab: AppNavTab.home,
-        onHome: () {}, // already here
+        onHome: () {},
         onUpdates: controller.goToUpdates,
         onRequests: controller.goToRequests,
         onProfile: controller.goToProfile,
@@ -33,194 +41,153 @@ class DashboardView extends GetView<DashboardController> {
         child: Obx(() {
           if (controller.isLoading.value) return const AppSkeletonList(itemBuilder: StaffTileSkeleton.new);
           return SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
             child: AppResponsiveContainer(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Stack(
-                    clipBehavior: Clip.none,
+                  // Society name + logout
+                  Row(
                     children: [
-                      Padding(
-                        // The bottom padding here isn't visual spacing — it
-                        // reserves room so the Stack's own layout size
-                        // includes the quick-action cards below, which is
-                        // what makes their lower half tappable. Flutter only
-                        // forwards taps to positions within a Stack's own
-                        // size, even with clipBehavior: Clip.none.
-                        padding: const EdgeInsets.only(bottom: 74),
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(30, 28, 30, 60),
-                          decoration: const BoxDecoration(
-                            color: AppColors.primaryDark,
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(AppDimens.headerRadius),
-                              bottomRight: Radius.circular(AppDimens.headerRadius),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Obx(() =>Text(
-                                      '${DashboardController.greeting} \n${controller.ownerFirstName}',
-                                      style: AppTextStyles.h2.copyWith(color: Colors.white),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Obx(() =>Text(
-                                      controller.societyNameText,
-                                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withValues(alpha: 0.7)),
-                                    )),
-                                  ],
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: controller.goToProfile,
-                                child: Container(
-                                  width: 44,
-                                  height: 44,
-                                   decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
-                                  alignment: Alignment.center,
-                                  child: Obx(() =>Text(
-                                    controller.ownerInitials,
-                                    style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryDark),
-                                  )),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 30,
-                        right: 30,
-                        bottom: 0,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: _QuickAction(
-                                icon: Icons.edit_rounded,
-                                label: 'Edit Society',
-                                color: AppColors.primaryDarkGradientEnd,
-                                onTap: controller.goToEditSociety,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _QuickAction(
-                                icon: Icons.groups_rounded,
-                                label: 'Residents',
-                                color: AppColors.primaryDarkGradientEnd,
-                                onTap: controller.goToResidents,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _QuickAction(
-                                icon: Icons.campaign_rounded,
-                                label: 'Updates',
-                                color: AppColors.accentGreen,
-                                onTap: controller.goToUpdates,
-                              ),
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: AppColors.accentGreen,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.accentGreen.withValues(alpha: 0.7),
+                              blurRadius: 8,
+                              spreadRadius: 2,
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Obx(() => Text(
+                              controller.societyNameText.toUpperCase(),
+                              style: AppTextStyles.overline,
+                              overflow: TextOverflow.ellipsis,
+                            )),
+                      ),
+                      IconButton(
+                        onPressed: controller.confirmLogout,
+                        icon: const Icon(Icons.logout_rounded, color: AppColors.danger),
+                        style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 1.6,
-                      children: [
-                        _StatCard(
-                          icon: Icons.villa_rounded,
-                          iconWidget: ClipOval(
-                            child: Transform.scale(
-                              scale: 1.8, // increase if there's still visible padding, decrease if it crops too tight
-                              child: Lottie.asset(
-                                'assets/lottie/building.json',
-                                width: 56,
-                                height: 56,
-                                fit: BoxFit.cover,
-                                repeat: false,
-                              ),
+                  const SizedBox(height: 12),
+
+                  // Greeting
+                  Obx(() => RichText(
+                        text: TextSpan(
+                          style: AppTextStyles.h1.copyWith(color: AppColors.textPrimary, height: 1.1),
+                          children: [
+                            TextSpan(text: '${DashboardController.greeting},\n'),
+                            TextSpan(
+                              text: '${controller.ownerFirstName}.',
+                              style: const TextStyle(color: AppColors.accentGreen),
                             ),
-                          ),
-                          label: 'Buildings',
-                          value: '${controller.stats.value?.buildings ?? 0}',
-                          color: AppColors.primaryDarkGradientEnd,
-                          onTap: controller.goToBuildings,
+                          ],
                         ),
-                        _StatCard(
-                          icon: Icons.villa_rounded,
-                          iconWidget: ClipOval(
-                            child: Transform.scale(
-                              scale: 1.8, // increase if there's still visible padding, decrease if it crops too tight
-                              child: Lottie.asset(
-                                'assets/lottie/complaint.json',
-                                width: 46,
-                                height: 46,
-                                fit: BoxFit.cover,
-                                repeat:false,
-                              ),
-                            ),
-                          ),
-                          label: 'Complaint',
-                          value: '${controller.complaintsCount.value}',
-                          color: AppColors.primaryDarkGradientEnd,
-                          onTap: controller.goToComplaints,
+                      )),
+                  const SizedBox(height: 20),
+
+                  // Avatar + role
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: controller.goToProfile,
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
+                          alignment: Alignment.center,
+                          child: Obx(() => Text(
+                                controller.ownerInitials,
+                                style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryDark),
+                              )),
                         ),
-                        _StatCard(
-                          icon: Icons.villa_rounded,
-                          iconWidget: ClipOval(
-                            child: Transform.scale(
-                              scale: 1.8, // increase if there's still visible padding, decrease if it crops too tight
-                              child: Lottie.asset(
-                                'assets/lottie/staff_dashboard.json',
-                                width: 56,
-                                height: 56,
-                                fit: BoxFit.cover,
-                                repeat: true,
-                              ),
-                            ),
-                          ),
-                          label: 'Staff',
-                          value: '${controller.stats.value?.mgmtStaff ?? 0}',
-                          color: AppColors.primaryDarkGradientEnd,
-                          onTap: controller.goToAddStaff,
-                        ),
-                        _StatCard(
-                          icon: Icons.villa_rounded,
-                          iconWidget: ClipOval(
-                            child: Transform.scale(
-                              scale: 1.5, // increase if there's still visible padding, decrease if it crops too tight
-                              child: Lottie.asset(
-                                'assets/lottie/pending.json',
-                                width: 46,
-                                height: 46,
-                                fit: BoxFit.cover,
-                                repeat: false,
-                              ),
-                            ),
-                          ),
-                          label: 'Pending',
-                          value: '${controller.stats.value?.pendingRequests ?? 0}',
-                          color: AppColors.primaryDarkGradientEnd,
-                          onTap: controller.goToRequests,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(child: Divider(color: AppColors.borderLight)),
+                      const SizedBox(width: 12),
+                      Text(
+                        controller.roleDisplay,
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
+
+                  // Stat pills
+                  SizedBox(
+                    height: 112,
+                    child: Obx(() => ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            _StatPill(
+                              icon: Icons.villa_rounded,
+                              value: '${controller.stats.value?.buildings ?? 0}',
+                              label: 'Buildings',
+                              filled: true,
+                              onTap: controller.goToBuildings,
+                            ),
+                            const SizedBox(width: 10),
+                            _StatPill(
+                              icon: Icons.report_problem_rounded,
+                              value: '${controller.complaintsCount.value}',
+                              label: 'Complaints',
+                              onTap: controller.goToComplaints,
+                            ),
+                            const SizedBox(width: 10),
+                            _StatPill(
+                              icon: Icons.people_rounded,
+                              value: '${controller.residentsCount.value}',
+                              label: 'Residents',
+                              onTap: controller.goToResidents,
+                            ),
+                            const SizedBox(width: 10),
+                            _StatPill(
+                              icon: Icons.hourglass_bottom_rounded,
+                              value: '${controller.pendingRequestsCount.value}',
+                              label: 'Pending',
+                              onTap: controller.goToRequests,
+                            ),
+                          ],
+                        )),
+                  ),
+                  const SizedBox(height: 28),
+
+                  Text('ACTIONS', style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark)),
+                  const SizedBox(height: 12),
+                  const Divider(color: AppColors.borderLight, height: 1),
+                  const SizedBox(height: 16),
+
+                  _ActionRow(
+                    icon: Icons.edit_rounded,
+                    title: 'Edit Society',
+                    subtitle: 'Manage society details',
+                    onTap: controller.goToEditSociety,
+                  ),
+                  const SizedBox(height: 12),
+                  _ActionRow(
+                    icon: Icons.groups_rounded,
+                    title: 'Add Staff',
+                    subtitle: 'Manage society staff',
+                    onTap: controller.goToAddStaff,
+                  ),
+                  const SizedBox(height: 12),
+                  _ActionRow(
+                    icon: Icons.campaign_rounded,
+                    title: 'Post Update',
+                    subtitle: 'Notify all residents',
+                    filled: true,
+                    onTap: showSendUpdateSheet,
+                  ),
                 ],
               ),
             ),
@@ -230,39 +197,55 @@ class DashboardView extends GetView<DashboardController> {
     );
   }
 }
-class _QuickAction extends StatelessWidget {
+
+class _StatPill extends StatelessWidget {
   final IconData icon;
+  final String value;
   final String label;
-  final Color color;
-  final VoidCallback onTap;
-  const _QuickAction({required this.icon, required this.label, required this.color, required this.onTap});
+  final bool filled;
+  final VoidCallback? onTap;
+  const _StatPill({
+    required this.icon,
+    required this.value,
+    required this.label,
+    this.filled = false,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final bg = filled ? AppColors.accentGreen : AppColors.surface;
+    final fg = filled ? Colors.white : AppColors.textPrimary;
+    final iconColor = filled ? Colors.white : AppColors.textMuted;
+    final labelColor = filled ? Colors.white.withValues(alpha: 0.85) : AppColors.textMuted;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+      borderRadius: BorderRadius.circular(AppDimens.radiusXl),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        width: 84,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-          boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
+          color: bg,
+          borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+          border: filled ? null : Border.all(color: AppColors.borderLight),
+          boxShadow: filled
+              ? [BoxShadow(color: AppColors.accentGreen.withValues(alpha: 0.25), blurRadius: 12, offset: const Offset(0, 4))]
+              : null,
         ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
-              alignment: Alignment.center,
-              child: Icon(icon, size: 24, color: color),
-            ),
-            const SizedBox(height: 28),
+            Icon(icon, size: 18, color: iconColor),
+            const SizedBox(height: 8),
+            Text(value, style: AppTextStyles.h4.copyWith(color: fg)),
+            const SizedBox(height: 2),
             Text(
               label,
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w700, color: color),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.caption.copyWith(color: labelColor),
             ),
           ],
         ),
@@ -270,56 +253,66 @@ class _QuickAction extends StatelessWidget {
     );
   }
 }
-class _StatCard extends StatelessWidget {
+
+class _ActionRow extends StatelessWidget {
   final IconData icon;
-  final Widget? iconWidget;
-  final String label;
-  final String value;
-  final Color color;
-  final VoidCallback? onTap;
-  const _StatCard({
+  final String title;
+  final String subtitle;
+  final bool filled;
+  final VoidCallback onTap;
+  const _ActionRow({
     required this.icon,
-    this.iconWidget,
-    required this.label,
-    required this.value,
-    required this.color,
-    this.onTap,
+    required this.title,
+    required this.subtitle,
+    this.filled = false,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final bg = filled ? AppColors.accentGreen : AppColors.surface;
+    final titleColor = filled ? Colors.white : AppColors.textPrimary;
+    final subtitleColor = filled ? Colors.white.withValues(alpha: 0.8) : AppColors.textMuted;
+    final iconBg = filled ? Colors.white.withValues(alpha: 0.2) : AppColors.surfaceMuted;
+    final iconColor = filled ? Colors.white : AppColors.textSecondary;
+    final chevronColor = filled ? Colors.white.withValues(alpha: 0.8) : AppColors.textMuted;
+
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+      borderRadius: BorderRadius.circular(AppDimens.radiusXl),
       child: Container(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-          boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
+          color: bg,
+          borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+          border: filled ? null : Border.all(color: AppColors.borderLight),
+          boxShadow: filled
+              ? [BoxShadow(color: AppColors.accentGreen.withValues(alpha: 0.25), blurRadius: 14, offset: const Offset(0, 4))]
+              : null,
         ),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(shape: BoxShape.circle),
-            alignment: Alignment.center,
-            child: iconWidget ?? Icon(icon, size: 28, color: color),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(value, style: AppTextStyles.h3),
-                const SizedBox(height: 6),
-                Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted)),
-              ],
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+              alignment: Alignment.center,
+              child: Icon(icon, size: 19, color: iconColor),
             ),
-          ),
-        ],
-      ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: AppTextStyles.labelLarge.copyWith(color: titleColor)),
+                  const SizedBox(height: 2),
+                  Text(subtitle, style: AppTextStyles.bodySmall.copyWith(color: subtitleColor)),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 20, color: chevronColor),
+          ],
+        ),
       ),
     );
   }

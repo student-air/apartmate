@@ -1,4 +1,4 @@
-enum StaffRole { admin, reception, electrician, plumber, securityGuard }
+enum StaffRole { admin, reception, electrician, plumber, securityGuard, other }
 
 extension StaffRoleX on StaffRole {
   String get label {
@@ -13,32 +13,8 @@ extension StaffRoleX on StaffRole {
         return 'Plumber';
       case StaffRole.securityGuard:
         return 'Security Guard';
-    }
-  }
-}
-
-enum StaffShift { morning, evening, night }
-
-extension StaffShiftX on StaffShift {
-  String get label {
-    switch (this) {
-      case StaffShift.morning:
-        return 'Morning (6AM – 2PM)';
-      case StaffShift.evening:
-        return 'Evening (2PM – 10PM)';
-      case StaffShift.night:
-        return 'Night (10PM – 6AM)';
-    }
-  }
-
-  String get shortLabel {
-    switch (this) {
-      case StaffShift.morning:
-        return 'Morning';
-      case StaffShift.evening:
-        return 'Evening';
-      case StaffShift.night:
-        return 'Night';
+      case StaffRole.other:
+        return 'Other';
     }
   }
 }
@@ -49,7 +25,7 @@ class StaffModel {
   final String phone;
   final String cnic;
   final StaffRole role;
-  final StaffShift shift;
+  final String? customRoleLabel;
   final String? photoPath;
 
   const StaffModel({
@@ -58,9 +34,18 @@ class StaffModel {
     required this.phone,
     required this.cnic,
     required this.role,
-    required this.shift,
+    this.customRoleLabel,
     this.photoPath,
   });
+
+  /// Display label — falls back to the entered custom text when role is
+  /// StaffRole.other, otherwise the fixed enum label.
+  String get roleDisplayLabel {
+    if (role == StaffRole.other && (customRoleLabel?.trim().isNotEmpty ?? false)) {
+      return customRoleLabel!.trim();
+    }
+    return role.label;
+  }
 
   String get initials {
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -73,7 +58,7 @@ class StaffModel {
     String? phone,
     String? cnic,
     StaffRole? role,
-    StaffShift? shift,
+    String? customRoleLabel,
     String? photoPath,
   }) {
     return StaffModel(
@@ -82,9 +67,8 @@ class StaffModel {
       phone: phone ?? this.phone,
       cnic: cnic ?? this.cnic,
       role: role ?? this.role,
-      shift: shift ?? this.shift,
+      customRoleLabel: customRoleLabel ?? this.customRoleLabel,
       photoPath: photoPath ?? this.photoPath,
     );
   }
 }
-  

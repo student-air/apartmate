@@ -19,6 +19,7 @@ class ResidentModel {
   final String emergencyContact;
   final bool rentPaid;
   final bool maintenancePaid;
+  
 
   const ResidentModel({
     required this.id,

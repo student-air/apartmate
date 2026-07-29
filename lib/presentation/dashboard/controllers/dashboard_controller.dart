@@ -1,31 +1,41 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:apartmate/data/models/dashboard_stats_model.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_dashboard_repository.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
-import 'package:apartmate/domain/repositories/i_update_repository.dart';
+import 'package:apartmate/domain/repositories/i_complaint_repository.dart';
 import 'package:apartmate/domain/repositories/i_request_repository.dart';
-import 'package:apartmate/data/models/update_model.dart';
+import 'package:apartmate/domain/repositories/i_auth_repository.dart';
+import 'package:apartmate/domain/repositories/i_resident_repository.dart';
 import 'package:apartmate/data/models/request_model.dart';
 import 'package:apartmate/routes/app_routes.dart';
+
 import 'package:apartmate/presentation/dashboard/widgets/edit_society_sheet.dart';
 
 class DashboardController extends GetxController {
   final IDashboardRepository _dashboardRepository;
   final ISocietyRepository _societyRepository;
-  final IUpdateRepository _updateRepository;
+  final IComplaintRepository _complaintRepository;
   final IRequestRepository _requestRepository;
+  final IAuthRepository _authRepository;
+  final IResidentRepository _residentRepository;
+
   DashboardController(
     this._dashboardRepository,
     this._societyRepository,
-    this._updateRepository,
+    this._complaintRepository,
     this._requestRepository,
+    this._authRepository,
+    this._residentRepository,
+
   );
 
   final stats = Rxn<DashboardStatsModel>();
   final society = Rxn<SocietyModel>();
   final complaintsCount = 0.obs;
   final pendingRequestsCount = 0.obs;
+  final residentsCount = 0.obs;
   final isLoading = false.obs;
 
   static String get greeting {
@@ -35,15 +45,12 @@ class DashboardController extends GetxController {
     return 'Good Evening';
   }
 
-  /// First name pulled from the owner name entered at society registration.
-  /// Empty until the society has loaded.
   String get ownerFirstName {
     final name = society.value?.ownerName.trim() ?? '';
     if (name.isEmpty) return '';
     return name.split(' ').first;
   }
 
-  /// Initials pulled from the registered owner name, e.g. "Ahmed Khan" -> "AK".
   String get ownerInitials {
     final name = society.value?.ownerName.trim() ?? '';
     if (name.isEmpty) return '';
@@ -53,8 +60,13 @@ class DashboardController extends GetxController {
     return (first + last).toUpperCase();
   }
 
-  /// Registered society name, shown under the greeting.
   String get societyNameText => society.value?.name ?? '';
+
+  String get roleDisplay {
+    final role = _authRepository.currentUser?.role ?? '';
+    if (role.trim().isEmpty) return 'Society Admin';
+    return role[0].toUpperCase() + role.substring(1);
+  }
 
   @override
   void onInit() {
@@ -63,6 +75,13 @@ class DashboardController extends GetxController {
     _loadSociety();
     _loadComplaintsCount();
     _loadPendingRequestsCount();
+    _loadResidentsCount();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    _loadComplaintsCount();
   }
 
   Future<void> _loadStats() async {
@@ -79,18 +98,28 @@ class DashboardController extends GetxController {
   }
 
   Future<void> _loadComplaintsCount() async {
-    final updates = await _updateRepository.getUpdates();
-    complaintsCount.value = updates.where((u) => u.type == UpdateType.complaint).length;
-  }
+  final list = await _complaintRepository.getComplaints();
+  complaintsCount.value = list.length;
+}
 
   Future<void> _loadPendingRequestsCount() async {
     final requests = await _requestRepository.getRequests();
     pendingRequestsCount.value = requests.where((r) => r.status == RequestStatus.pending).length;
   }
 
-  /// Called by EditSocietyController after a successful save, so the
-  /// header greeting/society name update immediately without a full reload.
+  Future<void> _loadResidentsCount() async {
+    final residents = await _residentRepository.getResidents();
+    residentsCount.value = residents.length;
+  }
+
   Future<void> refreshSociety() => _loadSociety();
+
+  Future<void> refreshRequestCounts() async {
+    await Future.wait([
+      _loadPendingRequestsCount(),
+      _loadResidentsCount(),
+    ]);
+  }
 
   void goToEditSociety() => showEditSocietySheet();
   void goToAddStaff() => Get.toNamed(AppRoutes.managementStaff);
@@ -100,4 +129,30 @@ class DashboardController extends GetxController {
   void goToBuildings() => Get.toNamed(AppRoutes.societyBuildings);
   void goToComplaints() => Get.toNamed(AppRoutes.complaints);
   void goToRequests() => Get.toNamed(AppRoutes.requests);
+
+  Future<void> logout() async {
+    await _authRepository.logout();
+    Get.offAllNamed(AppRoutes.login);
+  }
+
+  void confirmLogout() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Log out?'),
+        content: const Text('You will need to sign in again to access your account.'),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              Get.back();
+              logout();
+            },
+            child: const Text('Log Out'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> refreshComplaintsCount() => _loadComplaintsCount();
 }

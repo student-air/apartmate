@@ -4,6 +4,7 @@ import 'package:apartmate/data/models/resident_model.dart';
 import 'package:apartmate/domain/repositories/i_request_repository.dart';
 import 'package:apartmate/domain/repositories/i_resident_repository.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
+import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
 
 class RequestsController extends GetxController {
   final IRequestRepository _requestRepository;
@@ -67,6 +68,10 @@ class RequestsController extends GetxController {
 
       requests.removeWhere((r) => r.id == request.id);
       if (expandedRequestId.value == request.id) expandedRequestId.value = null;
+
+      if (Get.isRegistered<DashboardController>()) {
+        Get.find<DashboardController>().refreshRequestCounts();
+      }
 
       AppSnackbar.success('Accepted', '${request.tenantName} registered as a resident');
       // TODO: notify tenant via email/SMS once tenant-facing app exists.

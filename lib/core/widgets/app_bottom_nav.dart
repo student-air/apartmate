@@ -144,7 +144,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color color = isActive ? AppColors.primaryDarkGradientEnd : AppColors.textMuted;
+    final Color color = isActive ? AppColors.accentGreen : AppColors.textMuted;
     return InkWell(
       onTap: onTap,
       customBorder: const CircleBorder(),

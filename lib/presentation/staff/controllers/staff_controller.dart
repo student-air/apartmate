@@ -19,8 +19,8 @@ class StaffController extends GetxController {
   final nameCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
   final cnicCtrl = TextEditingController();
+  final customRoleCtrl = TextEditingController();
   final selectedRole = StaffRole.securityGuard.obs;
-  final selectedShift = StaffShift.morning.obs;
 
   final photo = Rxn<File>();
   static const int maxPhotoSizeBytes = 3 * 1024 * 1024; // 3MB
@@ -55,10 +55,7 @@ class StaffController extends GetxController {
 
   void setRole(StaffRole? role) {
     if (role != null) selectedRole.value = role;
-  }
-
-  void setShift(StaffShift? shift) {
-    if (shift != null) selectedShift.value = shift;
+    if (role != StaffRole.other) customRoleCtrl.clear();
   }
 
   void resetForm() {
@@ -66,8 +63,8 @@ class StaffController extends GetxController {
     nameCtrl.clear();
     phoneCtrl.clear();
     cnicCtrl.clear();
+    customRoleCtrl.clear();
     selectedRole.value = StaffRole.securityGuard;
-    selectedShift.value = StaffShift.morning;
     photo.value = null;
     phoneError.value = null;
     cnicError.value = null;
@@ -80,7 +77,7 @@ class StaffController extends GetxController {
     phoneCtrl.text = member.phone;
     cnicCtrl.text = member.cnic;
     selectedRole.value = member.role;
-    selectedShift.value = member.shift;
+    customRoleCtrl.text = member.customRoleLabel ?? '';
     photo.value = member.photoPath != null ? File(member.photoPath!) : null;
     phoneError.value = null;
     cnicError.value = null;
@@ -90,7 +87,11 @@ class StaffController extends GetxController {
     if (nameCtrl.text.trim().isEmpty || phoneCtrl.text.trim().isEmpty || cnicCtrl.text.trim().isEmpty) {
       staffShakeTrigger.value++;
       AppSnackbar.error('Missing info', 'Please fill in all required fields');
-      //Get.snackbar('Missing info', 'Please fill in all required fields');
+      return;
+    }
+    if (selectedRole.value == StaffRole.other && customRoleCtrl.text.trim().isEmpty) {
+      staffShakeTrigger.value++;
+      AppSnackbar.error('Missing info', 'Please enter the role name');
       return;
     }
     if (!Validators.isValidPhone(phoneCtrl.text)) {
@@ -111,7 +112,7 @@ class StaffController extends GetxController {
         phone: phoneCtrl.text.trim(),
         cnic: cnicCtrl.text.trim(),
         role: selectedRole.value,
-        shift: selectedShift.value,
+        customRoleLabel: selectedRole.value == StaffRole.other ? customRoleCtrl.text.trim() : null,
         photoPath: photo.value?.path,
       );
       final saved = await _staffRepository.updateStaff(updated);
@@ -124,7 +125,7 @@ class StaffController extends GetxController {
         phone: phoneCtrl.text.trim(),
         cnic: cnicCtrl.text.trim(),
         role: selectedRole.value,
-        shift: selectedShift.value,
+        customRoleLabel: selectedRole.value == StaffRole.other ? customRoleCtrl.text.trim() : null,
         photoPath: photo.value?.path,
       );
       final saved = await _staffRepository.addStaff(newStaff);
@@ -153,6 +154,7 @@ class StaffController extends GetxController {
     nameCtrl.dispose();
     phoneCtrl.dispose();
     cnicCtrl.dispose();
+    customRoleCtrl.dispose();
     super.onClose();
   }
 

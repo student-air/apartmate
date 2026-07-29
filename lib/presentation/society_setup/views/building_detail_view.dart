@@ -197,7 +197,7 @@ class BuildingDetailView extends GetView<BuildingDetailController> {
                 label: AppStrings.saveBuildingDetails,
                 icon: Icons.check,
                 backgroundColor: AppColors.primaryDark,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.accentGreen,
                 onPressed: controller.save,
               ),
             ),

@@ -184,7 +184,7 @@ class SocietySetupView extends GetView<SocietySetupController> {
                     () => AppPrimaryButton(
                       label: AppStrings.continueToStaffSetup,
                       backgroundColor: AppColors.primaryDark,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.accentGreen,
                       onPressed: controller.hasConfiguredBuilding
                           ? controller.continueToNextStep
                           : null,

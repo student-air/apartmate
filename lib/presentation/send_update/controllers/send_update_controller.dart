@@ -22,7 +22,6 @@ class SendUpdateController extends GetxController {
 
   static const sendToOptions = ['All', 'Building', 'Floor', 'Flat'];
 
-  final titleCtrl = TextEditingController();
   final descriptionCtrl = TextEditingController();
   final flatNumberCtrl = TextEditingController();
 
@@ -47,7 +46,24 @@ class SendUpdateController extends GetxController {
   /// Prefills the sheet for a specific flat — used when opened from a
   /// Resident card. Waits for buildings to finish loading (if still in
   /// flight) so the building/floor lookups below don't race the initial
-  /// _loadBuildings() call from onInit().
+  /// _loadBuildings() call from onInit(). 
+  // Future<void> prefillForFlat({
+  //   required String buildingName,
+  //   required int floor,
+  //   required String flatNumber,
+  // }) async {
+  //   while (isLoadingBuildings.value) {
+  //     await Future.delayed(const Duration(milliseconds: 50));
+  //   }
+  //   sendTo.value = 'Flat';
+  //   final match = buildings.firstWhereOrNull((b) => b.name == buildingName);
+  //   selectedBuilding.value = match;
+  //   selectedFloor.value = floor;
+  //   flatNumberCtrl.text = flatNumber;
+  // }
+
+  final isLocationLocked = false.obs;
+
   Future<void> prefillForFlat({
     required String buildingName,
     required int floor,
@@ -61,6 +77,7 @@ class SendUpdateController extends GetxController {
     selectedBuilding.value = match;
     selectedFloor.value = floor;
     flatNumberCtrl.text = flatNumber;
+    isLocationLocked.value = true;
   }
 
   Future<void> _loadBuildings() async {
@@ -126,24 +143,9 @@ class SendUpdateController extends GetxController {
   }
 
   Future<void> send() async {
-    if (titleCtrl.text.trim().isEmpty || descriptionCtrl.text.trim().isEmpty) {
+    if (descriptionCtrl.text.trim().isEmpty) {
       shakeTrigger.value++;
-      AppSnackbar.info('Missing info', 'Please fill in the title and description');
-      return;
-    }
-    if (sendTo.value != 'All' && selectedBuilding.value == null) {
-      shakeTrigger.value++;
-      AppSnackbar.info('Missing info', 'Please select a building');
-      return;
-    }
-    if (sendTo.value == 'Floor' && selectedFloor.value == null) {
-      shakeTrigger.value++;
-      AppSnackbar.info('Missing info', 'Please select a floor');
-      return;
-    }
-    if (sendTo.value == 'Flat' && flatNumberCtrl.text.trim().isEmpty) {
-      shakeTrigger.value++;
-      AppSnackbar.info('Missing info', 'Please enter a flat number');
+      AppSnackbar.info('Missing info', 'Please fill in the description');
       return;
     }
 
@@ -153,33 +155,19 @@ class SendUpdateController extends GetxController {
         UpdateModel(
           id: 'update-${DateTime.now().millisecondsSinceEpoch}',
           type: presets[selectedPreset.value] ?? UpdateType.general,
+          title: selectedPreset.value,
           category: selectedPreset.value,
-          title: titleCtrl.text.trim(),
           description: descriptionCtrl.text.trim(),
           postedAt: DateTime.now(),
         ),
       );
     } finally {
-      // Reset the loading flag — and let its Obx rebuild finish — while the
-      // sheet is still fully in the tree. Doing this *after* Get.back() would
-      // race the Navigator's teardown of this same route and corrupt the
-      // element tree (the red "_dependents.isEmpty" assertion).
       isSending.value = false;
     }
 
-    // Close the keyboard if a field still has focus, and give any
-    // in-flight animation — a dropdown menu closing, a ripple, the
-    // keyboard itself — real wall-clock time to finish before we tear
-    // down this route. A zero-duration delay only defers to the next
-    // microtask; it doesn't wait out an actual timed animation, which is
-    // why that approach alone didn't stop the crash. 250ms comfortably
-    // covers Material's default menu-close/ripple durations.
     FocusManager.instance.primaryFocus?.unfocus();
     await Future.delayed(const Duration(milliseconds: 250));
 
-    // Do the actual pop on the next frame, after Flutter's current
-    // build/layout/paint pass is fully done, rather than in the middle
-    // of whatever triggered this callback.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Get.back();
       AppSnackbar.success('Sent', 'Your notice has been sent');
@@ -191,7 +179,6 @@ class SendUpdateController extends GetxController {
 
   @override
   void onClose() {
-    titleCtrl.dispose();
     descriptionCtrl.dispose();
     flatNumberCtrl.dispose();
     super.onClose();

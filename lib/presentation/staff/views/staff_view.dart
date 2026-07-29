@@ -754,6 +754,26 @@ class StaffView extends GetView<StaffController> {
                         ),
                       );
                     }),
+                    // const SizedBox(height: 16),
+                    // Obx(
+                    //   () => AppDropdownField<StaffRole>(
+                    //     label: AppStrings.role,
+                    //     value: controller.selectedRole.value,
+                    //     items: StaffRole.values,
+                    //     labelBuilder: (r) => r.label,
+                    //     onChanged: controller.setRole,
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 16),
+                    // Obx(
+                    //   () => AppDropdownField<StaffShift>(
+                    //     label: AppStrings.shift,
+                    //     value: controller.selectedShift.value,
+                    //     items: StaffShift.values,
+                    //     labelBuilder: (s) => s.label,
+                    //     onChanged: controller.setShift,
+                    //   ),
+                    // ),
                     const SizedBox(height: 16),
                     Obx(
                       () => AppDropdownField<StaffRole>(
@@ -764,16 +784,19 @@ class StaffView extends GetView<StaffController> {
                         onChanged: controller.setRole,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Obx(
-                      () => AppDropdownField<StaffShift>(
-                        label: AppStrings.shift,
-                        value: controller.selectedShift.value,
-                        items: StaffShift.values,
-                        labelBuilder: (s) => s.label,
-                        onChanged: controller.setShift,
-                      ),
-                    ),
+                    Obx(() {
+                      if (controller.selectedRole.value != StaffRole.other) {
+                        return const SizedBox.shrink();
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: AppTextField(
+                          label: 'Role Name',
+                          hint: 'e.g. Gardener',
+                          controller: controller.customRoleCtrl,
+                        ),
+                      );
+                    }),
                     const SizedBox(height: 24),
                     AppPrimaryButton(
                       label: controller.isEditing ? 'Save Changes' : AppStrings.saveStaffMember,
@@ -904,6 +927,8 @@ class _StaffTileState extends State<_StaffTile> with SingleTickerProviderStateMi
         return (bg: AppColors.rolePlumberBg, fg: AppColors.rolePlumberText, border: AppColors.rolePlumberBorder);
       case StaffRole.securityGuard:
         return (bg: AppColors.roleSecurityBg, fg: AppColors.roleSecurityText, border: AppColors.roleSecurityBorder);
+      case StaffRole.other:
+        return (bg: AppColors.surfaceMuted, fg: AppColors.textSecondary, border: AppColors.borderLight);
     }
   }
 
@@ -983,15 +1008,10 @@ class _StaffTileState extends State<_StaffTile> with SingleTickerProviderStateMi
                     runSpacing: 4,
                     children: [
                       _Badge(
-                        label: staff.role.label,
+                        label: staff.roleDisplayLabel,
                         bg: colors.bg,
                         fg: colors.fg,
                         border: colors.border,
-                      ),
-                      _Badge(
-                        label: staff.shift.shortLabel,
-                        bg: AppColors.surfaceMuted,
-                        fg: AppColors.textSecondary,
                       ),
                     ],
                   ),
