@@ -5,9 +5,11 @@ import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/core/theme/app_theme.dart';
 import 'package:apartmate/routes/app_pages.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/services/app_notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AppNotificationService.init();
   runApp(const ApartMateApp());
 }
 

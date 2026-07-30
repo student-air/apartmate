@@ -271,6 +271,9 @@ class _ResidentsAppBarState extends State<_ResidentsAppBar> {
                 padding: const EdgeInsets.only(right: 8),
                 child: TextButton(
                   onPressed: controller.clearFilters,
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.accentGreen,
+                  ),
                   child: const Text('Clear', style: TextStyle(color: Colors.white)),
                 ),
               )

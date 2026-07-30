@@ -6,6 +6,8 @@ import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/data/models/update_model.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/domain/repositories/i_update_repository.dart';
+import 'package:apartmate/core/services/app_notification_service.dart';
+import 'package:apartmate/presentation/profile/controllers/profile_controller.dart';
 
 /// Backs the "Send Notice" bottom sheet, opened from the '+' FAB.
 class SendUpdateController extends GetxController {
@@ -161,6 +163,13 @@ class SendUpdateController extends GetxController {
           postedAt: DateTime.now(),
         ),
       );
+      if (Get.isRegistered<ProfileController>() && Get.find<ProfileController>().notifyUpdates.value) {
+        await AppNotificationService.show(
+          id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+          title: selectedPreset.value,
+          body: descriptionCtrl.text.trim(),
+        );
+      }
     } finally {
       isSending.value = false;
     }

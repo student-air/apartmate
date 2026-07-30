@@ -15,8 +15,12 @@ class ProfileView extends GetView<ProfileController> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: AppResponsiveContainer(
+        child: RefreshIndicator(
+          color: AppColors.primaryDark,
+          onRefresh: controller.refreshSociety,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: AppResponsiveContainer(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -149,28 +153,28 @@ class ProfileView extends GetView<ProfileController> {
                           icon: Icons.notifications_rounded,
                           iconColor: const Color(0xFF3B82F6),
                           label: 'Notification Preferences',
-                          onTap: () => controller.showComingSoon('Notification Preferences'),
+                          onTap: controller.openNotificationPreferences,
                         ),
                         const SizedBox(height: 10),
                         _MenuTile(
                           icon: Icons.shield_rounded,
                           iconColor: AppColors.danger,
                           label: 'Privacy & Security',
-                          onTap: () => controller.showComingSoon('Privacy & Security'),
+                          onTap: controller.openPrivacyAndSecurity,
                         ),
                         const SizedBox(height: 10),
                         _MenuTile(
                           icon: Icons.help_rounded,
                           iconColor: AppColors.accentGreenDark,
                           label: 'Help & Support',
-                          onTap: () => controller.showComingSoon('Help & Support'),
+                          onTap: controller.openHelpAndSupport,
                         ),
                         const SizedBox(height: 10),
                         _MenuTile(
                           icon: Icons.description_rounded,
                           iconColor: AppColors.textSecondary,
                           label: 'Terms of Service',
-                          onTap: () => controller.showComingSoon('Terms of Service'),
+                          onTap: controller.openTermsOfService,
                         ),
                         const SizedBox(height: 20),
 
@@ -195,10 +199,11 @@ class ProfileView extends GetView<ProfileController> {
                 ),
               ],
             ),
+              ),
+            ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
@@ -8,7 +9,7 @@ import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
 import 'package:apartmate/core/widgets/send_update_sheet.dart';
 import 'package:apartmate/core/widgets/app_skeletons.dart';
-
+import 'package:lottie/lottie.dart';
 
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
@@ -40,7 +41,11 @@ class DashboardView extends GetView<DashboardController> {
         bottom: false,
         child: Obx(() {
           if (controller.isLoading.value) return const AppSkeletonList(itemBuilder: StaffTileSkeleton.new);
-          return SingleChildScrollView(
+          return RefreshIndicator(
+            color: AppColors.primaryDark,
+            onRefresh: controller.refreshAll,
+            child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
             child: AppResponsiveContainer(
               child: Column(
@@ -81,19 +86,33 @@ class DashboardView extends GetView<DashboardController> {
                   ),
                   const SizedBox(height: 12),
 
-                  // Greeting
-                  Obx(() => RichText(
-                        text: TextSpan(
-                          style: AppTextStyles.h1.copyWith(color: AppColors.textPrimary, height: 1.1),
-                          children: [
-                            TextSpan(text: '${DashboardController.greeting},\n'),
-                            TextSpan(
-                              text: '${controller.ownerFirstName}.',
-                              style: const TextStyle(color: AppColors.accentGreen),
-                            ),
-                          ],
-                        ),
-                      )),
+                  // Greeting + time-of-day animation
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Obx(() => RichText(
+                              text: TextSpan(
+                                style: AppTextStyles.h1.copyWith(color: AppColors.textPrimary, height: 1.1),
+                                children: [
+                                  TextSpan(text: '${DashboardController.greeting},\n'),
+                                  TextSpan(
+                                    text: '${controller.ownerFirstName}.',
+                                    style: const TextStyle(color: AppColors.accentGreen),
+                                  ),
+                                ],
+                              ),
+                            )),
+                      ),
+                      Lottie.asset(
+                        DashboardController.greetingAnimationAsset,
+                        width: 64,
+                        height: 64,
+                        fit: BoxFit.contain,
+                        repeat: true,
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 20),
 
                   // Avatar + role
@@ -101,16 +120,29 @@ class DashboardView extends GetView<DashboardController> {
                     children: [
                       GestureDetector(
                         onTap: controller.goToProfile,
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
-                          alignment: Alignment.center,
-                          child: Obx(() => Text(
-                                controller.ownerInitials,
-                                style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryDark),
-                              )),
-                        ),
+                        child: Obx(() {
+                          final photoPath = controller.society.value?.ownerPhotoPath;
+                          final hasPhoto = photoPath != null && photoPath.isNotEmpty;
+                          return Container(
+                            width: 40,
+                            height: 40,
+                            decoration: const BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
+                            alignment: Alignment.center,
+                            child: hasPhoto
+                                ? ClipOval(
+                                    child: Image.file(
+                                      File(photoPath),
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : Text(
+                                    controller.ownerInitials,
+                                    style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryDark),
+                                  ),
+                          );
+                        }),
                       ),
                       const SizedBox(width: 12),
                       const Expanded(child: Divider(color: AppColors.borderLight)),
@@ -188,8 +220,9 @@ class DashboardView extends GetView<DashboardController> {
                     filled: true,
                     onTap: showSendUpdateSheet,
                   ),
-                ],
+             ],
               ),
+            ),
             ),
           );
         }),

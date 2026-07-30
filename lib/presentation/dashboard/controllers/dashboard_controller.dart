@@ -45,6 +45,12 @@ class DashboardController extends GetxController {
     return 'Good Evening';
   }
 
+  static String get greetingAnimationAsset {
+    // Sun for daytime hours, moon for evening/night.
+    if (greeting == 'Good Morning' || greeting == 'Good Afternoon') return 'assets/lottie/sun.json';
+    return 'assets/lottie/moon.json';
+  }
+
   String get ownerFirstName {
     final name = society.value?.ownerName.trim() ?? '';
     if (name.isEmpty) return '';
@@ -155,4 +161,14 @@ class DashboardController extends GetxController {
   }
 
   Future<void> refreshComplaintsCount() => _loadComplaintsCount();
+
+  Future<void> refreshAll() async {
+    await Future.wait([
+      _loadStats(),
+      _loadSociety(),
+      _loadComplaintsCount(),
+      _loadPendingRequestsCount(),
+      _loadResidentsCount(),
+    ]);
+  }
 }
