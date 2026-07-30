@@ -101,34 +101,38 @@ class ProfileController extends GetxController {
   }
 
   Future<void> changePassword() async {
-    if (currentPasswordCtrl.text.trim().isEmpty ||
-        newPasswordCtrl.text.trim().isEmpty ||
-        confirmPasswordCtrl.text.trim().isEmpty) {
-      AppSnackbar.error('Missing info', 'Please fill in all password fields');
-      return;
-    }
-    if (newPasswordCtrl.text.trim().length < 8) {
-      AppSnackbar.error('Weak password', 'New password must be at least 8 characters');
-      return;
-    }
-    if (newPasswordCtrl.text.trim() != confirmPasswordCtrl.text.trim()) {
-      AppSnackbar.error('Mismatch', 'New password and confirmation don\'t match');
-      return;
-    }
-
-    isChangingPassword.value = true;
-    try {
-      // No real backend yet — this simulates the request.
-      await Future.delayed(const Duration(milliseconds: 600));
-      currentPasswordCtrl.clear();
-      newPasswordCtrl.clear();
-      confirmPasswordCtrl.clear();
-      Get.back();
-      AppSnackbar.success('Password updated', 'Your password has been changed successfully');
-    } finally {
-      isChangingPassword.value = false;
-    }
+  if (currentPasswordCtrl.text.trim().isEmpty ||
+      newPasswordCtrl.text.trim().isEmpty ||
+      confirmPasswordCtrl.text.trim().isEmpty) {
+    AppSnackbar.error('Missing info', 'Please fill in all password fields');
+    return;
   }
+  if (newPasswordCtrl.text.trim().length < 8) {
+    AppSnackbar.error('Weak password', 'New password must be at least 8 characters');
+    return;
+  }
+  if (newPasswordCtrl.text.trim() != confirmPasswordCtrl.text.trim()) {
+    AppSnackbar.error('Mismatch', 'New password and confirmation don\'t match');
+    return;
+  }
+
+  isChangingPassword.value = true;
+  try {
+    await _authRepository.changePassword(
+      currentPassword: currentPasswordCtrl.text.trim(),
+      newPassword: newPasswordCtrl.text.trim(),
+    );
+    currentPasswordCtrl.clear();
+    newPasswordCtrl.clear();
+    confirmPasswordCtrl.clear();
+    Get.back();
+    AppSnackbar.success('Password updated', 'Your password has been changed successfully');
+  } catch (e) {
+    AppSnackbar.error('Update failed', e.toString());
+  } finally {
+    isChangingPassword.value = false;
+  }
+}
 
   Future<void> logout() async {
     await _authRepository.logout();
@@ -155,15 +159,18 @@ class ProfileController extends GetxController {
   }
 
   Future<void> sendPasswordResetLink() async {
-    final email = user?.email ?? '';
-    if (email.isEmpty) {
-      Get.snackbar('No email on file', 'Add an email to your profile first');
-      return;
-    }
-    // No real backend yet — simulates sending the reset email.
-    await Future.delayed(const Duration(milliseconds: 500));
-    AppSnackbar.info('Reset link sent', 'Check $email for a password reset link');
+  final email = user?.email ?? '';
+  if (email.isEmpty) {
+    AppSnackbar.error('No email on file', 'Add an email to your profile first');
+    return;
   }
+  try {
+    await _authRepository.sendPasswordResetEmail(email);
+    AppSnackbar.success('Reset link sent', 'Check $email for a password reset link');
+  } catch (e) {
+    AppSnackbar.error('Reset failed', e.toString());
+  }
+}
 
   Future<void> setNotifyUpdates(bool value) async {
     if (value && !await AppNotificationService.hasPermission()) {

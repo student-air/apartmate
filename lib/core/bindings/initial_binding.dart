@@ -3,7 +3,7 @@ import 'package:apartmate/data/repositories/firebase_auth_repository.dart';
 import 'package:apartmate/data/repositories/firebase_society_repository.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
-import 'package:apartmate/data/repositories/local_staff_repository.dart';
+import 'package:apartmate/data/repositories/firebase_staff_repository.dart';
 import 'package:apartmate/domain/repositories/i_staff_repository.dart';
 import 'package:apartmate/domain/repositories/i_dashboard_repository.dart';
 import 'package:apartmate/data/repositories/local_dashboard_repository.dart';
@@ -30,7 +30,7 @@ class InitialBinding extends Bindings {
   void dependencies() {
     Get.put<IAuthRepository>(FirebaseAuthRepository(), permanent: true);
     Get.put<ISocietyRepository>(FirebaseSocietyRepository(), permanent: true);
-    Get.put<IStaffRepository>(LocalStaffRepository(), permanent: true);
+    Get.put<IStaffRepository>(FirebaseStaffRepository(), permanent: true);
     Get.put<IDashboardRepository>(
       LocalDashboardRepository(Get.find<ISocietyRepository>(), Get.find<IStaffRepository>()),
       permanent: true,

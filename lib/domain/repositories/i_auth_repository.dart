@@ -7,6 +7,11 @@ abstract class IAuthRepository {
   Future<UserModel> login({required String username, required String password});
   Future<UserModel> loginWithGoogle();
   Future<UserModel> loginWithApple();
+  Future<void> changePassword({
+  required String currentPassword,
+  required String newPassword,
+});
+  Future<void> sendPasswordResetEmail(String email);
   Future<UserModel> updateProfile(UserModel updated);
   Future<UserModel> signUp({
     required String fullName,

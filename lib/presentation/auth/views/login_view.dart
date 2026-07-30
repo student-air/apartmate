@@ -8,7 +8,6 @@ import 'package:apartmate/core/widgets/app_button.dart';
 import 'package:apartmate/core/widgets/app_card.dart';
 import 'package:apartmate/core/widgets/app_text_field.dart';
 import 'package:apartmate/presentation/auth/controllers/auth_controller.dart';
-import 'package:apartmate/core/utils/app_snackbar.dart';
 
 class LoginView extends GetView<AuthController> {
   const LoginView({super.key});
@@ -178,9 +177,7 @@ class _LoginFormCardState extends State<_LoginFormCard> with SingleTickerProvide
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
-                onPressed: () {
-                  AppSnackbar.info('Coming soon', 'Password reset isn\'t available yet');
-                },
+                onPressed: controller.forgotPassword,
                 child: Text(AppStrings.forgotPassword, style: AppTextStyles.labelLarge),
               ),
             ),

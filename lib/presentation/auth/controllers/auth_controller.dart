@@ -22,6 +22,7 @@ class AuthController extends GetxController {
   final confirmPasswordCtrl = TextEditingController();
   final isSignupPasswordVisible = false.obs;
   final isConfirmPasswordVisible = false.obs;
+  final isResettingPassword = false.obs;
 
   final isLoading = false.obs;
   final loginShakeTrigger = 0.obs;
@@ -113,7 +114,64 @@ class AuthController extends GetxController {
       isLoading.value = false;
     }
   }
+  
 
+Future<void> forgotPassword() async {
+  final emailCtrl = TextEditingController(text: usernameCtrl.text.trim());
+  final result = await Get.dialog<String>(
+    Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Reset password', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 8),
+            const Text(
+              'Enter the email for your account. We\'ll send a reset link.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailCtrl,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                hintText: 'you@gmail.com',
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () => Get.back(result: emailCtrl.text.trim()),
+                child: const Text('Send reset link'),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Get.back(),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  if (result == null || result.isEmpty) return;
+
+  isResettingPassword.value = true;
+  try {
+    await _authRepository.sendPasswordResetEmail(result);
+    AppSnackbar.success('Email sent', 'Check $result for a password reset link');
+  } catch (e) {
+    AppSnackbar.error('Reset failed', e.toString());
+  } finally {
+    isResettingPassword.value = false;
+  }
+}
   Future<void> signUp() async {
     if (fullNameCtrl.text.trim().isEmpty ||
         emailCtrl.text.trim().isEmpty ||

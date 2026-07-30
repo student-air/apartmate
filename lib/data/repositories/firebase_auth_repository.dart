@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:apartmate/data/models/user_model.dart';
@@ -5,15 +6,59 @@ import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 
 class FirebaseAuthRepository implements IAuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
   UserModel? _cached;
   bool _googleInitialized = false;
 
+  DocumentReference<Map<String, dynamic>> _userDoc(String uid) =>
+      _db.collection('users').doc(uid);
+
   Future<void> _ensureGoogleInitialized() async {
     if (_googleInitialized) return;
     await _googleSignIn.initialize();
     _googleInitialized = true;
+  }
+
+  Future<UserModel> _loadOrCreateProfile(User user, {UserModel? seed}) async {
+    final ref = _userDoc(user.uid);
+    final snap = await ref.get();
+
+    if (snap.exists && snap.data() != null) {
+      final map = snap.data()!;
+      final model = UserModel(
+        id: user.uid,
+        fullName: map['fullName'] as String? ?? user.displayName ?? '',
+        email: map['email'] as String? ?? user.email ?? '',
+        phone: map['phone'] as String? ?? '',
+        role: map['role'] as String? ?? 'Society Owner',
+        photoPath: map['photoPath'] as String? ?? user.photoURL,
+      );
+      _cached = model;
+      return model;
+    }
+
+    final model = seed ??
+        UserModel(
+          id: user.uid,
+          fullName: user.displayName ?? '',
+          email: user.email ?? '',
+          phone: '',
+          role: 'Society Owner',
+          photoPath: user.photoURL,
+        );
+
+    await ref.set({
+      'fullName': model.fullName,
+      'email': model.email,
+      'phone': model.phone,
+      'role': model.role,
+      'photoPath': model.photoPath,
+    });
+
+    _cached = model;
+    return model;
   }
 
   @override
@@ -39,8 +84,7 @@ class FirebaseAuthRepository implements IAuthRepository {
         message: 'No user returned from Firebase',
       );
     }
-    _cached = _map(user);
-    return _cached!;
+    return _loadOrCreateProfile(user);
   }
 
   @override
@@ -65,26 +109,64 @@ class FirebaseAuthRepository implements IAuthRepository {
     await user.updateDisplayName(fullName.trim());
     await user.reload();
 
-    _cached = UserModel(
+    final model = UserModel(
       id: user.uid,
       fullName: fullName.trim(),
       email: user.email ?? email.trim(),
       phone: phone.trim(),
       role: 'Society Owner',
     );
-    return _cached!;
+
+    await _userDoc(user.uid).set({
+      'fullName': model.fullName,
+      'email': model.email,
+      'phone': model.phone,
+      'role': model.role,
+      'photoPath': null,
+    });
+
+    _cached = model;
+    return model;
   }
 
   @override
   Future<UserModel> updateProfile(UserModel updated) async {
     final user = _auth.currentUser;
     if (user == null) throw StateError('Not signed in');
+
     await user.updateDisplayName(updated.fullName);
     await user.reload();
-    _cached = updated;
-    return updated;
-  }
 
+    await _userDoc(user.uid).set({
+      'fullName': updated.fullName,
+      'email': updated.email,
+      'phone': updated.phone,
+      'role': updated.role,
+      'photoPath': updated.photoPath,
+    }, SetOptions(merge: true));
+
+    _cached = UserModel(
+      id: user.uid,
+      fullName: updated.fullName,
+      email: updated.email,
+      phone: updated.phone,
+      role: updated.role,
+      photoPath: updated.photoPath,
+    );
+    return _cached!;
+  }
+  
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    final trimmed = email.trim();
+    if (trimmed.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'invalid-email',
+        message: 'Email is required',
+      );
+    }
+    await _auth.sendPasswordResetEmail(email: trimmed);
+  }
   @override
   Future<void> logout() async {
     try {
@@ -105,7 +187,6 @@ class FirebaseAuthRepository implements IAuthRepository {
         scopeHint: ['email', 'profile'],
       );
     } on GoogleSignInException catch (e) {
-      // User cancelled the picker
       if (e.code.name.contains('canceled') ||
           e.code.name.contains('cancelled') ||
           e.code.name.contains('interrupted')) {
@@ -136,9 +217,25 @@ class FirebaseAuthRepository implements IAuthRepository {
       );
     }
 
-    _cached = _map(user);
-    return _cached!;
+    return _loadOrCreateProfile(user);
   }
+
+  @override
+Future<void> changePassword({
+  required String currentPassword,
+  required String newPassword,
+}) async {
+  final user = _auth.currentUser;
+  if (user == null || user.email == null) {
+    throw StateError('Not signed in');
+  }
+  final cred = EmailAuthProvider.credential(
+    email: user.email!,
+    password: currentPassword,
+  );
+  await user.reauthenticateWithCredential(cred);
+  await user.updatePassword(newPassword);
+}
 
   @override
   Future<UserModel> loginWithApple() async {
