@@ -11,7 +11,6 @@ import 'package:apartmate/core/widgets/help_support_sheet.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
 import 'package:apartmate/core/widgets/terms_of_service_sheet.dart';
 import 'package:apartmate/core/services/app_notification_service.dart';
-import 'package:apartmate/core/utils/app_snackbar.dart';
 
 class ProfileController extends GetxController {
   final IAuthRepository _authRepository;

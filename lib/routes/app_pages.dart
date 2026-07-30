@@ -30,6 +30,7 @@ import 'package:apartmate/presentation/edit_profile/bindings/edit_profile_bindin
 import 'package:apartmate/presentation/edit_profile/views/edit_profile_view.dart';
 import 'package:apartmate/presentation/residents/bindings/residents_binding.dart';
 import 'package:apartmate/presentation/residents/views/residents_view.dart';
+import 'package:apartmate/presentation/residents/views/resident_detail_view.dart';
 
 class AppPages {
   AppPages._();
@@ -115,5 +116,9 @@ GetPage(
       page: () => const ResidentsView(),
       binding: ResidentsBinding(),
     ),
+    GetPage(
+  name: AppRoutes.residentDetail,
+  page: () => const ResidentDetailView(),
+),
   ];
 }

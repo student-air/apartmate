@@ -360,8 +360,10 @@ class _ResidentTile extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+Widget build(BuildContext context) {
+  return GestureDetector(
+    onTap: () => Get.toNamed(AppRoutes.residentDetail, arguments: resident),
+    child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -419,6 +421,7 @@ class _ResidentTile extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

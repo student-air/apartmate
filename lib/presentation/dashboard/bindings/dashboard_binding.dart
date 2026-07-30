@@ -6,6 +6,7 @@ import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/domain/repositories/i_resident_repository.dart';
 import 'package:apartmate/domain/repositories/i_complaint_repository.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
+import 'package:apartmate/domain/repositories/i_update_repository.dart';
 
 class DashboardBinding extends Bindings {
   @override
@@ -18,7 +19,7 @@ class DashboardBinding extends Bindings {
         Get.find<IRequestRepository>(),
         Get.find<IAuthRepository>(),
         Get.find<IResidentRepository>(),
-      
+        Get.find<IUpdateRepository>()
       ),
     );
   }

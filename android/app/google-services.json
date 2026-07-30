@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "308746297398",
+    "project_id": "apart-mate-e0ced",
+    "storage_bucket": "apart-mate-e0ced.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:308746297398:android:a89d09bc20ca740b517897",
+        "android_client_info": {
+          "package_name": "com.example.apartmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1AlA09mcvJUEa-un6ylvhPH2WNoG_W3M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

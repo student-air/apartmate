@@ -34,7 +34,10 @@ class PrivacySecuritySheet extends StatelessWidget {
               width: 40,
               height: 4,
               margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(color: AppColors.borderLight, borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(
+                color: AppColors.borderLight,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
           ),
           Text('Privacy & Security', style: AppTextStyles.h3),
@@ -42,41 +45,13 @@ class PrivacySecuritySheet extends StatelessWidget {
 
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(color: AppColors.surfaceMuted, shape: BoxShape.circle),
-                alignment: Alignment.center,
-                child: const Icon(Icons.fingerprint_rounded, size: 20, color: AppColors.textSecondary),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Biometric Login', style: AppTextStyles.labelLarge),
-                    Text(
-                      'Use fingerprint or face unlock to sign in',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
-                    ),
-                  ],
-                ),
-              ),
-              Obx(() => Switch(
-                    value: controller.biometricLoginEnabled.value,
-                    onChanged: controller.toggleBiometricLogin,
-                    activeThumbColor: AppColors.accentGreen,
-                  )),
-            ],
-          ),
-          const Divider(height: 32, color: AppColors.borderLight),
-
-          Row(
-            children: [
               Expanded(child: Text('Change Password', style: AppTextStyles.labelLarge)),
               TextButton(
                 onPressed: () => _confirmSendResetLink(context, controller),
-                child: Text('Forgot Password?', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primaryDark)),
+                child: Text(
+                  'Forgot Password?',
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.accentGreen),
+                ),
               ),
             ],
           ),
@@ -99,24 +74,31 @@ class PrivacySecuritySheet extends StatelessWidget {
             obscureText: true,
           ),
           const SizedBox(height: 20),
-          Obx(() => SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: controller.isChangingPassword.value ? null : controller.changePassword,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50),
-                    backgroundColor: AppColors.primaryDark,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.radiusFull)),
+          Obx(
+            () => SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: controller.isChangingPassword.value ? null : controller.changePassword,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(50),
+                  backgroundColor: AppColors.primaryDark,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusFull),
                   ),
-                  child: controller.isChangingPassword.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : const Text('Update Password', style: TextStyle(color: AppColors.accentGreen)),
                 ),
-              )),
+                child: controller.isChangingPassword.value
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Text(
+                        'Update Password',
+                        style: TextStyle(color: AppColors.accentGreen),
+                      ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -126,7 +108,9 @@ class PrivacySecuritySheet extends StatelessWidget {
     Get.dialog(
       AlertDialog(
         title: const Text('Reset password?'),
-        content: const Text('We\'ll send a password reset link to your registered email address.'),
+        content: const Text(
+          'We\'ll send a password reset link to your registered email address.',
+        ),
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           TextButton(
