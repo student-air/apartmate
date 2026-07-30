@@ -64,36 +64,53 @@ class ResidentsView extends GetView<ResidentsController> {
         onProfile: () => Get.toNamed(AppRoutes.profile),
       ),
       body: Obx(() {
-        if (controller.isLoading.value) {
-          return const AppSkeletonList(itemBuilder: StaffTileSkeleton.new);
-        }
-        final grouped = controller.groupedByBuilding;
-        if (grouped.isEmpty) return const _EmptyResidentsState();
+  if (controller.isLoading.value) {
+    return const AppSkeletonList(itemBuilder: StaffTileSkeleton.new);
+  }
+  final grouped = controller.groupedByBuilding;
+  if (grouped.isEmpty) {
+    return RefreshIndicator(
+      color: AppColors.primaryDark,
+      onRefresh: controller.refresh,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          SizedBox(height: 200),
+          _EmptyResidentsState(),
+        ],
+      ),
+    );
+  }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-          child: AppResponsiveContainer(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: grouped.entries.expand((entry) {
-                return [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10, top: 4),
-                    child: Text(entry.key, style: AppTextStyles.h4),
-                  ),
-                  ...entry.value.map(
-                    (r) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: _ResidentTile(resident: r),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                ];
-              }).toList(),
-            ),
-          ),
-        );
-      }),
+  return RefreshIndicator(
+    color: AppColors.primaryDark,
+    onRefresh: controller.refresh,
+    child: SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+      child: AppResponsiveContainer(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: grouped.entries.expand((entry) {
+            return [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10, top: 4),
+                child: Text(entry.key, style: AppTextStyles.h4),
+              ),
+              ...entry.value.map(
+                (r) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _ResidentTile(resident: r),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ];
+          }).toList(),
+        ),
+      ),
+    ),
+  );
+}),
     );
   }
 }

@@ -62,14 +62,19 @@ class AuthController extends GetxController {
   }
 
   Future<void> loginWithGoogle() async {
-    isLoading.value = true;
-    try {
-      await _authRepository.loginWithGoogle();
-      Get.offAllNamed(AppRoutes.dashboard);
-    } finally {
-      isLoading.value = false;
+  isLoading.value = true;
+  try {
+    await _authRepository.loginWithGoogle();
+    Get.offAllNamed(AppRoutes.dashboard);
+  } catch (e) {
+    final msg = e.toString();
+    if (!msg.contains('aborted-by-user') && !msg.contains('canceled')) {
+      AppSnackbar.error('Google sign-in failed', 'Please try again');
     }
+  } finally {
+    isLoading.value = false;
   }
+}
 
   Future<void> loginWithApple() async {
     isLoading.value = true;
@@ -82,14 +87,22 @@ class AuthController extends GetxController {
   }
 
   Future<void> signUpWithGoogle() async {
-    isLoading.value = true;
-    try {
-      await _authRepository.loginWithGoogle();
-      Get.offNamed(AppRoutes.signupHandoff, arguments: 'Google');
-    } finally {
-      isLoading.value = false;
+  isLoading.value = true;
+  try {
+    await _authRepository.loginWithGoogle();
+    // Same flow as email Register → handoff → society register
+    Get.offNamed(AppRoutes.signupHandoff, arguments: 'Google');
+  } catch (e) {
+    final msg = e.toString();
+    if (!msg.contains('aborted-by-user') &&
+        !msg.contains('canceled') &&
+        !msg.contains('cancelled')) {
+      AppSnackbar.error('Google sign-in failed', 'Please try again');
     }
+  } finally {
+    isLoading.value = false;
   }
+}
 
   Future<void> signUpWithApple() async {
     isLoading.value = true;

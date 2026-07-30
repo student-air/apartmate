@@ -7,6 +7,9 @@ import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
 import 'package:apartmate/data/models/resident_model.dart';
+import 'package:apartmate/presentation/residents/controllers/residents_controller.dart';
+import 'package:flutter/foundation.dart'; // for debugPrint if needed
+import 'package:apartmate/domain/repositories/i_resident_repository.dart';
 
 class ResidentDetailView extends StatelessWidget {
   const ResidentDetailView({super.key});
@@ -169,6 +172,27 @@ class ResidentDetailView extends StatelessWidget {
                 ('Email', resident.email),
               ],
             ),
+            const SizedBox(height: 24),
+
+// Delete resident
+SizedBox(
+  width: double.infinity,
+  child: OutlinedButton.icon(
+    onPressed: () => _confirmDelete(context, resident),
+    icon: const Icon(Icons.delete_outline_rounded, size: 20, color: AppColors.danger),
+    label: Text(
+      'Delete Resident',
+      style: AppTextStyles.labelLarge.copyWith(color: AppColors.danger),
+    ),
+    style: OutlinedButton.styleFrom(
+      minimumSize: const Size.fromHeight(50),
+      side: const BorderSide(color: AppColors.dangerBorder),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+      ),
+    ),
+  ),
+),
           ],
         ),
       ),
@@ -188,6 +212,48 @@ class ResidentDetailView extends StatelessWidget {
         return 'th';
     }
   }
+  void _confirmDelete(BuildContext context, ResidentModel resident) {
+  Get.dialog(
+    AlertDialog(
+      title: const Text('Delete resident?'),
+      content: Text(
+        'This will permanently remove ${resident.name} from your residents list.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Get.back(),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () async {
+  Get.back(); // close dialog
+  try {
+    final repo = Get.find<IResidentRepository>();
+    await repo.removeResident(resident.id);
+
+    // Refresh list if residents screen is still alive
+    if (Get.isRegistered<ResidentsController>()) {
+      final c = Get.find<ResidentsController>();
+      c.residents.removeWhere((r) => r.id == resident.id);
+    }
+
+    Get.back(); // leave details page
+    AppSnackbar.success('Deleted', '${resident.name} has been removed');
+  } catch (e, st) {
+    debugPrint('DELETE RESIDENT ERROR: $e');
+    debugPrint('$st');
+    AppSnackbar.error('Failed', e.toString());
+  }
+},
+          child: const Text(
+            'Delete',
+            style: TextStyle(color: AppColors.danger),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 }
 
 // ── Re-used private widgets (same as Requests screen) ──

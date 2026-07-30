@@ -16,10 +16,6 @@ class DashboardView extends GetView<DashboardController> {
 
   @override
   Widget build(BuildContext context) {
-    // Refresh counts every time Dashboard is actually built/shown — this
-    // is the safety net so Pending/Residents/Complaints stay correct even
-    // if a screen that mutated them (e.g. Requests after Accept) couldn't
-    // find a live DashboardController to notify directly.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.refreshRequestCounts();
     });
@@ -93,7 +89,7 @@ class DashboardView extends GetView<DashboardController> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Greeting + time-of-day animation
+                    // Greeting + animation
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -247,64 +243,37 @@ class DashboardView extends GetView<DashboardController> {
 
                     const SizedBox(height: 28),
 
-                    // ── Occupancy overview ──
+                    // ── Occupancy overview (one card per building) ──
                     Text(
                       'OCCUPANCY OVERVIEW',
                       style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
                     ),
                     const SizedBox(height: 12),
                     Obx(() {
-                      final occupied = controller.occupiedFlats.value;
-                      final total = controller.totalFlats.value;
-                      final pct = controller.occupancyPercent;
-                      return Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-                          border: Border.all(color: AppColors.borderLight),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x14000000),
-                              blurRadius: 10,
-                              offset: Offset(0, 3),
+                      final list = controller.buildingOccupancy;
+                      if (list.isEmpty) {
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+                            border: Border.all(color: AppColors.borderLight),
+                          ),
+                          child: Text(
+                            'No buildings yet',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textSecondary,
                             ),
+                          ),
+                        );
+                      }
+                      return Column(
+                        children: [
+                          for (var i = 0; i < list.length; i++) ...[
+                            if (i > 0) const SizedBox(height: 12),
+                            _OccupancyCard(item: list[i]),
                           ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  '$occupied/$total flats',
-                                  style: AppTextStyles.h3.copyWith(
-                                    color: AppColors.textPrimary,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  '${(pct * 100).round()}%',
-                                  style: AppTextStyles.labelLarge.copyWith(
-                                    color: AppColors.accentGreenDark,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(AppDimens.radiusFull),
-                              child: LinearProgressIndicator(
-                                value: pct,
-                                minHeight: 10,
-                                backgroundColor: AppColors.surfaceMuted,
-                                valueColor: const AlwaysStoppedAnimation<Color>(
-                                  AppColors.accentGreen,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       );
                     }),
 
@@ -413,6 +382,67 @@ class DashboardView extends GetView<DashboardController> {
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Occupancy card (one per building)
+// ─────────────────────────────────────────────
+class _OccupancyCard extends StatelessWidget {
+  final BuildingOccupancy item;
+  const _OccupancyCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = item.percent;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+        border: Border.all(color: AppColors.borderLight),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            item.buildingName,
+            style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                '${item.occupiedFlats}/${item.totalFlats} flats',
+                style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
+              ),
+              const Spacer(),
+              Text(
+                '${(pct * 100).round()}%',
+                style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentGreenDark),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+            child: LinearProgressIndicator(
+              value: pct,
+              minHeight: 10,
+              backgroundColor: AppColors.surfaceMuted,
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accentGreen),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -573,7 +603,6 @@ class _ActionRow extends StatelessWidget {
 // ─────────────────────────────────────────────
 class _ComplaintsChart extends StatelessWidget {
   final List<int> counts;
-
   const _ComplaintsChart({required this.counts});
 
   @override
@@ -617,7 +646,6 @@ class _ComplaintsChart extends StatelessWidget {
 
 class _LineChartPainter extends CustomPainter {
   final List<int> counts;
-
   _LineChartPainter({required this.counts});
 
   @override

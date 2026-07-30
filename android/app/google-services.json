@@ -12,7 +12,20 @@
           "package_name": "com.example.apartmate"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "308746297398-q8109n896n7dhe8jee56ng5l0vqh7sid.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.apartmate",
+            "certificate_hash": "228a871e7733b62b1039e00a8fd7bc93e032e457"
+          }
+        },
+        {
+          "client_id": "308746297398-jpobogk3cmajv09lvmq13rmdoemhdln0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC1AlA09mcvJUEa-un6ylvhPH2WNoG_W3M"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "308746297398-jpobogk3cmajv09lvmq13rmdoemhdln0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "308746297398-f88mharsjb4l8hp839qhsluq98sud6jm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.apartmate"
+              }
+            }
+          ]
         }
       }
     }

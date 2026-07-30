@@ -39,8 +39,7 @@ class DashboardController extends GetxController {
   final pendingRequestsCount = 0.obs;
   final residentsCount = 0.obs;
   final isLoading = false.obs;
-  final totalFlats = 0.obs;
-  final occupiedFlats = 0.obs;
+  final buildingOccupancy = <BuildingOccupancy>[].obs;
   final recentActivity = <ActivityItem>[].obs;
   final weeklyComplaintCounts = List<int>.filled(7, 0).obs;
 
@@ -81,11 +80,6 @@ class DashboardController extends GetxController {
     return role[0].toUpperCase() + role.substring(1);
   }
 
-  double get occupancyPercent {
-    if (totalFlats.value == 0) return 0;
-    return (occupiedFlats.value / totalFlats.value).clamp(0.0, 1.0);
-  }
-
   @override
   void onInit() {
     super.onInit();
@@ -109,17 +103,31 @@ class DashboardController extends GetxController {
     isLoading.value = true;
     try {
       stats.value = await _dashboardRepository.getStats();
-      totalFlats.value = stats.value?.totalFlats ?? 0;
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> _loadOccupancy() async {
-    final s = await _dashboardRepository.getStats();
-    totalFlats.value = s.totalFlats;
+    final buildings = await _societyRepository.getBuildings();
     final residents = await _residentRepository.getResidents();
-    occupiedFlats.value = residents.length;
+
+    residentsCount.value = residents.length;
+
+    buildingOccupancy.value = buildings.map((b) {
+      final total = b.details?.totalApartments ?? 0;
+      final occupied = residents.where((r) {
+        if (r.buildingId.isNotEmpty && r.buildingId == b.id) return true;
+        return r.buildingName == b.name;
+      }).length;
+
+      return BuildingOccupancy(
+        buildingId: b.id,
+        buildingName: b.name,
+        totalFlats: total,
+        occupiedFlats: occupied,
+      );
+    }).toList();
   }
 
   Future<void> _loadRecentActivity() async {
@@ -165,7 +173,6 @@ class DashboardController extends GetxController {
       final d = DateTime(c.postedAt.year, c.postedAt.month, c.postedAt.day);
       final diff = today.difference(d).inDays;
       if (diff >= 0 && diff < 7) {
-        // index 0 = 6 days ago … index 6 = today
         counts[6 - diff]++;
       }
     }
@@ -206,6 +213,7 @@ class DashboardController extends GetxController {
     await Future.wait([
       _loadPendingRequestsCount(),
       _loadResidentsCount(),
+      _loadOccupancy(),
     ]);
   }
 
@@ -257,6 +265,25 @@ class DashboardController extends GetxController {
       _loadRecentActivity(),
       _loadWeeklyComplaints(),
     ]);
+  }
+}
+
+class BuildingOccupancy {
+  final String buildingId;
+  final String buildingName;
+  final int totalFlats;
+  final int occupiedFlats;
+
+  const BuildingOccupancy({
+    required this.buildingId,
+    required this.buildingName,
+    required this.totalFlats,
+    required this.occupiedFlats,
+  });
+
+  double get percent {
+    if (totalFlats <= 0) return 0;
+    return (occupiedFlats / totalFlats).clamp(0.0, 1.0);
   }
 }
 

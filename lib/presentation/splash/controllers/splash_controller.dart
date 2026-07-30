@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 
 class SplashController extends GetxController {
   @override
@@ -9,7 +10,7 @@ class SplashController extends GetxController {
     _init();
   }
 
-  void skip() => _goToLogin();
+  void skip() => _goToNext();
 
   Future<void> _init() async {
     if (Get.context != null) {
@@ -19,12 +20,19 @@ class SplashController extends GetxController {
       );
     }
     await Future.delayed(const Duration(milliseconds: 2200));
-    _goToLogin();
+    _goToNext();
   }
 
-  void _goToLogin() {
-    if (Get.currentRoute == AppRoutes.splash) {
+  void _goToNext() {
+    if (Get.currentRoute != AppRoutes.splash) return;
+
+    final authRepository = Get.find<IAuthRepository>();
+    final isLoggedIn = authRepository.currentUser != null;
+
+    if (isLoggedIn) {
+      Get.offAllNamed(AppRoutes.dashboard);
+    } else {
       Get.offAllNamed(AppRoutes.login);
     }
   }
-} 
+}

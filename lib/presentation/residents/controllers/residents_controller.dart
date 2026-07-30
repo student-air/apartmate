@@ -112,5 +112,10 @@ class ResidentsController extends GetxController {
     buildings.value = await _societyRepository.getBuildings();
   }
 
+  Future<void> deleteResident(String residentId) async {
+  await _residentRepository.removeResident(residentId);
+  residents.removeWhere((r) => r.id == residentId);
+}
+
   Future<void> refresh() => _load();
 }
