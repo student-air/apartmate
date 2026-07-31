@@ -161,6 +161,10 @@ class SendUpdateController extends GetxController {
           category: selectedPreset.value,
           description: descriptionCtrl.text.trim(),
           postedAt: DateTime.now(),
+          sendTo: sendTo.value,
+          buildingName: selectedBuilding.value?.name,
+          floor: selectedFloor.value,
+          flatNumber: flatNumberCtrl.text.trim().isEmpty ? null : flatNumberCtrl.text.trim(),
         ),
       );
       if (Get.isRegistered<ProfileController>() && Get.find<ProfileController>().notifyUpdates.value) {

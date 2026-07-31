@@ -5,7 +5,7 @@ import 'package:apartmate/data/models/user_model.dart';
 /// touching any controller or view.
 abstract class IAuthRepository {
   Future<UserModel> login({required String username, required String password});
-  Future<UserModel> loginWithGoogle();
+  //Future<UserModel> loginWithGoogle();
   Future<UserModel> loginWithApple();
   Future<void> changePassword({
   required String currentPassword,
@@ -19,6 +19,7 @@ abstract class IAuthRepository {
     required String phone,
     required String password,
   });
+  Future<({UserModel user, bool isNewUser})> loginWithGoogle();
   Future<void> logout();
   UserModel? get currentUser;
 }

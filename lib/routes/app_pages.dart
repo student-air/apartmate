@@ -31,6 +31,10 @@ import 'package:apartmate/presentation/edit_profile/views/edit_profile_view.dart
 import 'package:apartmate/presentation/residents/bindings/residents_binding.dart';
 import 'package:apartmate/presentation/residents/views/residents_view.dart';
 import 'package:apartmate/presentation/residents/views/resident_detail_view.dart';
+import 'package:apartmate/presentation/owners/bindings/owners_binding.dart';
+import 'package:apartmate/presentation/owners/views/owners_view.dart';
+import 'package:apartmate/presentation/committee/bindings/committee_binding.dart';
+import 'package:apartmate/presentation/committee/views/committee_view.dart';
 
 class AppPages {
   AppPages._();
@@ -119,6 +123,16 @@ GetPage(
     GetPage(
   name: AppRoutes.residentDetail,
   page: () => const ResidentDetailView(),
+),
+GetPage(
+  name: AppRoutes.owners,
+  page: () => const OwnersView(),
+  binding: OwnersBinding(),
+),
+GetPage(
+  name: AppRoutes.committee,
+  page: () => const CommitteeView(),
+  binding: CommitteeBinding(),
 ),
   ];
 }

@@ -11,6 +11,7 @@ class LocalRequestRepository implements IRequestRepository {
   void _seedSampleRequests() {
     final now = DateTime.now();
     _requests.addAll([
+      // ── Tenant requests (3) ──
       RequestModel(
         id: 'req-sample-1',
         buildingId: 'bldg-sample-1',
@@ -32,6 +33,7 @@ class LocalRequestRepository implements IRequestRepository {
         emergencyContact: '+92 300 1112233 (Brother)',
         status: RequestStatus.pending,
         submittedAt: now.subtract(const Duration(hours: 3)),
+        applicantType: RequestApplicantType.tenant,
       ),
       RequestModel(
         id: 'req-sample-2',
@@ -54,6 +56,7 @@ class LocalRequestRepository implements IRequestRepository {
         emergencyContact: '+92 321 4445566 (Spouse)',
         status: RequestStatus.pending,
         submittedAt: now.subtract(const Duration(days: 1)),
+        applicantType: RequestApplicantType.tenant,
       ),
       RequestModel(
         id: 'req-sample-3',
@@ -76,13 +79,64 @@ class LocalRequestRepository implements IRequestRepository {
         emergencyContact: '+92 345 7778899 (Father)',
         status: RequestStatus.pending,
         submittedAt: now.subtract(const Duration(days: 2)),
+        applicantType: RequestApplicantType.tenant,
+      ),
+
+      // ── Owner requests (2) ──
+      RequestModel(
+        id: 'req-owner-1',
+        buildingId: 'bldg-sample-1',
+        buildingName: 'Fortune Tower A',
+        floor: 3,
+        flatNumber: 'Flat 3B',
+        flatType: '2-Bedroom',
+        tenantName: 'Imran Malik',
+        cnic: '42101-5544332-1',
+        phone: '+92 301 2223344',
+        email: 'imran.malik@email.com',
+        residentsCount: 1,
+        allotmentDate: DateTime(2025, 12, 1),
+        leaseDurationMonths: 0,
+        rent: 0,
+        profession: 'Business Owner',
+        employerCompany: 'Malik Traders',
+        previousAddress: 'Clifton Block 4, Karachi',
+        emergencyContact: '+92 300 9988776 (Wife)',
+        status: RequestStatus.pending,
+        submittedAt: now.subtract(const Duration(hours: 5)),
+        applicantType: RequestApplicantType.owner,
+      ),
+      RequestModel(
+        id: 'req-owner-2',
+        buildingId: 'bldg-sample-2',
+        buildingName: 'Fortune Tower B',
+        floor: 7,
+        flatNumber: 'Flat 7A',
+        flatType: '3-Bedroom',
+        tenantName: 'Nadia Hussain',
+        cnic: '42201-7788990-3',
+        phone: '+92 333 4455667',
+        email: 'nadia.hussain@email.com',
+        residentsCount: 1,
+        allotmentDate: DateTime(2026, 1, 15),
+        leaseDurationMonths: 0,
+        rent: 0,
+        profession: 'Architect',
+        employerCompany: 'Hussain Design Studio',
+        previousAddress: 'PECHS Block 2, Karachi',
+        emergencyContact: '+92 321 1122334 (Brother)',
+        status: RequestStatus.pending,
+        submittedAt: now.subtract(const Duration(days: 1, hours: 4)),
+        applicantType: RequestApplicantType.owner,
       ),
     ]);
   }
+
   @override
   Future<List<RequestModel>> getRequests() async {
     await Future.delayed(const Duration(milliseconds: 400));
-    final sorted = List<RequestModel>.from(_requests)..sort((a, b) => b.submittedAt.compareTo(a.submittedAt));
+    final sorted = List<RequestModel>.from(_requests)
+      ..sort((a, b) => b.submittedAt.compareTo(a.submittedAt));
     return List.unmodifiable(sorted);
   }
 

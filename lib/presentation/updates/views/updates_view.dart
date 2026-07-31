@@ -177,6 +177,11 @@ class _UpdateCard extends StatelessWidget {
             update.description,
             style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
           ),
+          const SizedBox(height: 8),
+          Text(
+            update.destinationLabel,
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+          ),
         ],
       ),
     );

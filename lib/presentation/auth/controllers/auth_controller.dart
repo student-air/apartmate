@@ -4,6 +4,8 @@ import 'package:apartmate/core/utils/validators.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/routes/app_routes.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:apartmate/domain/repositories/i_society_repository.dart';
 
 class AuthController extends GetxController {
   final IAuthRepository _authRepository;
@@ -62,16 +64,42 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<void> loginWithGoogle() async {
+//   Future<void> loginWithGoogle() async {
+//   isLoading.value = true;
+//   try {
+//     await _authRepository.loginWithGoogle();
+//     Get.offAllNamed(AppRoutes.dashboard);
+//   } catch (e) {
+//     final msg = e.toString();
+//     if (!msg.contains('aborted-by-user') && !msg.contains('canceled')) {
+//       AppSnackbar.error('Google sign-in failed', 'Please try again');
+//     }
+//   } finally {
+//     isLoading.value = false;
+//   }
+// }
+
+Future<void> loginWithGoogle() async {
   isLoading.value = true;
   try {
-    await _authRepository.loginWithGoogle();
+    final result = await _authRepository.loginWithGoogle();
+    final isNew = result.isNewUser;
+
+    if (isNew) {
+      Get.offAllNamed(AppRoutes.societyRegister);
+      return;
+    }
+
+    final society = await Get.find<ISocietyRepository>().getCurrentSociety();
+    if (society == null) {
+      Get.offAllNamed(AppRoutes.societyRegister);
+      return;
+    }
+
     Get.offAllNamed(AppRoutes.dashboard);
   } catch (e) {
-    final msg = e.toString();
-    if (!msg.contains('aborted-by-user') && !msg.contains('canceled')) {
-      AppSnackbar.error('Google sign-in failed', 'Please try again');
-    }
+    if (e is FirebaseAuthException && e.code == 'aborted-by-user') return;
+    AppSnackbar.error('Google sign-in failed', e.toString());
   } finally {
     isLoading.value = false;
   }

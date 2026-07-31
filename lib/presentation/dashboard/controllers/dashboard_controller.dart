@@ -9,9 +9,13 @@ import 'package:apartmate/domain/repositories/i_request_repository.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/domain/repositories/i_resident_repository.dart';
 import 'package:apartmate/domain/repositories/i_update_repository.dart';
+import 'package:apartmate/domain/repositories/i_owner_repository.dart';
+import 'package:apartmate/domain/repositories/i_committee_repository.dart';
 import 'package:apartmate/data/models/request_model.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/core/constants/app_dimens.dart';
+import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/presentation/dashboard/widgets/edit_society_sheet.dart';
 
 class DashboardController extends GetxController {
@@ -22,6 +26,8 @@ class DashboardController extends GetxController {
   final IAuthRepository _authRepository;
   final IResidentRepository _residentRepository;
   final IUpdateRepository _updateRepository;
+  final IOwnerRepository _ownerRepository;
+  final ICommitteeRepository _committeeRepository;
 
   DashboardController(
     this._dashboardRepository,
@@ -31,6 +37,8 @@ class DashboardController extends GetxController {
     this._authRepository,
     this._residentRepository,
     this._updateRepository,
+    this._ownerRepository,
+    this._committeeRepository,
   );
 
   final stats = Rxn<DashboardStatsModel>();
@@ -42,16 +50,26 @@ class DashboardController extends GetxController {
   final buildingOccupancy = <BuildingOccupancy>[].obs;
   final recentActivity = <ActivityItem>[].obs;
   final weeklyComplaintCounts = List<int>.filled(7, 0).obs;
+  final ownersCount = 0.obs;
+  final committeeCount = 0.obs;
 
+  // static String get greeting {
+  //   final hour = DateTime.now().hour;
+  //   if (hour < 12) return 'Good Morning';
+  //   if (hour < 17) return 'Good Afternoon';
+  //   return 'Good Evening';
+  // }
   static String get greeting {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
+    if (hour >= 4 && hour < 6) return 'Early Morning';
+    if (hour >= 6 && hour < 12) return 'Good Morning';
+    if (hour >= 12 && hour < 17) return 'Good Afternoon';
+    if (hour >= 17 && hour < 21) return 'Good Evening';
+    return 'Good Night';
   }
 
   static String get greetingAnimationAsset {
-    if (greeting == 'Good Morning' || greeting == 'Good Afternoon') {
+    if (greeting == 'Early Morning' || greeting == 'Good Morning' || greeting == 'Good Afternoon') {
       return 'assets/lottie/sun.json';
     }
     return 'assets/lottie/moon.json';
@@ -91,6 +109,8 @@ class DashboardController extends GetxController {
     _loadOccupancy();
     _loadRecentActivity();
     _loadWeeklyComplaints();
+    _loadOwnersCount();
+    _loadCommitteeCount();
   }
 
   @override
@@ -209,11 +229,23 @@ class DashboardController extends GetxController {
 
   Future<void> refreshSociety() => _loadSociety();
 
+  Future<void> _loadOwnersCount() async {
+  final list = await Get.find<IOwnerRepository>().getOwners();
+  ownersCount.value = list.length;
+}
+
+Future<void> _loadCommitteeCount() async {
+  final list = await Get.find<ICommitteeRepository>().getMembers();
+  committeeCount.value = list.length;
+}
+
   Future<void> refreshRequestCounts() async {
     await Future.wait([
       _loadPendingRequestsCount(),
       _loadResidentsCount(),
       _loadOccupancy(),
+      _loadOwnersCount(),
+      _loadCommitteeCount(),
     ]);
   }
 
@@ -225,6 +257,8 @@ class DashboardController extends GetxController {
   void goToBuildings() => Get.toNamed(AppRoutes.societyBuildings);
   void goToComplaints() => Get.toNamed(AppRoutes.complaints);
   void goToRequests() => Get.toNamed(AppRoutes.requests);
+  void goToOwners() => Get.toNamed(AppRoutes.owners);
+  void goToCommittee() => Get.toNamed(AppRoutes.committee);
 
   Future<void> logout() async {
     await _authRepository.logout();
@@ -232,25 +266,73 @@ class DashboardController extends GetxController {
   }
 
   void confirmLogout() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Log out?'),
-        content: const Text(
-          'You will need to sign in again to access your account.',
+  Get.dialog(
+    Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: AppColors.surface,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.danger.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.logout_rounded, size: 30, color: AppColors.danger),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Log out?',
+              style: AppTextStyles.h4,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'You will need to sign in again to access your ApartMate account.',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Get.back();
+                  logout();
+                },
+                icon: const Icon(Icons.logout_rounded, size: 18, color: Colors.white),
+                label: Text(
+                  'Log Out',
+                  style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.danger,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
+              ),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              logout();
-            },
-            child: const Text('Log Out'),
-          ),
-        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Future<void> refreshComplaintsCount() => _loadComplaintsCount();
 

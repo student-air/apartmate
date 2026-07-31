@@ -170,43 +170,74 @@ class DashboardView extends GetView<DashboardController> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Stat pills
-                    SizedBox(
-                      height: 112,
-                      child: Obx(
-                        () => ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: [
-                            _StatPill(
-                              icon: Icons.villa_rounded,
-                              value: '${controller.stats.value?.buildings ?? 0}',
-                              label: 'Buildings',
-                              filled: true,
-                              onTap: controller.goToBuildings,
-                            ),
-                            const SizedBox(width: 10),
-                            _StatPill(
-                              icon: Icons.report_problem_rounded,
-                              value: '${controller.complaintsCount.value}',
-                              label: 'Complaints',
-                              onTap: controller.goToComplaints,
-                            ),
-                            const SizedBox(width: 10),
-                            _StatPill(
-                              icon: Icons.people_rounded,
-                              value: '${controller.residentsCount.value}',
-                              label: 'Residents',
-                              onTap: controller.goToResidents,
-                            ),
-                            const SizedBox(width: 10),
-                            _StatPill(
-                              icon: Icons.hourglass_bottom_rounded,
-                              value: '${controller.pendingRequestsCount.value}',
-                              label: 'Pending',
-                              onTap: controller.goToRequests,
-                            ),
-                          ],
-                        ),
+                    // Stat pills — 2 rows × 3
+                    Obx(
+                      () => Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _StatPill(
+                                  icon: Icons.villa_rounded,
+                                  value: '${controller.stats.value?.buildings ?? 0}',
+                                  label: 'Buildings',
+                                  filled: true,
+                                  onTap: controller.goToBuildings,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _StatPill(
+                                  icon: Icons.report_problem_rounded,
+                                  value: '${controller.complaintsCount.value}',
+                                  label: 'Complaints',
+                                  onTap: controller.goToComplaints,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _StatPill(
+                                  icon: Icons.document_scanner_rounded,
+                                  value: '${controller.residentsCount.value}',
+                                  label: 'Residents',
+                                  onTap: controller.goToResidents,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _StatPill(
+                                  icon: Icons.person_2_rounded,
+                                  value: '${controller.ownersCount.value}',
+                                  label: 'Owners',
+                                  onTap: controller.goToOwners,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _StatPill(
+                                  icon: Icons.groups_2_rounded,
+                                  value: '${controller.committeeCount.value}',
+                                  label: 'Committee',
+                                  onTap: controller.goToCommittee,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _StatPill(
+                                  icon: Icons.hourglass_bottom_rounded,
+                                  value: '${controller.pendingRequestsCount.value}',
+                                  label: 'Pending',
+                                  danger: true,
+                                  onTap: controller.goToRequests,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 28),
@@ -243,7 +274,7 @@ class DashboardView extends GetView<DashboardController> {
 
                     const SizedBox(height: 28),
 
-                    // ── Occupancy overview (one card per building) ──
+                    // Occupancy overview (one card per building)
                     Text(
                       'OCCUPANCY OVERVIEW',
                       style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
@@ -279,7 +310,7 @@ class DashboardView extends GetView<DashboardController> {
 
                     const SizedBox(height: 24),
 
-                    // ── Recent activity ──
+                    // Recent activity
                     Text(
                       'RECENT ACTIVITY',
                       style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
@@ -365,7 +396,7 @@ class DashboardView extends GetView<DashboardController> {
 
                     const SizedBox(height: 24),
 
-                    // ── Complaints last 7 days ──
+                    // Complaints last 7 days
                     Text(
                       'COMPLAINTS, LAST 7 DAYS',
                       style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
@@ -388,7 +419,7 @@ class DashboardView extends GetView<DashboardController> {
 }
 
 // ─────────────────────────────────────────────
-// Occupancy card (one per building)
+// Occupancy card
 // ─────────────────────────────────────────────
 class _OccupancyCard extends StatelessWidget {
   final BuildingOccupancy item;
@@ -456,6 +487,7 @@ class _StatPill extends StatelessWidget {
   final String value;
   final String label;
   final bool filled;
+  final bool danger;
   final VoidCallback? onTap;
 
   const _StatPill({
@@ -463,55 +495,79 @@ class _StatPill extends StatelessWidget {
     required this.value,
     required this.label,
     this.filled = false,
+    this.danger = false,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bg = filled ? AppColors.accentGreen : AppColors.surface;
-    final fg = filled ? Colors.white : AppColors.textPrimary;
-    final iconColor = filled ? Colors.white : AppColors.textMuted;
-    final labelColor =
-        filled ? Colors.white.withValues(alpha: 0.85) : AppColors.textMuted;
+    final Color bg;
+    final Color fg;
+    final Color iconColor;
+    final Color labelColor;
+
+    if (filled) {
+      bg = AppColors.accentGreen;
+      fg = Colors.white;
+      iconColor = Colors.white;
+      labelColor = Colors.white.withValues(alpha: 0.85);
+    } else if (danger) {
+      bg = AppColors.dangerBg;
+      fg = AppColors.danger;
+      iconColor = AppColors.danger;
+      labelColor = AppColors.danger.withValues(alpha: 0.85);
+    } else {
+      bg = AppColors.surface;
+      fg = AppColors.textPrimary;
+      iconColor = AppColors.textMuted;
+      labelColor = AppColors.textMuted;
+    }
 
     return InkWell(
-      onTap: onTap,
+  onTap: onTap,
+  borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+  child: Container(
+    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+    decoration: BoxDecoration(
+      color: bg,
       borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-      child: Container(
-        width: 84,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-          border: filled ? null : Border.all(color: AppColors.borderLight),
-          boxShadow: filled
-              ? [
-                  BoxShadow(
-                    color: AppColors.accentGreen.withValues(alpha: 0.25),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 18, color: iconColor),
-            const SizedBox(height: 8),
-            Text(value, style: AppTextStyles.h4.copyWith(color: fg)),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.caption.copyWith(color: labelColor),
+      border: filled
+          ? null
+          : Border.all(
+              color: danger ? Colors.white : AppColors.borderLight,
             ),
-          ],
+      boxShadow: filled
+          ? [
+              BoxShadow(
+                color: AppColors.accentGreen.withValues(alpha: 0.25),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ]
+          : null,
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: iconColor),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: AppTextStyles.h4.copyWith(color: fg, fontSize: 18),
         ),
-      ),
-    );
+        const SizedBox(height: 2),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyles.caption.copyWith(color: labelColor, fontSize: 11),
+        ),
+      ],
+    ),
+  ),
+);
   }
 }
 

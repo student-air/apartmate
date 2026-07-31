@@ -7,7 +7,7 @@ class LocalResidentRepository implements IResidentRepository {
   @override
   Future<List<ResidentModel>> getResidents() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return List.unmodifiable(_residents);
+    return List<ResidentModel>.from(_residents);
   }
 
   @override
@@ -24,13 +24,20 @@ class LocalResidentRepository implements IResidentRepository {
   }
 
   @override
-  Future<ResidentModel> updatePaymentStatus(String residentId, {bool? rentPaid, bool? maintenancePaid}) async {
+  Future<ResidentModel> updatePaymentStatus(
+    String residentId, {
+    bool? rentPaid,
+    bool? maintenancePaid,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 250));
     final index = _residents.indexWhere((r) => r.id == residentId);
     if (index == -1) {
       throw StateError('Resident not found: $residentId');
     }
-    final updated = _residents[index].copyWith(rentPaid: rentPaid, maintenancePaid: maintenancePaid);
+    final updated = _residents[index].copyWith(
+      rentPaid: rentPaid,
+      maintenancePaid: maintenancePaid,
+    );
     _residents[index] = updated;
     return updated;
   }

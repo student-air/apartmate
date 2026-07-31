@@ -16,15 +16,11 @@ import 'package:apartmate/data/repositories/local_resident_repository.dart';
 import 'package:apartmate/domain/repositories/i_resident_repository.dart';
 import 'package:apartmate/data/repositories/local_complaint_repository.dart';
 import 'package:apartmate/domain/repositories/i_complaint_repository.dart';
+import 'package:apartmate/data/repositories/local_owner_repository.dart';
+import 'package:apartmate/domain/repositories/i_owner_repository.dart';
+import 'package:apartmate/data/repositories/local_committee_repository.dart';
+import 'package:apartmate/domain/repositories/i_committee_repository.dart';
 
-/// Wires every repository interface to its concrete implementation.
-///
-/// This is the ONLY place that needs to change when a real backend
-/// (Firebase, REST, etc.) replaces the local mock data sources — swap the
-/// `Local...Repository()` on the right-hand side for e.g.
-/// `FirebaseAuthRepository()` and every controller in the app keeps working
-/// unmodified, because they only ever depend on the `I...Repository`
-/// interfaces.
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
@@ -32,7 +28,10 @@ class InitialBinding extends Bindings {
     Get.put<ISocietyRepository>(FirebaseSocietyRepository(), permanent: true);
     Get.put<IStaffRepository>(FirebaseStaffRepository(), permanent: true);
     Get.put<IDashboardRepository>(
-      LocalDashboardRepository(Get.find<ISocietyRepository>(), Get.find<IStaffRepository>()),
+      LocalDashboardRepository(
+        Get.find<ISocietyRepository>(),
+        Get.find<IStaffRepository>(),
+      ),
       permanent: true,
     );
     Get.put<IUpdateRepository>(LocalUpdateRepository(), permanent: true);
@@ -40,5 +39,7 @@ class InitialBinding extends Bindings {
     Get.put<IRequestRepository>(LocalRequestRepository(), permanent: true);
     Get.put<IResidentRepository>(LocalResidentRepository(), permanent: true);
     Get.put<IComplaintRepository>(LocalComplaintRepository(), permanent: true);
+    Get.put<IOwnerRepository>(LocalOwnerRepository(), permanent: true);
+    Get.put<ICommitteeRepository>(LocalCommitteeRepository(), permanent: true);
   }
 }

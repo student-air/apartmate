@@ -11,6 +11,9 @@ import 'package:apartmate/core/widgets/help_support_sheet.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
 import 'package:apartmate/core/widgets/terms_of_service_sheet.dart';
 import 'package:apartmate/core/services/app_notification_service.dart';
+import 'package:apartmate/core/constants/app_colors.dart';
+import 'package:apartmate/core/constants/app_dimens.dart';
+import 'package:apartmate/core/constants/app_text_styles.dart';
 
 class ProfileController extends GetxController {
   final IAuthRepository _authRepository;
@@ -140,24 +143,73 @@ class ProfileController extends GetxController {
   }
 
   void confirmLogout() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Log out?'),
-        content: const Text('You will need to sign in again to access your account.'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              logout();
-            },
-            child: const Text('Log Out'),
-          ),
-        ],
+  Get.dialog(
+    Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: AppColors.surface,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.danger.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.logout_rounded, size: 30, color: AppColors.danger),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Log out?',
+              style: AppTextStyles.h4,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'You will need to sign in again to access your ApartMate account.',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Get.back();
+                  logout();
+                },
+                icon: const Icon(Icons.logout_rounded, size: 18, color: Colors.white),
+                label: Text(
+                  'Log Out',
+                  style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.danger,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
+              ),
+            ),
+          ],
+        ),
       ),
-    );
-  }
-
+    ),
+  );
+}
   Future<void> sendPasswordResetLink() async {
   final email = user?.email ?? '';
   if (email.isEmpty) {

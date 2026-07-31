@@ -17,7 +17,10 @@ class FirebaseAuthRepository implements IAuthRepository {
 
   Future<void> _ensureGoogleInitialized() async {
     if (_googleInitialized) return;
-    await _googleSignIn.initialize();
+    await _googleSignIn.initialize(
+      serverClientId:
+        '308746297398-jpobogk3cmajv09lvmq13rmdoemhdln0.apps.googleusercontent.com',
+    );
     _googleInitialized = true;
   }
 
@@ -155,7 +158,7 @@ class FirebaseAuthRepository implements IAuthRepository {
     );
     return _cached!;
   }
-  
+
   @override
   Future<void> sendPasswordResetEmail(String email) async {
     final trimmed = email.trim();
@@ -167,6 +170,24 @@ class FirebaseAuthRepository implements IAuthRepository {
     }
     await _auth.sendPasswordResetEmail(email: trimmed);
   }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final user = _auth.currentUser;
+    if (user == null || user.email == null) {
+      throw StateError('Not signed in');
+    }
+    final cred = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+    await user.reauthenticateWithCredential(cred);
+    await user.updatePassword(newPassword);
+  }
+
   @override
   Future<void> logout() async {
     try {
@@ -178,7 +199,7 @@ class FirebaseAuthRepository implements IAuthRepository {
   }
 
   @override
-  Future<UserModel> loginWithGoogle() async {
+  Future<({UserModel user, bool isNewUser})> loginWithGoogle() async {
     await _ensureGoogleInitialized();
 
     final GoogleSignInAccount googleUser;
@@ -217,25 +238,10 @@ class FirebaseAuthRepository implements IAuthRepository {
       );
     }
 
-    return _loadOrCreateProfile(user);
+    final isNewUser = userCred.additionalUserInfo?.isNewUser ?? false;
+    final model = await _loadOrCreateProfile(user);
+    return (user: model, isNewUser: isNewUser);
   }
-
-  @override
-Future<void> changePassword({
-  required String currentPassword,
-  required String newPassword,
-}) async {
-  final user = _auth.currentUser;
-  if (user == null || user.email == null) {
-    throw StateError('Not signed in');
-  }
-  final cred = EmailAuthProvider.credential(
-    email: user.email!,
-    password: currentPassword,
-  );
-  await user.reauthenticateWithCredential(cred);
-  await user.updatePassword(newPassword);
-}
 
   @override
   Future<UserModel> loginWithApple() async {

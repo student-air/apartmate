@@ -6,12 +6,15 @@ class UpdateModel {
   final String title;
   final String description;
   final DateTime postedAt;
-
-  /// The specific preset picked when composing (e.g. "Maintenance Alert",
-  /// "Security Alert"). [type] stays as the coarse category used for the
-  /// feed's color-coded pill; this is the more specific label shown instead
-  /// of [type] when present.
   final String? category;
+
+  /// Who this was sent to — mirrors SendUpdateController.sendTo ('All',
+  /// 'Building', 'Floor', 'Flat'). Building/floor/flat are only populated
+  /// when relevant to that scope.
+  final String sendTo;
+  final String? buildingName;
+  final int? floor;
+  final String? flatNumber;
 
   const UpdateModel({
     required this.id,
@@ -20,5 +23,23 @@ class UpdateModel {
     required this.description,
     required this.postedAt,
     this.category,
+    this.sendTo = 'All',
+    this.buildingName,
+    this.floor,
+    this.flatNumber,
   });
+
+  /// Human-readable reference line shown at the bottom of the update card.
+  String get destinationLabel {
+    switch (sendTo) {
+      case 'Building':
+        return buildingName ?? '';
+      case 'Floor':
+        return '${buildingName ?? ''} · Floor ${floor ?? ''}';
+      case 'Flat':
+        return '${buildingName ?? ''} · Floor ${floor ?? ''} · Flat ${flatNumber ?? ''}';
+      default:
+        return 'All Residents';
+    }
+  }
 }

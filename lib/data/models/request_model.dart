@@ -1,5 +1,7 @@
 enum RequestStatus { pending, accepted, rejected }
 
+enum RequestApplicantType { owner, tenant }
+
 class RequestModel {
   final String id;
   final String buildingId;
@@ -21,6 +23,7 @@ class RequestModel {
   final String emergencyContact;
   final RequestStatus status;
   final DateTime submittedAt;
+  final RequestApplicantType applicantType; // NEW
 
   RequestModel({
     required this.id,
@@ -43,6 +46,7 @@ class RequestModel {
     required this.emergencyContact,
     required this.status,
     required this.submittedAt,
+    this.applicantType = RequestApplicantType.tenant, // default tenant
   });
 
   String get initials {
@@ -51,7 +55,10 @@ class RequestModel {
     return letters.isEmpty ? '?' : letters.toUpperCase();
   }
 
-  RequestModel copyWith({RequestStatus? status}) {
+  RequestModel copyWith({
+    RequestStatus? status,
+    RequestApplicantType? applicantType,
+  }) {
     return RequestModel(
       id: id,
       buildingId: buildingId,
@@ -73,6 +80,7 @@ class RequestModel {
       emergencyContact: emergencyContact,
       status: status ?? this.status,
       submittedAt: submittedAt,
+      applicantType: applicantType ?? this.applicantType,
     );
   }
 }

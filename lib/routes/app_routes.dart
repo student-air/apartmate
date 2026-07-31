@@ -21,4 +21,6 @@ abstract class AppRoutes {
   static const requests = '/requests';
   static const residents = '/residents';
   static const residentDetail = '/resident-detail';
+  static const owners = '/owners';
+  static const committee = '/committee';
 }

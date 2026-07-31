@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
@@ -36,6 +35,17 @@ class RequestsView extends GetView<RequestsController> {
           ],
         ),
         iconTheme: const IconThemeData(color: Colors.white),
+        bottom: TabBar(
+          controller: controller.tabController,
+          indicatorColor: AppColors.accentGreen,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          labelStyle: AppTextStyles.labelLarge,
+          tabs: const [
+            Tab(text: 'Owners'),
+            Tab(text: 'Tenants'),
+          ],
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AppAddFab(
@@ -45,33 +55,96 @@ class RequestsView extends GetView<RequestsController> {
         activeTab: AppNavTab.requests,
         onHome: () => Get.offNamed(AppRoutes.dashboard),
         onUpdates: () => Get.offNamed(AppRoutes.updates),
-        onRequests: () {}, // already here
+        onRequests: () {},
         onProfile: () => Get.toNamed(AppRoutes.profile),
       ),
       body: SafeArea(
-        child: Obx(() {
-          if (controller.isLoading.value && controller.requests.isEmpty) {
-            return const AppSkeletonList(itemBuilder: UpdateCardSkeleton.new);
-          }
-          if (controller.requests.isEmpty) {
-            return _EmptyState(onRefresh: controller.refresh);
-          }
-          return RefreshIndicator(
-            color: AppColors.primaryDark,
-            onRefresh: controller.refresh,
-            child: AppResponsiveContainer(
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-                itemCount: controller.requests.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final request = controller.requests[index];
-                  return _RequestCard(request: request);
-                },
+        child: AppResponsiveContainer(
+          child: Obx(() {
+            if (controller.isLoading.value &&
+                controller.ownerRequests.isEmpty &&
+                controller.tenantRequests.isEmpty) {
+              return const AppSkeletonList(itemBuilder: UpdateCardSkeleton.new);
+            }
+            return TabBarView(
+              controller: controller.tabController,
+              children: [
+                _RequestsList(
+                  items: controller.ownerRequests,
+                  emptyTitle: 'No owner requests',
+                  emptySubtitle: 'Owner applications will show up here',
+                  onRefresh: controller.refresh,
+                ),
+                _RequestsList(
+                  items: controller.tenantRequests,
+                  emptyTitle: 'No tenant requests',
+                  emptySubtitle: 'Tenant applications will show up here',
+                  onRefresh: controller.refresh,
+                ),
+              ],
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}
+
+class _RequestsList extends StatelessWidget {
+  final List<RequestModel> items;
+  final String emptyTitle;
+  final String emptySubtitle;
+  final Future<void> Function() onRefresh;
+
+  const _RequestsList({
+    required this.items,
+    required this.emptyTitle,
+    required this.emptySubtitle,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) {
+      return RefreshIndicator(
+        color: AppColors.primaryDark,
+        onRefresh: onRefresh,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.45,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.inbox_outlined, size: 48, color: AppColors.textMuted),
+                    const SizedBox(height: 12),
+                    Text(emptyTitle, style: AppTextStyles.h4),
+                    const SizedBox(height: 6),
+                    Text(
+                      emptySubtitle,
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
               ),
             ),
-          );
-        }),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      color: AppColors.primaryDark,
+      onRefresh: onRefresh,
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        itemCount: items.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (context, index) => _RequestCard(request: items[index]),
       ),
     );
   }
@@ -91,12 +164,13 @@ class _RequestCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-          boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
+          boxShadow: const [
+            BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3)),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header: avatar, name, CNIC, pending badge
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -110,7 +184,10 @@ class _RequestCard extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     request.initials,
-                    style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryDark, fontSize: 16),
+                    style: AppTextStyles.labelLarge.copyWith(
+                      color: AppColors.primaryDark,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -134,7 +211,10 @@ class _RequestCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppDimens.radiusFull),
                     border: Border.all(color: AppColors.warningBorder),
                   ),
-                  child: Text('PENDING', style: AppTextStyles.labelSmall.copyWith(color: AppColors.warning)),
+                  child: Text(
+                    'PENDING',
+                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.warning),
+                  ),
                 ),
               ],
             ),
@@ -162,7 +242,11 @@ class _RequestCard extends StatelessWidget {
                 rows: [
                   _FieldPair(
                     left: (icon: Icons.villa_rounded, label: 'Building', value: request.buildingName),
-                    right: (icon: Icons.stairs_rounded, label: 'Floor', value: '${request.floor}${_ordinalSuffix(request.floor)} Floor'),
+                    right: (
+                      icon: Icons.stairs_rounded,
+                      label: 'Floor',
+                      value: '${request.floor}${_ordinalSuffix(request.floor)} Floor',
+                    ),
                   ),
                   _FieldPair(
                     left: (icon: Icons.door_front_door_rounded, label: 'Flat Number', value: request.flatNumber),
@@ -175,19 +259,35 @@ class _RequestCard extends StatelessWidget {
                 title: 'Tenancy Details',
                 rows: [
                   _FieldPair(
-                    left: (icon: Icons.event_rounded, label: 'Move-in Date', value: DateFormat('MMM d, yyyy').format(request.allotmentDate)),
-                    right: (icon: Icons.calendar_month_rounded, label: 'Lease Duration', value: '${request.leaseDurationMonths} Months'),
+                    left: (
+                      icon: Icons.event_rounded,
+                      label: 'Move-in Date',
+                      value: DateFormat('MMM d, yyyy').format(request.allotmentDate),
+                    ),
+                    right: (
+                      icon: Icons.calendar_month_rounded,
+                      label: 'Lease Duration',
+                      value: '${request.leaseDurationMonths} Months',
+                    ),
                   ),
                   _FieldPair(
-                    left: (icon: Icons.groups_rounded, label: 'Occupants', value: '${request.residentsCount} Members'),
-                    right: (icon: Icons.payments_rounded, label: 'Monthly Rent', value: 'PKR ${request.rent.toStringAsFixed(0)}'),
+                    left: (
+                      icon: Icons.groups_rounded,
+                      label: 'Occupants',
+                      value: '${request.residentsCount} Members',
+                    ),
+                    right: (
+                      icon: Icons.payments_rounded,
+                      label: 'Monthly Rent',
+                      value: 'PKR ${request.rent.toStringAsFixed(0)}',
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
               _SectionBlock(
                 title: 'Applicant Information',
-                rows: [],
+                rows: const [],
                 infoLines: [
                   ('Profession', request.profession),
                   ('Employer / Company', request.employerCompany),
@@ -206,7 +306,9 @@ class _RequestCard extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
                         side: const BorderSide(color: AppColors.dangerBorder),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.radiusFull)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                        ),
                       ),
                     ),
                   ),
@@ -219,7 +321,9 @@ class _RequestCard extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
                         backgroundColor: AppColors.successGreenDark,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.radiusFull)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                        ),
                       ),
                     ),
                   ),
@@ -236,7 +340,9 @@ class _RequestCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(46),
                     backgroundColor: AppColors.primaryDark,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.radiusFull)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                    ),
                   ),
                 ),
               ),
@@ -250,10 +356,14 @@ class _RequestCard extends StatelessWidget {
   String _ordinalSuffix(int n) {
     if (n % 100 >= 11 && n % 100 <= 13) return 'th';
     switch (n % 10) {
-      case 1: return 'st';
-      case 2: return 'nd';
-      case 3: return 'rd';
-      default: return 'th';
+      case 1:
+        return 'st';
+      case 2:
+        return 'nd';
+      case 3:
+        return 'rd';
+      default:
+        return 'th';
     }
   }
 }
@@ -304,6 +414,7 @@ class _CallablePhonePill extends StatelessWidget {
     );
   }
 }
+
 class _SectionBlock extends StatelessWidget {
   final String title;
   final List<_FieldPair> rows;
@@ -334,7 +445,10 @@ class _SectionBlock extends StatelessWidget {
                   children: [
                     SizedBox(
                       width: 130,
-                      child: Text(line.$1, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted)),
+                      child: Text(
+                        line.$1,
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+                      ),
                     ),
                     Expanded(
                       child: Text(
@@ -392,50 +506,6 @@ class _FieldItem extends StatelessWidget {
         const SizedBox(height: 4),
         Text(value, style: AppTextStyles.labelMedium.copyWith(color: AppColors.primaryDark)),
       ],
-    );
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  final Future<void> Function() onRefresh;
-  const _EmptyState({required this.onRefresh});
-
-  @override
-  Widget build(BuildContext context) {
-    return RefreshIndicator(
-      color: AppColors.primaryDark,
-      onRefresh: onRefresh,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Lottie animation
-                  Lottie.asset(
-                    'assets/lottie/requests.json',
-                    width: 320,
-                    height: 280,
-                    fit: BoxFit.contain,
-                    repeat: true,
-                  ),
-                  const SizedBox(height: 20),
-                  Text('No requests', style: AppTextStyles.h4),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Requests from new residents\nwill show up here.',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
