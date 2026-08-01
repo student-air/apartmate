@@ -11,6 +11,7 @@ import 'package:apartmate/data/models/resident_model.dart';
 import 'package:apartmate/presentation/residents/controllers/residents_controller.dart';
 import 'package:apartmate/routes/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:lottie/lottie.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
 
 class ResidentsView extends GetView<ResidentsController> {
@@ -339,22 +340,22 @@ class _EmptyResidentsState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.primaryDark.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-              ),
-              child: Icon(Icons.groups_rounded, size: 40, color: AppColors.primaryDark.withValues(alpha: 0.4)),
+            Lottie.asset(
+              'assets/lottie/persons.json',
+              width: 220,
+              height: 180,
+              fit: BoxFit.contain,
+              repeat: true,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text('No residents yet', style: AppTextStyles.h4),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Text(
-              'Accepted tenant requests will appear here',
+              'Residents will appear here once they are added !',
               textAlign: TextAlign.center,
-              style: AppTextStyles.caption,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
         ),
@@ -362,7 +363,6 @@ class _EmptyResidentsState extends StatelessWidget {
     );
   }
 }
-
 class _ResidentTile extends StatelessWidget {
   final ResidentModel resident;
   const _ResidentTile({required this.resident});

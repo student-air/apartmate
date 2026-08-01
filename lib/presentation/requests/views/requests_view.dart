@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
@@ -113,21 +114,32 @@ class _RequestsList extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height * 0.45,
+              height: MediaQuery.of(context).size.height * 0.55,
               child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.inbox_outlined, size: 48, color: AppColors.textMuted),
-                    const SizedBox(height: 12),
-                    Text(emptyTitle, style: AppTextStyles.h4),
-                    const SizedBox(height: 6),
-                    Text(
-                      emptySubtitle,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Lottie.asset(
+                        'assets/lottie/requests.json',
+                        width: 240,
+                        height: 200,
+                        fit: BoxFit.contain,
+                        repeat: true,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(emptyTitle, style: AppTextStyles.h4),
+                      const SizedBox(height: 6),
+                      Text(
+                        emptySubtitle,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -171,6 +183,7 @@ class _RequestCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -199,7 +212,9 @@ class _RequestCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         'CNIC: ${request.cnic}',
-                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ],
                   ),
@@ -226,7 +241,9 @@ class _RequestCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     '${request.buildingName} · Floor ${request.floor} · ${request.flatNumber}',
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -245,7 +262,7 @@ class _RequestCard extends StatelessWidget {
                     right: (
                       icon: Icons.stairs_rounded,
                       label: 'Floor',
-                      value: '${request.floor}${_ordinalSuffix(request.floor)} Floor',
+                      value: '${request.floor}${_ordinalSuffix(request.floor)} Floor'
                     ),
                   ),
                   _FieldPair(
@@ -262,24 +279,24 @@ class _RequestCard extends StatelessWidget {
                     left: (
                       icon: Icons.event_rounded,
                       label: 'Move-in Date',
-                      value: DateFormat('MMM d, yyyy').format(request.allotmentDate),
+                      value: DateFormat('MMM d, yyyy').format(request.allotmentDate)
                     ),
                     right: (
                       icon: Icons.calendar_month_rounded,
                       label: 'Lease Duration',
-                      value: '${request.leaseDurationMonths} Months',
+                      value: '${request.leaseDurationMonths} Months'
                     ),
                   ),
                   _FieldPair(
                     left: (
                       icon: Icons.groups_rounded,
                       label: 'Occupants',
-                      value: '${request.residentsCount} Members',
+                      value: '${request.residentsCount} Members'
                     ),
                     right: (
                       icon: Icons.payments_rounded,
                       label: 'Monthly Rent',
-                      value: 'PKR ${request.rent.toStringAsFixed(0)}',
+                      value: 'PKR ${request.rent.toStringAsFixed(0)}'
                     ),
                   ),
                 ],
@@ -299,28 +316,49 @@ class _RequestCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => controller.ignore(request),
-                      icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.danger),
-                      label: Text('Decline', style: AppTextStyles.labelLarge.copyWith(color: AppColors.danger)),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(48),
-                        side: const BorderSide(color: AppColors.dangerBorder),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppDimens.radiusFull),
-                        ),
-                      ),
-                    ),
-                  ),
+  child: Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+      boxShadow: [
+        BoxShadow(
+          color: AppColors.danger.withValues(alpha: 0.35),
+          blurRadius: 16,
+          offset: const Offset(0, 6),
+        ),
+      ],
+    ),
+    child: SizedBox(
+      height: 48,
+      child: ElevatedButton.icon(
+        onPressed: () => controller.ignore(request),
+        icon: const Icon(Icons.close_rounded, size: 18, color: Colors.white),
+        label: Text(
+          'Delete',
+          style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.danger,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+          ),
+        ),
+      ),
+    ),
+  ),
+),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () => controller.accept(request),
                       icon: const Icon(Icons.check_rounded, size: 18, color: Colors.white),
-                      label: Text('Accept', style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
+                      label: Text(
+                        'Accept',
+                        style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+                      ),
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size.fromHeight(48),
-                        backgroundColor: AppColors.successGreenDark,
+                        backgroundColor: AppColors.successGreen,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(AppDimens.radiusFull),
                         ),
@@ -336,7 +374,10 @@ class _RequestCard extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => controller.toggleExpanded(request.id),
                   icon: const Icon(Icons.expand_more_rounded, size: 18, color: AppColors.accentGreen),
-                  label: Text('View Details', style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentGreen)),
+                  label: Text(
+                    'View Details',
+                    style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentGreen),
+                  ),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(46),
                     backgroundColor: AppColors.primaryDark,

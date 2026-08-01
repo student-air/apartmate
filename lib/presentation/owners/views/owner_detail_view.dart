@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
-import 'package:apartmate/data/models/resident_model.dart';
-import 'package:apartmate/presentation/residents/controllers/residents_controller.dart';
+import 'package:apartmate/data/models/owner_model.dart';
+import 'package:apartmate/presentation/owners/controllers/owners_controller.dart';
 
-class ResidentDetailView extends StatelessWidget {
-  const ResidentDetailView({super.key});
+class OwnerDetailView extends StatelessWidget {
+  const OwnerDetailView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final resident = Get.arguments as ResidentModel;
-    final controller = Get.find<ResidentsController>();
+    final owner = Get.arguments as OwnerModel;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -24,7 +22,7 @@ class ResidentDetailView extends StatelessWidget {
         titleSpacing: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
-          'Resident Details',
+          'Owner Details',
           style: AppTextStyles.h4.copyWith(color: Colors.white),
         ),
       ),
@@ -33,6 +31,7 @@ class ResidentDetailView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Header card
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -57,7 +56,7 @@ class ResidentDetailView extends StatelessWidget {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          resident.initials,
+                          owner.initials,
                           style: AppTextStyles.labelLarge.copyWith(
                             color: AppColors.primaryDark,
                             fontSize: 16,
@@ -69,10 +68,10 @@ class ResidentDetailView extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(resident.name, style: AppTextStyles.h4),
+                            Text(owner.name, style: AppTextStyles.h4),
                             const SizedBox(height: 2),
                             Text(
-                              'CNIC: ${resident.cnic}',
+                              'CNIC: ${owner.cnic}',
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.textSecondary,
                               ),
@@ -89,79 +88,48 @@ class ResidentDetailView extends StatelessWidget {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          '${resident.buildingName} · Floor ${resident.floor} · ${resident.flatNumber}',
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                          '${owner.buildingName} · Flat ${owner.flatNumber}',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  _CallablePhonePill(phone: resident.phone),
+                  _CallablePhonePill(phone: owner.phone),
                 ],
               ),
             ),
             const SizedBox(height: 16),
+
+            // Property info
             _SectionBlock(
-              title: 'Requested Flat',
+              title: 'Property',
               rows: [
                 _FieldPair(
-                  left: (icon: Icons.villa_rounded, label: 'Building', value: resident.buildingName),
-                  right: (
-                    icon: Icons.stairs_rounded,
-                    label: 'Floor',
-                    value: '${resident.floor}${_ordinalSuffix(resident.floor)} Floor',
-                  ),
-                ),
-                _FieldPair(
-                  left: (icon: Icons.door_front_door_rounded, label: 'Flat Number', value: resident.flatNumber),
-                  right: (icon: Icons.king_bed_rounded, label: 'Flat Type', value: resident.flatType),
+                  left: (icon: Icons.villa_rounded, label: 'Building', value: owner.buildingName),
+                  right: (icon: Icons.door_front_door_rounded, label: 'Flat', value: owner.flatNumber),
                 ),
               ],
             ),
             const SizedBox(height: 12),
+
+            // Contact info
             _SectionBlock(
-              title: 'Tenancy Details',
-              rows: [
-                _FieldPair(
-                  left: (
-                    icon: Icons.event_rounded,
-                    label: 'Move-in Date',
-                    value: DateFormat('MMM d, yyyy').format(resident.allotmentDate),
-                  ),
-                  right: (
-                    icon: Icons.calendar_month_rounded,
-                    label: 'Lease Duration',
-                    value: '${resident.leaseDurationMonths} Months',
-                  ),
-                ),
-                _FieldPair(
-                  left: (
-                    icon: Icons.groups_rounded,
-                    label: 'Occupants',
-                    value: '${resident.residentsCount} Members',
-                  ),
-                  right: (
-                    icon: Icons.payments_rounded,
-                    label: 'Monthly Rent',
-                    value: 'PKR ${resident.rent.toStringAsFixed(0)}',
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _SectionBlock(
-              title: 'Applicant Information',
+              title: 'Contact Information',
               rows: const [],
               infoLines: [
-                ('Profession', resident.profession),
-                ('Employer / Company', resident.employerCompany),
-                ('Previous Address', resident.previousAddress),
-                ('Emergency Contact', resident.emergencyContact),
-                ('Email', resident.email),
+                ('Phone', owner.phone),
+                ('Email', owner.email),
+                ('CNIC', owner.cnic),
               ],
             ),
             const SizedBox(height: 24),
+
+            // Optional delete (only if your controller has it)
+            // Uncomment if you add confirmDeleteOwner later
             Container(
   width: double.infinity,
   decoration: BoxDecoration(
@@ -177,10 +145,10 @@ class ResidentDetailView extends StatelessWidget {
   child: SizedBox(
     height: 50,
     child: ElevatedButton.icon(
-      onPressed: () => Get.find<ResidentsController>().confirmDeleteResident(resident),
+      onPressed: () => Get.find<OwnersController>().confirmDeleteOwner(owner),
       icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.white),
       label: Text(
-        'Delete Resident',
+        'Delete Owner',
         style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
       ),
       style: ElevatedButton.styleFrom(
@@ -193,24 +161,11 @@ class ResidentDetailView extends StatelessWidget {
     ),
   ),
 ),
+            
           ],
         ),
       ),
     );
-  }
-
-  String _ordinalSuffix(int n) {
-    if (n % 100 >= 11 && n % 100 <= 13) return 'th';
-    switch (n % 10) {
-      case 1:
-        return 'st';
-      case 2:
-        return 'nd';
-      case 3:
-        return 'rd';
-      default:
-        return 'th';
-    }
   }
 }
 
@@ -291,7 +246,10 @@ class _SectionBlock extends StatelessWidget {
                   children: [
                     SizedBox(
                       width: 130,
-                      child: Text(line.$1, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted)),
+                      child: Text(
+                        line.$1,
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+                      ),
                     ),
                     Expanded(
                       child: Text(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
@@ -25,40 +26,39 @@ class CommitteeView extends GetView<CommitteeController> {
         title: Text('Committee', style: AppTextStyles.h4.copyWith(color: Colors.white)),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-  floatingActionButton: AppAddFab(
-    onPressed: showSendUpdateSheet,
-  ),
-  bottomNavigationBar: AppBottomNav(
-    activeTab: AppNavTab.home, // or leave home if no dedicated tab
-    onHome: () => Get.offNamed(AppRoutes.dashboard),
-    onUpdates: () => Get.offNamed(AppRoutes.updates),
-    onRequests: () => Get.offNamed(AppRoutes.requests),
-    onProfile: () => Get.toNamed(AppRoutes.profile),
-  ),
+      floatingActionButton: AppAddFab(
+        onPressed: showSendUpdateSheet,
+      ),
+      bottomNavigationBar: AppBottomNav(
+        activeTab: AppNavTab.home,
+        onHome: () => Get.offNamed(AppRoutes.dashboard),
+        onUpdates: () => Get.offNamed(AppRoutes.updates),
+        onRequests: () => Get.offNamed(AppRoutes.requests),
+        onProfile: () => Get.toNamed(AppRoutes.profile),
+      ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const AppSkeletonList(itemBuilder: StaffTileSkeleton.new);
         }
+
         if (controller.members.isEmpty) {
           return RefreshIndicator(
-  color: AppColors.primaryDark,
-  onRefresh: controller.refresh,
-  child: SingleChildScrollView(
-    physics: const AlwaysScrollableScrollPhysics(),
-    padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-    child: AppResponsiveContainer(
-      child: Column(
-        children: [
-          for (var i = 0; i < controller.members.length; i++) ...[
-            if (i > 0) const SizedBox(height: 12),
-            _MemberTile(member: controller.members[i]),
-          ],
-        ],
-      ),
-    ),
-  ),
-);
+            color: AppColors.primaryDark,
+            onRefresh: controller.refresh,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  child: const Center(
+                    child: _EmptyCommitteeState(),
+                  ),
+                ),
+              ],
+            ),
+          );
         }
+
         return RefreshIndicator(
           color: AppColors.primaryDark,
           onRefresh: controller.refresh,
@@ -71,6 +71,39 @@ class CommitteeView extends GetView<CommitteeController> {
           ),
         );
       }),
+    );
+  }
+}
+
+class _EmptyCommitteeState extends StatelessWidget {
+  const _EmptyCommitteeState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Lottie.asset(
+            'assets/lottie/committee.json',
+            width: 220,
+            height: 180,
+            fit: BoxFit.contain,
+            repeat: true,
+          ),
+          const SizedBox(height: 20),
+          Text('No committee members yet', style: AppTextStyles.h4),
+          const SizedBox(height: 8),
+          Text(
+            'Committee members will appear here once they are added !',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

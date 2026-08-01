@@ -259,7 +259,7 @@ class DashboardView extends GetView<DashboardController> {
                     const SizedBox(height: 12),
                     _ActionRow(
                       icon: Icons.groups_rounded,
-                      title: 'Add Staff',
+                      title: 'Manage Staff',
                       subtitle: 'Manage society staff',
                       onTap: controller.goToAddStaff,
                     ),

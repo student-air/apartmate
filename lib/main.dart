@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:apartmate/core/bindings/initial_binding.dart';
 import 'package:apartmate/core/constants/app_strings.dart';
 import 'package:apartmate/core/theme/app_theme.dart';
@@ -12,13 +13,19 @@ import 'package:apartmate/firebase_options.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize Local Notifications
   await AppNotificationService.init();
+
+  // Ask for notification permission once on first install
+  final prefs = await SharedPreferences.getInstance();
+  final askedBefore = prefs.getBool('notification_permission_asked') ?? false;
+  if (!askedBefore) {
+    await AppNotificationService.requestPermission();
+    await prefs.setBool('notification_permission_asked', true);
+  }
 
   runApp(const ApartMateApp());
 }
@@ -36,7 +43,6 @@ class ApartMateApp extends StatelessWidget {
       initialRoute: AppRoutes.splash,
       getPages: AppPages.pages,
       builder: (context, child) {
-        // Precache logo image
         precacheImage(const AssetImage('assets/images/logo.png'), context);
         return child ?? const SizedBox.shrink();
       },

@@ -826,9 +826,7 @@ class StaffView extends GetView<StaffController> {
   }
 }
 
-// ────────────────────────────────────────────────
-// Empty state with Lottie
-// ────────────────────────────────────────────────
+
 class _EmptyStaffState extends StatelessWidget {
   const _EmptyStaffState();
 

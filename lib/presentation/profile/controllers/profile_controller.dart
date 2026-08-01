@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:apartmate/data/models/user_model.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
@@ -24,13 +25,13 @@ class ProfileController extends GetxController {
 
   final ownerName = ''.obs;
   String get fullName => ownerName.value.isEmpty ? (user?.fullName ?? 'Guest') : ownerName.value;
+
   String get initials {
     final name = ownerName.value.isNotEmpty ? ownerName.value : (user?.fullName ?? '');
     if (name.trim().isEmpty) return '?';
     final parts = name.trim().split(' ').where((p) => p.isNotEmpty).toList();
     final first = parts.first[0];
     final last = parts.length > 1 ? parts.last[0] : '';
-    
     return (first + last).toUpperCase();
   }
 
@@ -58,6 +59,11 @@ class ProfileController extends GetxController {
   final notifyRequests = true.obs;
   final notifySound = false.obs;
 
+  static const _kNotifyUpdates = 'pref_notify_updates';
+  static const _kNotifyComplaints = 'pref_notify_complaints';
+  static const _kNotifyRequests = 'pref_notify_requests';
+  static const _kNotifySound = 'pref_notify_sound';
+
   // ── Privacy & Security state ──
   final biometricLoginEnabled = false.obs;
   final currentPasswordCtrl = TextEditingController();
@@ -69,6 +75,7 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     _loadSociety();
+    _loadNotificationPrefs();
   }
 
   Future<void> _loadSociety() async {
@@ -99,43 +106,45 @@ class ProfileController extends GetxController {
     biometricLoginEnabled.value = value;
     AppSnackbar.info(
       value ? 'Biometric login enabled' : 'Biometric login disabled',
-      value ? 'You can now sign in with fingerprint or face unlock' : 'Password will be required to sign in',
+      value
+          ? 'You can now sign in with fingerprint or face unlock'
+          : 'Password will be required to sign in',
     );
   }
 
   Future<void> changePassword() async {
-  if (currentPasswordCtrl.text.trim().isEmpty ||
-      newPasswordCtrl.text.trim().isEmpty ||
-      confirmPasswordCtrl.text.trim().isEmpty) {
-    AppSnackbar.error('Missing info', 'Please fill in all password fields');
-    return;
-  }
-  if (newPasswordCtrl.text.trim().length < 8) {
-    AppSnackbar.error('Weak password', 'New password must be at least 8 characters');
-    return;
-  }
-  if (newPasswordCtrl.text.trim() != confirmPasswordCtrl.text.trim()) {
-    AppSnackbar.error('Mismatch', 'New password and confirmation don\'t match');
-    return;
-  }
+    if (currentPasswordCtrl.text.trim().isEmpty ||
+        newPasswordCtrl.text.trim().isEmpty ||
+        confirmPasswordCtrl.text.trim().isEmpty) {
+      AppSnackbar.error('Missing info', 'Please fill in all password fields');
+      return;
+    }
+    if (newPasswordCtrl.text.trim().length < 8) {
+      AppSnackbar.error('Weak password', 'New password must be at least 8 characters');
+      return;
+    }
+    if (newPasswordCtrl.text.trim() != confirmPasswordCtrl.text.trim()) {
+      AppSnackbar.error('Mismatch', 'New password and confirmation don\'t match');
+      return;
+    }
 
-  isChangingPassword.value = true;
-  try {
-    await _authRepository.changePassword(
-      currentPassword: currentPasswordCtrl.text.trim(),
-      newPassword: newPasswordCtrl.text.trim(),
-    );
-    currentPasswordCtrl.clear();
-    newPasswordCtrl.clear();
-    confirmPasswordCtrl.clear();
-    Get.back();
-    AppSnackbar.success('Password updated', 'Your password has been changed successfully');
-  } catch (e) {
-    AppSnackbar.error('Update failed', e.toString());
-  } finally {
-    isChangingPassword.value = false;
+    isChangingPassword.value = true;
+    try {
+      await _authRepository.changePassword(
+        currentPassword: currentPasswordCtrl.text.trim(),
+        newPassword: newPasswordCtrl.text.trim(),
+      );
+      currentPasswordCtrl.clear();
+      newPasswordCtrl.clear();
+      confirmPasswordCtrl.clear();
+      Get.back();
+      AppSnackbar.success('Password updated', 'Your password has been changed successfully');
+    } catch (e) {
+      AppSnackbar.error('Update failed', e.toString());
+    } finally {
+      isChangingPassword.value = false;
+    }
   }
-}
 
   Future<void> logout() async {
     await _authRepository.logout();
@@ -143,121 +152,151 @@ class ProfileController extends GetxController {
   }
 
   void confirmLogout() {
-  Get.dialog(
-    Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: AppColors.surface,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.danger.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.logout_rounded, size: 30, color: AppColors.danger),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Log out?',
-              style: AppTextStyles.h4,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'You will need to sign in again to access your ApartMate account.',
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Get.back();
-                  logout();
-                },
-                icon: const Icon(Icons.logout_rounded, size: 18, color: Colors.white),
-                label: Text(
-                  'Log Out',
-                  style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: AppColors.surface,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.danger,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                child: Icon(Icons.logout_rounded, size: 30, color: AppColors.danger),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Log out?',
+                style: AppTextStyles.h4,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'You will need to sign in again to access your ApartMate account.',
+                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Get.back();
+                    logout();
+                  },
+                  icon: const Icon(Icons.logout_rounded, size: 18, color: Colors.white),
+                  label: Text(
+                    'Log Out',
+                    style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.danger,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text(
-                'Cancel',
-                style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  'Cancel',
+                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
+
   Future<void> sendPasswordResetLink() async {
-  final email = user?.email ?? '';
-  if (email.isEmpty) {
-    AppSnackbar.error('No email on file', 'Add an email to your profile first');
-    return;
+    final email = user?.email ?? '';
+    if (email.isEmpty) {
+      AppSnackbar.error('No email on file', 'Add an email to your profile first');
+      return;
+    }
+    try {
+      await _authRepository.sendPasswordResetEmail(email);
+      AppSnackbar.success('Reset link sent', 'Check $email for a password reset link');
+    } catch (e) {
+      AppSnackbar.error('Reset failed', e.toString());
+    }
   }
-  try {
-    await _authRepository.sendPasswordResetEmail(email);
-    AppSnackbar.success('Reset link sent', 'Check $email for a password reset link');
-  } catch (e) {
-    AppSnackbar.error('Reset failed', e.toString());
+
+  // ── Notification prefs (persisted) ──
+  Future<void> _loadNotificationPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    notifyUpdates.value = prefs.getBool(_kNotifyUpdates) ?? true;
+    notifyComplaints.value = prefs.getBool(_kNotifyComplaints) ?? true;
+    notifyRequests.value = prefs.getBool(_kNotifyRequests) ?? true;
+    notifySound.value = prefs.getBool(_kNotifySound) ?? false;
   }
-}
+
+  Future<void> _saveBool(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(key, value);
+  }
 
   Future<void> setNotifyUpdates(bool value) async {
     if (value && !await AppNotificationService.hasPermission()) {
       final granted = await AppNotificationService.requestPermission();
       if (!granted) {
-        AppSnackbar.error('Permission denied', 'Enable notifications in device settings to receive alerts');
+        AppSnackbar.error(
+          'Permission denied',
+          'Enable notifications in device settings to receive alerts',
+        );
         return;
       }
     }
     notifyUpdates.value = value;
+    await _saveBool(_kNotifyUpdates, value);
   }
 
   Future<void> setNotifyComplaints(bool value) async {
     if (value && !await AppNotificationService.hasPermission()) {
       final granted = await AppNotificationService.requestPermission();
       if (!granted) {
-        AppSnackbar.error('Permission denied', 'Enable notifications in device settings to receive alerts');
+        AppSnackbar.error(
+          'Permission denied',
+          'Enable notifications in device settings to receive alerts',
+        );
         return;
       }
     }
     notifyComplaints.value = value;
+    await _saveBool(_kNotifyComplaints, value);
   }
 
   Future<void> setNotifyRequests(bool value) async {
     if (value && !await AppNotificationService.hasPermission()) {
       final granted = await AppNotificationService.requestPermission();
       if (!granted) {
-        AppSnackbar.error('Permission denied', 'Enable notifications in device settings to receive alerts');
+        AppSnackbar.error(
+          'Permission denied',
+          'Enable notifications in device settings to receive alerts',
+        );
         return;
       }
     }
     notifyRequests.value = value;
+    await _saveBool(_kNotifyRequests, value);
   }
 
-  void setNotifySound(bool value) => notifySound.value = value;
+  Future<void> setNotifySound(bool value) async {
+    notifySound.value = value;
+    await _saveBool(_kNotifySound, value);
+  }
 
   @override
   void onClose() {

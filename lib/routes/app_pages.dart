@@ -35,6 +35,7 @@ import 'package:apartmate/presentation/owners/bindings/owners_binding.dart';
 import 'package:apartmate/presentation/owners/views/owners_view.dart';
 import 'package:apartmate/presentation/committee/bindings/committee_binding.dart';
 import 'package:apartmate/presentation/committee/views/committee_view.dart';
+import 'package:apartmate/presentation/owners/views/owner_detail_view.dart';
 
 class AppPages {
   AppPages._();
@@ -128,6 +129,10 @@ GetPage(
   name: AppRoutes.owners,
   page: () => const OwnersView(),
   binding: OwnersBinding(),
+),
+GetPage(
+  name: AppRoutes.ownerDetail,
+  page: () => const OwnerDetailView(),
 ),
 GetPage(
   name: AppRoutes.committee,
