@@ -66,3 +66,12 @@ class AppColors {
   static const Color roleSecurityText = Color(0xFF92400E);
   static const Color roleSecurityBorder = Color(0xFFFDE68A);
 }
+
+extension ColorValues on Color {
+  /// Convenience method used across the app to set opacity using a named
+  /// parameter (`alpha`) matching existing usages like `color.withValues(alpha: 0.6)`.
+  Color withValues({double? alpha}) {
+    if (alpha != null) return withOpacity(alpha);
+    return this;
+  }
+}

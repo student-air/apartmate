@@ -1,10 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 
 class FirebaseSocietyRepository implements ISocietyRepository {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  static const _codeChars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no 0/O, 1/I/L — avoids confusion
+
+  String _randomCode() {
+    final rand = Random.secure();
+    return List.generate(6, (_) => _codeChars[rand.nextInt(_codeChars.length)]).join();
+  }
+
+  Future<String> _generateUniqueJoinCode() async {
+    for (var attempt = 0; attempt < 5; attempt++) {
+      final code = _randomCode();
+      final existing = await _db.collection('societies').where('joinCode', isEqualTo: code).limit(1).get();
+      if (existing.docs.isEmpty) return code;
+    }
+    throw StateError('Could not generate a unique join code — please try again');
+  }
 
   String get _uid {
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -22,9 +39,18 @@ class FirebaseSocietyRepository implements ISocietyRepository {
 
   @override
   Future<SocietyModel> registerSociety(SocietyModel society) async {
-    final data = _societyToMap(society);
-    await _societyDoc.set(data);
-    return society;
+    final existingDoc = await _societyDoc.get();
+    final alreadyHasCode = existingDoc.exists && existingDoc.data()?['joinCode'] != null;
+
+    final joinCode = alreadyHasCode
+        ? existingDoc.data()!['joinCode'] as String
+        : await _generateUniqueJoinCode();
+
+    final map = _societyToMap(society)..['joinCode'] = joinCode;
+    await _societyDoc.set(map, SetOptions(merge: true));
+
+    final saved = await _societyDoc.get();
+    return _societyFromMap(saved.id, saved.data()!);
   }
 
   @override
@@ -93,26 +119,28 @@ class FirebaseSocietyRepository implements ISocietyRepository {
         'contactNumber': s.contactNumber,
         'description': s.description,
         'ownerPhotoPath': s.ownerPhotoPath,
+        'joinCode': s.joinCode,
         'registrationStatus': s.registrationStatus.name,
         'submittedAt': Timestamp.fromDate(s.submittedAt),
       };
 
-  SocietyModel _societyFromMap(String id, Map<String, dynamic> map) {
+  SocietyModel _societyFromMap(String id, Map<String, dynamic> data) {
     return SocietyModel(
       id: id,
-      name: map['name'] ?? '',
-      ownerName: map['ownerName'] ?? '',
-      address: map['address'] ?? '',
-      city: map['city'] ?? '',
-      country: map['country'] ?? '',
-      contactNumber: map['contactNumber'] ?? '',
-      description: map['description'],
-      ownerPhotoPath: map['ownerPhotoPath'],
+      name: data['name'] ?? '',
+      ownerName: data['ownerName'] ?? '',
+      address: data['address'] ?? '',
+      city: data['city'] ?? '',
+      country: data['country'] ?? '',
+      contactNumber: data['contactNumber'] ?? '',
+      description: data['description'],
+      ownerPhotoPath: data['ownerPhotoPath'],
+      joinCode: data['joinCode'] ?? '',
       registrationStatus: SocietyRegistrationStatus.values.firstWhere(
-        (e) => e.name == map['registrationStatus'],
+        (e) => e.name == data['registrationStatus'],
         orElse: () => SocietyRegistrationStatus.pendingReview,
       ),
-      submittedAt: (map['submittedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      submittedAt: (data['submittedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 

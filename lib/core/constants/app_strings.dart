@@ -59,7 +59,7 @@ class AppStrings {
   
   // Society register - Registration status
   static const registrationSubmitted = 'Registration Submitted!';
-  static const registrationSubmittedDesc = 'Your registration request has been sent. You will be notified via SMS and email once approved.';
+  static const registrationSubmittedDesc = 'Your request has been sent. You will be notified via SMS and email once approved.';
   static const status = 'Status';
   static const pendingReview = 'PENDING REVIEW';
   static const date = 'Date';

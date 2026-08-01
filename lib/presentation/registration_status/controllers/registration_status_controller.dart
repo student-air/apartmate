@@ -31,6 +31,7 @@ class RegistrationStatusController extends GetxController {
     if (date == null) return '';
     return DateFormat('MMM d, yyyy').format(date);
   }
+  String get joinCode => society.value?.joinCode ?? '——————';
 
   void continueSetup() => Get.toNamed(AppRoutes.societyBuildings);
 }

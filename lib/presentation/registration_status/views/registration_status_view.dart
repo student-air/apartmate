@@ -7,7 +7,10 @@ import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_animations.dart';
 import 'package:apartmate/core/widgets/app_button.dart';
 import 'package:apartmate/core/widgets/app_card.dart';
+import 'package:flutter/services.dart';
+import 'package:apartmate/core/utils/app_snackbar.dart';
 import 'package:apartmate/core/widgets/app_loading.dart';
+
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/presentation/registration_status/controllers/registration_status_controller.dart';
 
@@ -28,14 +31,15 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
               child: Column(
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 2),
                   const AppAnimatedCheckmark(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   AppFadeSlideIn(
                     delay: const Duration(milliseconds: 500),
                     child: Text(AppStrings.registrationSubmitted, style: AppTextStyles.h2, textAlign: TextAlign.center),
                   ),
-                  const SizedBox(height: 8),
+                
+                  const SizedBox(height: 4),
                   AppFadeSlideIn(
                     delay: const Duration(milliseconds: 650),
                     child: Text(
@@ -44,7 +48,136 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
                       style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary, height: 1.5),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
+                  // AppPopIn(
+                  //   delay: const Duration(milliseconds: 700),
+                  //   child: Container(
+                  //     width: double.infinity,
+                  //     height: MediaQuery.of(context).size.height * 0.22,
+                  //     padding: const EdgeInsets.all(20),
+                  //     decoration: BoxDecoration(
+                  //       gradient: const LinearGradient(
+                  //         colors: [AppColors.accentGreenDark, AppColors.accentGreen],
+                  //         begin: Alignment.topLeft,
+                  //         end: Alignment.bottomRight,
+                  //       ),
+                  //       borderRadius: BorderRadius.circular(AppDimens.radius2xl),
+                  //       boxShadow: [
+                  //         BoxShadow(color: AppColors.accentGreen.withValues(alpha: 0.12), blurRadius: 18, offset: const Offset(0, 6)),
+                  //       ],
+                  //     ),
+                  //     child: Column(
+                  //       mainAxisSize: MainAxisSize.max,
+                  //       mainAxisAlignment: MainAxisAlignment.center,
+                  //       crossAxisAlignment: CrossAxisAlignment.center,
+                  //       children: [
+                  //         AppPopIn(
+                  //           delay: const Duration(milliseconds: 780),
+                  //           child: Text(
+                  //             'SOCIETY JOIN CODE',
+                  //             textAlign: TextAlign.center,
+                  //             style: AppTextStyles.overline.copyWith(color: Colors.white.withValues(alpha: 0.9), letterSpacing: 1.6),
+                  //           ),
+                  //         ),
+                  //         const SizedBox(height: 10),
+                  //         AppPopIn(
+                  //           delay: const Duration(milliseconds: 860),
+                  //           child: SelectableText(
+                  //             controller.joinCode,
+                  //             textAlign: TextAlign.center,
+                  //             style: AppTextStyles.h1.copyWith(
+                  //               color: Colors.white,
+                  //               letterSpacing: 8,
+                  //               fontFamily: 'monospace',
+                  //             ),
+                  //           ),
+                  //         ),
+                  //         const SizedBox(height: 6),
+                  //         AppPopIn(
+                  //           delay: const Duration(milliseconds: 920),
+                  //           child: Text(
+                  //             'Share this code !',
+                  //             textAlign: TextAlign.center,
+                  //             style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withValues(alpha: 0.85)),
+                  //           ),
+                  //         ),
+                  //         const SizedBox(height: 6),
+                  //         AppPopIn(
+                  //           delay: const Duration(milliseconds: 980),
+                  //           child: OutlinedButton.icon(
+                  //             onPressed: () {
+                  //               Clipboard.setData(ClipboardData(text: controller.joinCode));
+                  //               AppSnackbar.info('Copied', 'Society code copied to clipboard');
+                  //             },
+                  //             icon: const Icon(Icons.copy, size: 16, color: Colors.white),
+                  //             label: Text('Copy Code', style: AppTextStyles.labelMedium.copyWith(color: Colors.white)),
+                  //             style: OutlinedButton.styleFrom(
+                  //               side: BorderSide(color: Colors.white.withValues(alpha: 0.22)),
+                  //               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimens.radiusFull)),
+                  //               backgroundColor: Colors.black.withValues(alpha: 0.03),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
+                  AppPopIn(
+                    delay: const Duration(milliseconds: 700),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(20, 12, 8, 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.textOnDark,
+                        borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                        border: Border.all(color: AppColors.borderLight),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'SOCIETY JOIN CODE',
+                                  style: AppTextStyles.overline.copyWith(color: AppColors.textPrimary, letterSpacing: 1),
+                                ),
+                                const SizedBox(height: 2),
+                                SelectableText(
+                                  controller.joinCode,
+                                  style: AppTextStyles.h4.copyWith(
+                                    fontFamily: 'monospace',
+                                    letterSpacing: 2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: controller.joinCode));
+                              AppSnackbar.info('Copied', 'Society code copied to clipboard');
+                            },
+                            icon: const Icon(Icons.copy_rounded, size: 18),
+                            style: IconButton.styleFrom(
+                              backgroundColor: AppColors.surfaceMuted,
+                              shape: const CircleBorder(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  AppFadeSlideIn(
+                    delay: const Duration(milliseconds: 850),
+                    child: Text(
+                      'Users enter this code to join your society',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
+                    ),
+                  ),
+                  const SizedBox(height: 22),
                   AppFadeSlideIn(
                     delay: const Duration(milliseconds: 900),
                     child: AppCard(
@@ -128,7 +261,7 @@ class RegistrationStatusView extends GetView<RegistrationStatusController> {
                   AppPrimaryButton(
                     label: AppStrings.continueSetup,
                     backgroundColor: AppColors.primaryDark,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.accentGreen,
                     onPressed: controller.continueSetup,
                   ),
                 ],

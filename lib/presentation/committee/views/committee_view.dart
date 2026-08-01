@@ -9,7 +9,7 @@ import 'package:apartmate/data/models/committee_model.dart';
 import 'package:apartmate/core/widgets/app_bottom_nav.dart';
 import 'package:apartmate/core/widgets/send_update_sheet.dart';
 import 'package:apartmate/routes/app_routes.dart';
-import 'package:apartmate/core/widgets/app_responsive_container.dart';
+// import 'package:apartmate/core/widgets/app_responsive_container.dart';
 import 'package:apartmate/presentation/committee/controllers/committee_controller.dart';
 
 class CommitteeView extends GetView<CommitteeController> {

@@ -10,7 +10,8 @@ class SocietyModel {
   final String country;
   final String contactNumber;
   final String? description;
-  final String? ownerPhotoPath; 
+  final String? ownerPhotoPath;
+  final String joinCode;
   final SocietyRegistrationStatus registrationStatus;
   final DateTime submittedAt;
 
@@ -24,35 +25,38 @@ class SocietyModel {
     required this.contactNumber,
     this.description,
     this.ownerPhotoPath,
+    this.joinCode = '',
     this.registrationStatus = SocietyRegistrationStatus.pendingReview,
     required this.submittedAt,
   });
 
   SocietyModel copyWith({
-  String? name,
-  String? ownerName,
-  String? address,
-  String? city,
-  String? country,
-  String? contactNumber,
-  String? description,
-  String? ownerPhotoPath,
-  SocietyRegistrationStatus? registrationStatus,
-}) {
-  return SocietyModel(
-    id: id,
-    name: name ?? this.name,
-    ownerName: ownerName ?? this.ownerName,
-    address: address ?? this.address,
-    city: city ?? this.city,
-    country: country ?? this.country,
-    contactNumber: contactNumber ?? this.contactNumber,
-    description: description ?? this.description,
-    ownerPhotoPath: ownerPhotoPath ?? this.ownerPhotoPath,
-    registrationStatus: registrationStatus ?? this.registrationStatus,
-    submittedAt: submittedAt,
-  );
-}
+    String? name,
+    String? ownerName,
+    String? address,
+    String? city,
+    String? country,
+    String? contactNumber,
+    String? description,
+    String? ownerPhotoPath,
+    String? joinCode,
+    SocietyRegistrationStatus? registrationStatus,
+  }) {
+    return SocietyModel(
+      id: id,
+      name: name ?? this.name,
+      ownerName: ownerName ?? this.ownerName,
+      address: address ?? this.address,
+      city: city ?? this.city,
+      country: country ?? this.country,
+      contactNumber: contactNumber ?? this.contactNumber,
+      description: description ?? this.description,
+      ownerPhotoPath: ownerPhotoPath ?? this.ownerPhotoPath,
+      joinCode: joinCode ?? this.joinCode,
+      registrationStatus: registrationStatus ?? this.registrationStatus,
+      submittedAt: submittedAt,
+    );
+  }
 }
 
 /// A single building within a society.
