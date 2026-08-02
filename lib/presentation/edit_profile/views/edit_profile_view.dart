@@ -1,4 +1,4 @@
-//import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
@@ -44,8 +44,24 @@ class EditProfileView extends GetView<EditProfileController> {
                           ),
                           alignment: Alignment.center,
                           child: file != null
-                              ? ClipOval(child: Image.file(file, width: 96, height: 96, fit: BoxFit.cover))
-                              : Icon(Icons.camera_alt_outlined, size: 28, color: AppColors.primaryDark.withValues(alpha: 0.5)),
+    ? ClipOval(
+        child: Image.file(
+          file,
+          width: 96,
+          height: 96,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Icon(
+            Icons.camera_alt_outlined,
+            size: 28,
+            color: AppColors.primaryDark.withValues(alpha: 0.5),
+          ),
+        ),
+      )
+    : Icon(
+        Icons.camera_alt_outlined,
+        size: 28,
+        color: AppColors.primaryDark.withValues(alpha: 0.5),
+      ),
                         ),
                         Positioned(
                           bottom: -2,

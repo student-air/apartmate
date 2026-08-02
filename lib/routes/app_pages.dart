@@ -91,9 +91,9 @@ class AppPages {
       binding: DashboardBinding(),
     ),
     GetPage(
-  name: AppRoutes.updates,
-  page: () => const UpdatesView(),
-  binding: UpdatesBinding(),
+      name: AppRoutes.updates,
+      page: () => const UpdatesView(),
+      binding: UpdatesBinding(),
     ),
     GetPage(
       name: AppRoutes.profile,
@@ -106,38 +106,37 @@ class AppPages {
       binding: EditProfileBinding(),
     ),
     GetPage(
-  name: AppRoutes.requests,
-  page: () => const RequestsView(),
-  binding: RequestsBinding(),
+      name: AppRoutes.requests,
+      page: () => const RequestsView(),
+      binding: RequestsBinding(),
 ),
     GetPage(
-  name: AppRoutes.complaints,
-  page: () => const ComplaintsView(),
-  binding: ComplaintsBinding(),
+      name: AppRoutes.complaints,
+      page: () => const ComplaintsView(),
+      binding: ComplaintsBinding(),
 ),
-
-GetPage(
+    GetPage(
       name: AppRoutes.residents,
       page: () => const ResidentsView(),
       binding: ResidentsBinding(),
     ),
     GetPage(
-  name: AppRoutes.residentDetail,
-  page: () => const ResidentDetailView(),
+      name: AppRoutes.residentDetail,
+      page: () => const ResidentDetailView(),
 ),
-GetPage(
-  name: AppRoutes.owners,
-  page: () => const OwnersView(),
-  binding: OwnersBinding(),
+    GetPage(
+      name: AppRoutes.owners,
+      page: () => const OwnersView(),
+      binding: OwnersBinding(),
 ),
-GetPage(
-  name: AppRoutes.ownerDetail,
-  page: () => const OwnerDetailView(),
+    GetPage(
+      name: AppRoutes.ownerDetail,
+      page: () => const OwnerDetailView(),
 ),
-GetPage(
-  name: AppRoutes.committee,
-  page: () => const CommitteeView(),
-  binding: CommitteeBinding(),
+    GetPage(
+      name: AppRoutes.committee,
+      page: () => const CommitteeView(),
+      binding: CommitteeBinding(),
 ),
   ];
 }

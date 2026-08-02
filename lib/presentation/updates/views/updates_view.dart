@@ -17,24 +17,63 @@ class UpdatesView extends GetView<UpdatesController> {
   const UpdatesView({super.key});
 
   Future<void> _confirmClearAll(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Clear all updates?'),
-        content: const Text('This will remove every update from this list. This can\'t be undone.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text('Clear All', style: TextStyle(color: AppColors.danger)),
-          ),
-        ],
+  Get.dialog(
+    Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: AppColors.surface,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Clear all updates?',
+              style: AppTextStyles.h4,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'This will permanently remove every update from this list.',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Get.back();
+                  controller.clearAll();
+                },
+                icon: const Icon(Icons.delete_outline, size: 18, color: Colors.white),
+                label: Text(
+                  'Clear All',
+                  style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.danger,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
+              ),
+            ),
+          ],
+        ),
       ),
-    );
-    if (confirmed == true) {
-      controller.clearAll();
-    }
-  }
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {

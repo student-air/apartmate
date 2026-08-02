@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:apartmate/routes/app_routes.dart';
+import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
+import 'package:apartmate/domain/repositories/i_society_repository.dart';
+import 'package:apartmate/routes/app_routes.dart';
 
 class SplashController extends GetxController {
   @override
@@ -20,19 +22,37 @@ class SplashController extends GetxController {
       );
     }
     await Future.delayed(const Duration(milliseconds: 2200));
-    _goToNext();
+    await _goToNext();
   }
 
-  void _goToNext() {
+  Future<void> _goToNext() async {
     if (Get.currentRoute != AppRoutes.splash) return;
 
     final authRepository = Get.find<IAuthRepository>();
     final isLoggedIn = authRepository.currentUser != null;
 
-    if (isLoggedIn) {
-      Get.offAllNamed(AppRoutes.dashboard);
-    } else {
+    if (!isLoggedIn) {
       Get.offAllNamed(AppRoutes.login);
+      return;
+    }
+
+    try {
+      final societyRepository = Get.find<ISocietyRepository>();
+      final society = await societyRepository.getCurrentSociety();
+
+      if (society == null) {
+        Get.offAllNamed(AppRoutes.societyRegister);
+        return;
+      }
+
+      if (society.registrationStatus != SocietyRegistrationStatus.approved) {
+        Get.offAllNamed(AppRoutes.registrationStatus);
+        return;
+      }
+
+      Get.offAllNamed(AppRoutes.dashboard);
+    } catch (_) {
+      Get.offAllNamed(AppRoutes.registrationStatus);
     }
   }
 }

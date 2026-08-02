@@ -36,27 +36,41 @@ class EditProfileController extends GetxController {
   }
 
   Future<void> _prefill() async {
-    final user = _current;
-    if (user != null) {
-      fullNameCtrl.text = user.fullName;
-      emailCtrl.text = user.email;
-      phoneCtrl.text = user.phone;
-      if (user.photoPath != null && user.photoPath!.isNotEmpty) {
-        photo.value = File(user.photoPath!);
+  final user = _current;
+  if (user != null) {
+    fullNameCtrl.text = user.fullName;
+    emailCtrl.text = user.email;
+    phoneCtrl.text = user.phone;
+  }
+
+  isLoading.value = true;
+  try {
+    final society = await _societyRepository.getCurrentSociety();
+    ownerNameCtrl.text = society?.ownerName ?? '';
+
+    // Prefer photo from society registration
+    final societyPath = society?.ownerPhotoPath;
+    if (societyPath != null && societyPath.isNotEmpty) {
+      final file = File(societyPath);
+      if (await file.exists()) {
+        photo.value = file;
       }
     }
 
-    isLoading.value = true;
-    try {
-      final society = await _societyRepository.getCurrentSociety();
-      ownerNameCtrl.text = society?.ownerName ?? '';
-      if (photo.value == null && society?.ownerPhotoPath != null && society!.ownerPhotoPath!.isNotEmpty) {
-        photo.value = File(society.ownerPhotoPath!);
+    // Fallback: user profile photo
+    if (photo.value == null) {
+      final userPath = user?.photoPath;
+      if (userPath != null && userPath.isNotEmpty) {
+        final file = File(userPath);
+        if (await file.exists()) {
+          photo.value = file;
+        }
       }
-    } finally {
-      isLoading.value = false;
     }
+  } finally {
+    isLoading.value = false;
   }
+}
 
   Future<void> pickPhoto() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery, imageQuality: 85);
