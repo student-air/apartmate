@@ -15,7 +15,6 @@ class ResidentDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final resident = Get.arguments as ResidentModel;
-    final controller = Get.find<ResidentsController>();
 
     return Scaffold(
       backgroundColor: AppColors.background,

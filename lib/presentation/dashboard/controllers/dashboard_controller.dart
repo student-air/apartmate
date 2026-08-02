@@ -235,14 +235,14 @@ class DashboardController extends GetxController {
   Future<void> refreshSociety() => _loadSociety();
 
   Future<void> _loadOwnersCount() async {
-  final list = await Get.find<IOwnerRepository>().getOwners();
-  ownersCount.value = list.length;
-}
+    final list = await _ownerRepository.getOwners();
+    ownersCount.value = list.length;
+  }
 
-Future<void> _loadCommitteeCount() async {
-  final list = await Get.find<ICommitteeRepository>().getMembers();
-  committeeCount.value = list.length;
-}
+  Future<void> _loadCommitteeCount() async {
+    final list = await _committeeRepository.getMembers();
+    committeeCount.value = list.length;
+  }
 
   Future<void> refreshRequestCounts() async {
     await Future.wait([
