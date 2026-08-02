@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_strings.dart';
@@ -111,17 +112,31 @@ class ProfileView extends GetView<ProfileController> {
                                       );
                                     }),
                                     const SizedBox(height: 14),
-                                    Obx(() => Text(controller.fullName, style: AppTextStyles.h3)),
+                                    Obx(
+                                      () => Text(
+                                        controller.fullName,
+                                        style: AppTextStyles.h3,
+                                      ),
+                                    ),
                                     const SizedBox(height: 6),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 4,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: AppColors.accentGreen.withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                                        color: AppColors.accentGreen
+                                            .withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(
+                                          AppDimens.radiusFull,
+                                        ),
                                       ),
                                       child: Text(
                                         controller.role.toUpperCase(),
-                                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.accentGreenDark),
+                                        style: AppTextStyles.labelMedium
+                                            .copyWith(
+                                          color: AppColors.accentGreenDark,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -131,7 +146,11 @@ class ProfileView extends GetView<ProfileController> {
                                   right: 8,
                                   child: IconButton(
                                     onPressed: controller.goToEditProfile,
-                                    icon: const Icon(Icons.edit_outlined, size: 18, color: AppColors.textSecondary),
+                                    icon: const Icon(
+                                      Icons.edit_outlined,
+                                      size: 18,
+                                      color: AppColors.textSecondary,
+                                    ),
                                     style: IconButton.styleFrom(
                                       backgroundColor: AppColors.surfaceMuted,
                                       shape: const CircleBorder(),
@@ -141,9 +160,87 @@ class ProfileView extends GetView<ProfileController> {
                               ],
                             ),
                           ),
+                          Obx(() {
+                            final code = controller.joinCode.value;
+                            if (code.isEmpty) return const SizedBox.shrink();
+                            return Column(
+                              children: [
+                                SizedBox(
+                      height: 140,
+                      width: double.infinity,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+        Positioned.fill(
+                    child: Lottie.asset(
+                      'assets/lottie/code.json',
+                      fit: BoxFit.contain,
+                      repeat: true,
+                    ),
+                  ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 60,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    'SOCIETY JOIN CODE',
+                                                    style: AppTextStyles.overline
+                                                        .copyWith(
+                                                      color: Colors.white,
+                                                      letterSpacing: 1,
+                                                      fontSize: 10,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  SelectableText(
+                                                    code,
+                                                    style: AppTextStyles.h4
+                                                        .copyWith(
+                                                      color: Colors.white,
+                                                      fontFamily: 'monospace',
+                                                      letterSpacing: 2,
+                                                      fontWeight: FontWeight.w700,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+                                                Clipboard.setData(
+                                                  ClipboardData(text: code),
+                                                );
+                                                AppSnackbar.info(
+                                                  'Copied',
+                                                  'Society code copied to clipboard',
+                                                );
+                                              },
+                                              icon: const Icon(
+                                                Icons.copy_rounded,
+                                                size: 32,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
 
-                          const SizedBox(height: 14),
-
+                
+const SizedBox(height: 0),
                           // Contact
                           _SectionCard(
                             title: 'Contact Information',

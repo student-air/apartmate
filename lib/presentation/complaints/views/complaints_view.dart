@@ -77,7 +77,8 @@ class ComplaintsView extends GetView<ComplaintsController> {
                   emptySubtitle: 'All complaints will show up here',
                   onDelete: controller.deleteComplaint,
                   onMarkSeen: (id) => controller.setStatus(id, ComplaintStatus.pending),
-                  onMarkReviewed: (id) => controller.setStatus(id, ComplaintStatus.underReview),
+                  onMarkReviewed: (id) =>
+                      controller.setStatus(id, ComplaintStatus.underReview),
                   onMarkResolved: controller.markResolved,
                   showActions: true,
                 ),
@@ -153,8 +154,10 @@ class _ComplaintsList extends StatelessWidget {
             complaint: item,
             showActions: showActions,
             onMarkSeen: onMarkSeen == null ? null : () => onMarkSeen!(item.id),
-            onMarkReviewed: onMarkReviewed == null ? null : () => onMarkReviewed!(item.id),
-            onMarkResolved: onMarkResolved == null ? null : () => onMarkResolved!(item.id),
+            onMarkReviewed:
+                onMarkReviewed == null ? null : () => onMarkReviewed!(item.id),
+            onMarkResolved:
+                onMarkResolved == null ? null : () => onMarkResolved!(item.id),
             onDelete: () => onDelete(item.id),
           ),
         );
@@ -227,85 +230,95 @@ class _ComplaintCard extends StatelessWidget {
   });
 
   void _confirmDelete(BuildContext context) {
-  Get.dialog(
-    Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      backgroundColor: AppColors.surface,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: AppColors.danger.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: AppColors.surface,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.delete_outline_rounded,
+                  size: 30,
+                  color: AppColors.danger,
+                ),
               ),
-              child: Icon(Icons.delete_outline_rounded, size: 30, color: AppColors.danger),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Delete complaint?',
-              style: AppTextStyles.h4,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'This will permanently remove "${complaint.title}" from the list.',
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(AppDimens.radiusFull),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.danger.withValues(alpha: 0.35),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
+              const SizedBox(height: 16),
+              Text(
+                'Delete complaint?',
+                style: AppTextStyles.h4,
+                textAlign: TextAlign.center,
               ),
-              child: SizedBox(
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Get.back();
-                    onDelete();
-                  },
-                  icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Colors.white),
-                  label: Text(
-                    'Delete',
-                    style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.danger,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+              const SizedBox(height: 8),
+              Text(
+                'This will permanently remove "${complaint.title}" from the list.',
+                style: AppTextStyles.bodyMedium
+                    .copyWith(color: AppColors.textSecondary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.danger.withValues(alpha: 0.35),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  height: 48,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Get.back();
+                      onDelete();
+                    },
+                    icon: const Icon(
+                      Icons.delete_outline_rounded,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'Delete',
+                      style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.danger,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => Get.back(),
-              child: Text(
-                'Cancel',
-                style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  'Cancel',
+                  style: AppTextStyles.labelLarge
+                      .copyWith(color: AppColors.textPrimary),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   String _formatDate(DateTime date) {
     final now = DateTime.now();
@@ -385,89 +398,104 @@ class _ComplaintCard extends StatelessWidget {
                 _formatDate(complaint.postedAt),
                 style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
               ),
-              PopupMenuButton<String>(
-  icon: const Icon(Icons.more_vert, size: 20, color: AppColors.textMuted),
-  color: AppColors.surface,
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-  ),
-  onSelected: (value) {
-    switch (value) {
-      case 'seen':
-        onMarkSeen?.call();
-        break;
-      case 'resolved':
-        onMarkResolved?.call();
-        break;
-      case 'delete':
-        _confirmDelete(context);
-        break;
-    }
-  },
-  itemBuilder: (context) => [
-    PopupMenuItem(
-      value: 'seen',
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: AppColors.pending.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Icon(Icons.visibility_rounded, size: 16, color: AppColors.pending),
-          ),
-          const SizedBox(width: 12),
-          Text('Mark as Seen', style: AppTextStyles.labelLarge),
-        ],
-      ),
-    ),
-    PopupMenuItem(
-      value: 'resolved',
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: AppColors.successGreen.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Icon(Icons.check_circle_rounded, size: 16, color: AppColors.successGreen),
-          ),
-          const SizedBox(width: 12),
-          Text('Mark as Resolved', style: AppTextStyles.labelLarge),
-        ],
-      ),
-    ),
-    const PopupMenuDivider(),
-    PopupMenuItem(
-      value: 'delete',
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: AppColors.danger.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.danger),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Delete',
-            style: AppTextStyles.labelLarge.copyWith(color: AppColors.danger),
-          ),
-        ],
-      ),
-    ),
-  ],
-),
+              // Only on All Complaints tab — hidden on Resolved
+              if (showActions)
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert, size: 20, color: AppColors.textMuted),
+                  color: AppColors.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+                  ),
+                  onSelected: (value) {
+                    switch (value) {
+                      case 'seen':
+                        onMarkSeen?.call();
+                        break;
+                      case 'resolved':
+                        onMarkResolved?.call();
+                        break;
+                      case 'delete':
+                        _confirmDelete(context);
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'seen',
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: AppColors.pending.withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.visibility_rounded,
+                              size: 16,
+                              color: AppColors.pending,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text('Mark as Seen', style: AppTextStyles.labelLarge),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'resolved',
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: AppColors.successGreen.withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.check_circle_rounded,
+                              size: 16,
+                              color: AppColors.successGreen,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text('Mark as Resolved', style: AppTextStyles.labelLarge),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: AppColors.danger.withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.delete_outline_rounded,
+                              size: 16,
+                              color: AppColors.danger,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Delete',
+                            style: AppTextStyles.labelLarge
+                                .copyWith(color: AppColors.danger),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
           const SizedBox(height: 10),

@@ -74,9 +74,10 @@ class _UpdateCard extends StatelessWidget {
 
   ({Color bg, Color text, Color border, String label}) get _typeStyle {
     final fallback = switch (update.type) {
-      UpdateType.complaint => (bg: AppColors.dangerBg, text: AppColors.danger, border: AppColors.dangerBorder, label: 'Complaint'),
+      UpdateType.security => (bg: AppColors.dangerBg, text: AppColors.danger, border: AppColors.dangerBorder, label: 'Security Alert'),
       UpdateType.announcement => (bg: AppColors.roleAdminBg, text: AppColors.roleAdminText, border: AppColors.roleAdminBorder, label: 'Announcement'),
-      UpdateType.general => (bg: AppColors.warningBg, text: AppColors.warning, border: AppColors.warningBorder, label: 'Update'),
+      UpdateType.other => (bg: AppColors.dangerBg, text: AppColors.successGreen, border: AppColors.dangerBorder, label: 'Other'),
+      UpdateType.general => (bg: AppColors.warningBg, text: AppColors.warning, border: AppColors.warningBorder, label: 'General Update'),
     };
     // Prefer the specific preset picked at compose time (e.g. "Maintenance
     // Alert") over the coarse type label, but keep the coarse type's color.

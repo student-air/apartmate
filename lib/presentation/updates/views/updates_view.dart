@@ -124,12 +124,14 @@ class _UpdateCard extends StatelessWidget {
 
   ({Color bg, Color text, Color border, String label}) get _typeStyle {
     switch (update.type) {
-      case UpdateType.complaint:
-        return (bg: AppColors.dangerBg, text: AppColors.danger, border: AppColors.dangerBorder, label: 'Complaint');
+      case UpdateType.security:
+        return (bg: AppColors.dangerBg, text: AppColors.danger, border: AppColors.dangerBorder, label: 'Security Alert');
       case UpdateType.announcement:
         return (bg: AppColors.roleAdminBg, text: AppColors.roleAdminText, border: AppColors.roleAdminBorder, label: 'Announcement');
       case UpdateType.general:
-        return (bg: AppColors.warningBg, text: AppColors.warning, border: AppColors.warningBorder, label: 'Update');
+        return (bg: AppColors.warningBg, text: AppColors.warning, border: AppColors.warningBorder, label: 'General Update');
+      case UpdateType.other:
+        return (bg: const Color.fromARGB(255, 172, 232, 194), text: AppColors.accentGreenDark, border: AppColors.accentGreenDark, label: 'Other');
     }
   }
 

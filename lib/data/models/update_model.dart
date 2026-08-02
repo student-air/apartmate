@@ -1,4 +1,4 @@
-enum UpdateType { general, complaint, announcement }
+enum UpdateType { general, security, announcement, other }
 
 class UpdateModel {
   final String id;

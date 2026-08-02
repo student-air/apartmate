@@ -16,9 +16,10 @@ class SendUpdateController extends GetxController {
   SendUpdateController(this._updateRepository, this._societyRepository);
 
   static const Map<String, UpdateType> presets = {
+    'Other': UpdateType.other,
     'Maintenance Alert': UpdateType.general,
-    'Security Alert': UpdateType.general,
-    'General Notice': UpdateType.general,
+    'Security Alert': UpdateType.security,
+    'General Update': UpdateType.general,
     'Announcement': UpdateType.announcement,
   };
 
@@ -27,7 +28,7 @@ class SendUpdateController extends GetxController {
   final descriptionCtrl = TextEditingController();
   final flatNumberCtrl = TextEditingController();
 
-  final selectedPreset = 'Maintenance Alert'.obs;
+  final selectedPreset = 'General Update'.obs;
   final sendTo = 'All'.obs;
 
   // Cascading selection state
@@ -183,7 +184,7 @@ class SendUpdateController extends GetxController {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Get.back();
-      AppSnackbar.success('Sent', 'Your notice has been sent');
+      AppSnackbar.success('Sent', 'Your Update has been sent');
       if (Get.isRegistered<UpdatesBadgeController>()) {
         Get.find<UpdatesBadgeController>().increment();
       }

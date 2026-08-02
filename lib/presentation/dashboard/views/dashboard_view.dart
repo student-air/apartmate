@@ -242,9 +242,22 @@ class DashboardView extends GetView<DashboardController> {
                     ),
                     const SizedBox(height: 28),
 
-                    Text(
-                      'ACTIONS',
-                      style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
+                    // ACTIONS + green key (copy join code)
+                    Row(
+                      children: [
+                        Text(
+                          'ACTIONS',
+                          style: AppTextStyles.overline.copyWith(
+                            color: AppColors.primaryDark,
+                          ),
+                        ),
+                        const Spacer(),
+                        Material(
+                          color: Colors.transparent,
+                          
+                        ),
+                        _JoinCodeExpandButton(onCopy: controller.copyJoinCode),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     const Divider(color: AppColors.borderLight, height: 1),
@@ -274,7 +287,7 @@ class DashboardView extends GetView<DashboardController> {
 
                     const SizedBox(height: 28),
 
-                    // Occupancy overview (one card per building)
+                    // Occupancy overview
                     Text(
                       'OCCUPANCY OVERVIEW',
                       style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
@@ -417,10 +430,129 @@ class DashboardView extends GetView<DashboardController> {
     );
   }
 }
+class _JoinCodeExpandButton extends StatefulWidget {
+  final VoidCallback onCopy;
+  const _JoinCodeExpandButton({required this.onCopy});
 
-// ─────────────────────────────────────────────
-// Occupancy card
-// ─────────────────────────────────────────────
+  @override
+  State<_JoinCodeExpandButton> createState() => _JoinCodeExpandButtonState();
+}
+
+class _JoinCodeExpandButtonState extends State<_JoinCodeExpandButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _t;
+  bool _expanded = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 550),
+    );
+    _t = CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic);
+
+    // Start expanded, then collapse to key after a short delay
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(milliseconds: 2200));
+      if (!mounted) return;
+      setState(() => _expanded = false);
+      await _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTap() {
+    if (_expanded) {
+      widget.onCopy();
+      return;
+    }
+    // Expand briefly, then copy
+    setState(() => _expanded = true);
+    _controller.reverse().then((_) async {
+      await Future.delayed(const Duration(milliseconds: 1200));
+      if (!mounted) return;
+      setState(() => _expanded = false);
+      _controller.forward();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final code = Get.find<DashboardController>().joinCode;
+
+    return AnimatedBuilder(
+      animation: _t,
+      builder: (context, _) {
+        // 0 = expanded, 1 = collapsed key
+        final t = _t.value;
+        final width = 40 + (180 * (1 - t)); // ~220 → 40
+        final radius = 20 + (12 * (1 - t));
+
+        return GestureDetector(
+          onTap: _onTap,
+          child: Container(
+            width: width,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.primaryDark,
+              borderRadius: BorderRadius.circular(radius),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryDark.withValues(alpha: 0.35),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: t < 0.5
+                ? Opacity(
+                    opacity: (1 - t * 2).clamp(0.0, 1.0),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  code.isEmpty ? '————' : code,
+                                  style: AppTextStyles.labelLarge.copyWith(
+                                    color: AppColors.accentGreen,
+                                    fontFamily: 'monospace',
+                                    letterSpacing: 1.5,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.copy_rounded, size: 16, color: AppColors.accentGreen),
+                        ],
+                      ),
+                    ),
+                  )
+                : Opacity(
+                    opacity: ((t - 0.5) * 2).clamp(0.0, 1.0),
+                    child: const Icon(Icons.key_rounded, size: 20, color: AppColors.accentGreen),
+                  ),
+          ),
+        );
+      },
+    );
+  }
+}
 class _OccupancyCard extends StatelessWidget {
   final BuildingOccupancy item;
   const _OccupancyCard({required this.item});
@@ -479,9 +611,6 @@ class _OccupancyCard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Stat pill
-// ─────────────────────────────────────────────
 class _StatPill extends StatelessWidget {
   final IconData icon;
   final String value;
@@ -524,56 +653,53 @@ class _StatPill extends StatelessWidget {
     }
 
     return InkWell(
-  onTap: onTap,
-  borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-  child: Container(
-    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-    decoration: BoxDecoration(
-      color: bg,
+      onTap: onTap,
       borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-      border: filled
-          ? null
-          : Border.all(
-              color: danger ? Colors.white : AppColors.borderLight,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+          border: filled
+              ? null
+              : Border.all(
+                  color: danger ? Colors.white : AppColors.borderLight,
+                ),
+          boxShadow: filled
+              ? [
+                  BoxShadow(
+                    color: AppColors.accentGreen.withValues(alpha: 0.25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: iconColor),
+            const SizedBox(height: 6),
+            Text(
+              value,
+              style: AppTextStyles.h4.copyWith(color: fg, fontSize: 18),
             ),
-      boxShadow: filled
-          ? [
-              BoxShadow(
-                color: AppColors.accentGreen.withValues(alpha: 0.25),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ]
-          : null,
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 16, color: iconColor),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: AppTextStyles.h4.copyWith(color: fg, fontSize: 18),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.caption.copyWith(color: labelColor, fontSize: 11),
+            ),
+          ],
         ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: AppTextStyles.caption.copyWith(color: labelColor, fontSize: 11),
-        ),
-      ],
-    ),
-  ),
-);
+      ),
+    );
   }
 }
 
-// ─────────────────────────────────────────────
-// Action row
-// ─────────────────────────────────────────────
 class _ActionRow extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -654,9 +780,6 @@ class _ActionRow extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
-// Complaints chart
-// ─────────────────────────────────────────────
 class _ComplaintsChart extends StatelessWidget {
   final List<int> counts;
   const _ComplaintsChart({required this.counts});

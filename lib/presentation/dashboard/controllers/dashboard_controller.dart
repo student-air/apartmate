@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter/services.dart';
+import 'package:apartmate/core/utils/app_snackbar.dart';
 import 'package:apartmate/data/models/dashboard_stats_model.dart';
 import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_dashboard_repository.dart';
@@ -97,6 +99,9 @@ class DashboardController extends GetxController {
     if (role.trim().isEmpty) return 'Society Admin';
     return role[0].toUpperCase() + role.substring(1);
   }
+  String get joinCode => society.value?.joinCode ?? '';
+
+
 
   @override
   void onInit() {
@@ -259,6 +264,15 @@ Future<void> _loadCommitteeCount() async {
   void goToRequests() => Get.toNamed(AppRoutes.requests);
   void goToOwners() => Get.toNamed(AppRoutes.owners);
   void goToCommittee() => Get.toNamed(AppRoutes.committee);
+  void copyJoinCode() {
+  final code = joinCode;
+  if (code.isEmpty) {
+    AppSnackbar.error('No code', 'Society join code is not available yet');
+    return;
+  }
+  Clipboard.setData(ClipboardData(text: code));
+  AppSnackbar.info('Copied', 'Society join code $code copied');
+}
 
   Future<void> logout() async {
     await _authRepository.logout();

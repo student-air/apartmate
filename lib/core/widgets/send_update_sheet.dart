@@ -82,7 +82,7 @@ class SendUpdateSheet extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(20, 12, 12, 0),
                   child: Row(
                     children: [
-                      Expanded(child: Text('Send Notice', style: AppTextStyles.h4)),
+                      Expanded(child: Text('Send Update', style: AppTextStyles.h4)),
                       IconButton(
                         onPressed: closeSheet,
                         icon: const Icon(Icons.close_rounded, color: AppColors.textMuted),
@@ -98,7 +98,7 @@ class SendUpdateSheet extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text('Notice Type', style: AppTextStyles.labelLarge),
+                          Text('Type', style: AppTextStyles.labelLarge),
                           const SizedBox(height: AppDimens.space6),
                           Obx(() => DropdownButtonFormField<String>(
                                 initialValue: controller.selectedPreset.value,
@@ -381,7 +381,7 @@ class _SendButton extends StatelessWidget {
                 children: [
                   const Icon(Icons.send_rounded, size: 18, color: AppColors.accentGreen),
                   const SizedBox(width: AppDimens.space8),
-                  Text('Send Notice', style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentGreen)),
+                  Text('Send Update', style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentGreen)),
                 ],
               ),
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:apartmate/data/models/user_model.dart';
+import 'package:apartmate/data/models/society_model.dart';
 import 'package:apartmate/domain/repositories/i_auth_repository.dart';
 import 'package:apartmate/domain/repositories/i_society_repository.dart';
 import 'package:apartmate/core/constants/app_strings.dart';
@@ -24,10 +24,12 @@ class ProfileController extends GetxController {
   UserModel? get user => _authRepository.currentUser;
 
   final ownerName = ''.obs;
-  String get fullName => ownerName.value.isEmpty ? (user?.fullName ?? 'Guest') : ownerName.value;
+  String get fullName =>
+      ownerName.value.isEmpty ? (user?.fullName ?? 'Guest') : ownerName.value;
 
   String get initials {
-    final name = ownerName.value.isNotEmpty ? ownerName.value : (user?.fullName ?? '');
+    final name =
+        ownerName.value.isNotEmpty ? ownerName.value : (user?.fullName ?? '');
     if (name.trim().isEmpty) return '?';
     final parts = name.trim().split(' ').where((p) => p.isNotEmpty).toList();
     final first = parts.first[0];
@@ -53,16 +55,19 @@ class ProfileController extends GetxController {
   final ownerPhotoPath = Rxn<String>();
   final societyContactNumber = ''.obs;
 
+  // Society join code + registration status
+  final joinCode = ''.obs;
+  final registrationStatus = Rxn<SocietyRegistrationStatus>();
+
+  bool get isPendingReview =>
+      registrationStatus.value == SocietyRegistrationStatus.pendingReview ||
+      registrationStatus.value == SocietyRegistrationStatus.submitted;
+
   // ── Notification Preferences state ──
   final notifyUpdates = true.obs;
   final notifyComplaints = true.obs;
   final notifyRequests = true.obs;
   final notifySound = false.obs;
-
-  static const _kNotifyUpdates = 'pref_notify_updates';
-  static const _kNotifyComplaints = 'pref_notify_complaints';
-  static const _kNotifyRequests = 'pref_notify_requests';
-  static const _kNotifySound = 'pref_notify_sound';
 
   // ── Privacy & Security state ──
   final biometricLoginEnabled = false.obs;
@@ -75,7 +80,6 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     _loadSociety();
-    _loadNotificationPrefs();
   }
 
   Future<void> _loadSociety() async {
@@ -83,10 +87,13 @@ class ProfileController extends GetxController {
     try {
       final society = await _societyRepository.getCurrentSociety();
       societyName.value = society?.name ?? '';
-      societyAddress.value = society != null ? '${society.address}, ${society.city}' : '';
+      societyAddress.value =
+          society != null ? '${society.address}, ${society.city}' : '';
       ownerPhotoPath.value = society?.ownerPhotoPath;
       ownerName.value = society?.ownerName ?? '';
       societyContactNumber.value = society?.contactNumber ?? '';
+      joinCode.value = society?.joinCode ?? '';
+      registrationStatus.value = society?.registrationStatus;
     } finally {
       isLoading.value = false;
     }
@@ -120,11 +127,17 @@ class ProfileController extends GetxController {
       return;
     }
     if (newPasswordCtrl.text.trim().length < 8) {
-      AppSnackbar.error('Weak password', 'New password must be at least 8 characters');
+      AppSnackbar.error(
+        'Weak password',
+        'New password must be at least 8 characters',
+      );
       return;
     }
     if (newPasswordCtrl.text.trim() != confirmPasswordCtrl.text.trim()) {
-      AppSnackbar.error('Mismatch', 'New password and confirmation don\'t match');
+      AppSnackbar.error(
+        'Mismatch',
+        'New password and confirmation don\'t match',
+      );
       return;
     }
 
@@ -138,7 +151,10 @@ class ProfileController extends GetxController {
       newPasswordCtrl.clear();
       confirmPasswordCtrl.clear();
       Get.back();
-      AppSnackbar.success('Password updated', 'Your password has been changed successfully');
+      AppSnackbar.success(
+        'Password updated',
+        'Your password has been changed successfully',
+      );
     } catch (e) {
       AppSnackbar.error('Update failed', e.toString());
     } finally {
@@ -179,7 +195,8 @@ class ProfileController extends GetxController {
               const SizedBox(height: 8),
               Text(
                 'You will need to sign in again to access your ApartMate account.',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: AppTextStyles.bodyMedium
+                    .copyWith(color: AppColors.textSecondary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -210,7 +227,8 @@ class ProfileController extends GetxController {
                 onPressed: () => Get.back(),
                 child: Text(
                   'Cancel',
-                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
+                  style: AppTextStyles.labelLarge
+                      .copyWith(color: AppColors.textPrimary),
                 ),
               ),
             ],
@@ -228,24 +246,13 @@ class ProfileController extends GetxController {
     }
     try {
       await _authRepository.sendPasswordResetEmail(email);
-      AppSnackbar.success('Reset link sent', 'Check $email for a password reset link');
+      AppSnackbar.success(
+        'Reset link sent',
+        'Check $email for a password reset link',
+      );
     } catch (e) {
       AppSnackbar.error('Reset failed', e.toString());
     }
-  }
-
-  // ── Notification prefs (persisted) ──
-  Future<void> _loadNotificationPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    notifyUpdates.value = prefs.getBool(_kNotifyUpdates) ?? true;
-    notifyComplaints.value = prefs.getBool(_kNotifyComplaints) ?? true;
-    notifyRequests.value = prefs.getBool(_kNotifyRequests) ?? true;
-    notifySound.value = prefs.getBool(_kNotifySound) ?? false;
-  }
-
-  Future<void> _saveBool(String key, bool value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(key, value);
   }
 
   Future<void> setNotifyUpdates(bool value) async {
@@ -260,7 +267,6 @@ class ProfileController extends GetxController {
       }
     }
     notifyUpdates.value = value;
-    await _saveBool(_kNotifyUpdates, value);
   }
 
   Future<void> setNotifyComplaints(bool value) async {
@@ -275,7 +281,6 @@ class ProfileController extends GetxController {
       }
     }
     notifyComplaints.value = value;
-    await _saveBool(_kNotifyComplaints, value);
   }
 
   Future<void> setNotifyRequests(bool value) async {
@@ -290,13 +295,9 @@ class ProfileController extends GetxController {
       }
     }
     notifyRequests.value = value;
-    await _saveBool(_kNotifyRequests, value);
   }
 
-  Future<void> setNotifySound(bool value) async {
-    notifySound.value = value;
-    await _saveBool(_kNotifySound, value);
-  }
+  void setNotifySound(bool value) => notifySound.value = value;
 
   @override
   void onClose() {
