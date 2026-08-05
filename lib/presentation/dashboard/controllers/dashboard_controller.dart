@@ -678,6 +678,7 @@ class DashboardController extends GetxController {
   void goToOwners() => Get.toNamed(AppRoutes.owners);
   void goToCommittee() => Get.toNamed(AppRoutes.committee);
 
+  
   void copyJoinCode() {
     final code = joinCode;
     if (code.isEmpty) {

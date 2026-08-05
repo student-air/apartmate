@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
@@ -59,6 +61,8 @@ class DashboardView extends GetView<DashboardController> {
                     const SizedBox(height: 16),
                     _QuickActions(controller: controller),
                     const SizedBox(height: 16),
+                    _ResidentsOverviewCard(controller: controller),
+                    const SizedBox(height: 16),
                     _RecentActivityCard(controller: controller),
                     const SizedBox(height: 16),
                     _OccupancyOverview(controller: controller),
@@ -73,7 +77,7 @@ class DashboardView extends GetView<DashboardController> {
   }
 }
 
-// ── Side drawer (hamburger) ──────────────────────────────
+// ── Side drawer ──────────────────────────────────────────
 class _DashboardDrawer extends StatelessWidget {
   final DashboardController controller;
   const _DashboardDrawer({required this.controller});
@@ -87,90 +91,127 @@ class _DashboardDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       backgroundColor: AppColors.background,
-      child: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
-          children: [
-            Obx(() {
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            color: AppColors.primaryDark,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 16,
+              left: 20,
+              right: 16,
+              bottom: 20,
+            ),
+            child: Obx(() {
               final name = controller.societyNameText.isEmpty
                   ? 'ApartMate'
                   : controller.societyNameText;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(name, style: AppTextStyles.h3),
-                  const SizedBox(height: 4),
-                  Text(
-                    controller.roleDisplay,
-                    style: AppTextStyles.bodySmall
-                        .copyWith(color: AppColors.textSecondary),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.h4.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          controller.roleDisplay,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.accentGreen,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 44,
+                      height: 44,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ],
               );
             }),
-            const SizedBox(height: 20),
-            const Divider(color: AppColors.borderLight),
-            const SizedBox(height: 8),
-            _DrawerTile(
-              icon: Icons.home_rounded,
-              label: 'Buildings',
-              onTap: () => _closeAnd(context, controller.goToBuildings),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              children: [
+                _DrawerTile(
+                  icon: LucideIcons.building_2,
+                  label: 'Buildings',
+                  onTap: () => _closeAnd(context, controller.goToBuildings),
+                ),
+                _DrawerTile(
+                  icon: Icons.groups_rounded,
+                  label: 'Residents',
+                  onTap: () => _closeAnd(context, controller.goToResidents),
+                ),
+                _DrawerTile(
+                  icon: LucideIcons.crown,
+                  label: 'Owners',
+                  onTap: () => _closeAnd(context, controller.goToOwners),
+                ),
+                _DrawerTile(
+                  icon: Icons.groups_2_rounded,
+                  label: 'Committee',
+                  onTap: () => _closeAnd(context, controller.goToCommittee),
+                ),
+                _DrawerTile(
+                  icon: Icons.badge_rounded,
+                  label: 'Staff',
+                  onTap: () => _closeAnd(context, controller.goToAddStaff),
+                ),
+                _DrawerTile(
+                  icon: Icons.inbox_rounded,
+                  label: 'Requests',
+                  onTap: () => _closeAnd(context, controller.goToRequests),
+                ),
+                _DrawerTile(
+                  icon: Icons.campaign_rounded,
+                  label: 'Updates',
+                  onTap: () => _closeAnd(context, controller.goToUpdates),
+                ),
+                _DrawerTile(
+                  icon: Icons.report_problem_rounded,
+                  label: 'Complaints',
+                  onTap: () => _closeAnd(context, controller.goToComplaints),
+                ),
+                _DrawerTile(
+                  icon: Icons.edit_rounded,
+                  label: 'Edit Society',
+                  onTap: () => _closeAnd(context, controller.goToEditSociety),
+                ),
+                _DrawerTile(
+                  icon: Icons.person_outline_rounded,
+                  label: 'Profile',
+                  onTap: () => _closeAnd(context, controller.goToProfile),
+                ),
+                const SizedBox(height: 8),
+                const Divider(color: AppColors.borderLight),
+                _DrawerTile(
+                  icon: Icons.logout_rounded,
+                  label: 'Log out',
+                  color: AppColors.danger,
+                  onTap: () => _closeAnd(context, controller.confirmLogout),
+                ),
+              ],
             ),
-            _DrawerTile(
-              icon: Icons.groups_rounded,
-              label: 'Residents',
-              onTap: () => _closeAnd(context, controller.goToResidents),
-            ),
-            _DrawerTile(
-              icon: Icons.person_rounded,
-              label: 'Owners',
-              onTap: () => _closeAnd(context, controller.goToOwners),
-            ),
-            _DrawerTile(
-              icon: Icons.groups_2_rounded,
-              label: 'Committee',
-              onTap: () => _closeAnd(context, controller.goToCommittee),
-            ),
-            _DrawerTile(
-              icon: Icons.badge_rounded,
-              label: 'Staff',
-              onTap: () => _closeAnd(context, controller.goToAddStaff),
-            ),
-            _DrawerTile(
-              icon: Icons.inbox_rounded,
-              label: 'Requests',
-              onTap: () => _closeAnd(context, controller.goToRequests),
-            ),
-            _DrawerTile(
-              icon: Icons.campaign_rounded,
-              label: 'Updates',
-              onTap: () => _closeAnd(context, controller.goToUpdates),
-            ),
-            _DrawerTile(
-              icon: Icons.report_problem_rounded,
-              label: 'Complaints',
-              onTap: () => _closeAnd(context, controller.goToComplaints),
-            ),
-            _DrawerTile(
-              icon: Icons.edit_rounded,
-              label: 'Edit Society',
-              onTap: () => _closeAnd(context, controller.goToEditSociety),
-            ),
-            _DrawerTile(
-              icon: Icons.person_outline_rounded,
-              label: 'Profile',
-              onTap: () => _closeAnd(context, controller.goToProfile),
-            ),
-            const SizedBox(height: 8),
-            const Divider(color: AppColors.borderLight),
-            _DrawerTile(
-              icon: Icons.logout_rounded,
-              label: 'Log out',
-              color: AppColors.danger,
-              onTap: () => _closeAnd(context, controller.confirmLogout),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -195,11 +236,9 @@ class _DrawerTile extends StatelessWidget {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Icon(icon, color: c, size: 22),
-      title: Text(
-        label,
-        style: AppTextStyles.labelLarge.copyWith(color: c),
-      ),
-      trailing: Icon(Icons.chevron_right_rounded, color: AppColors.textMuted, size: 20),
+      title: Text(label, style: AppTextStyles.labelLarge.copyWith(color: c)),
+      trailing: const Icon(Icons.chevron_right_rounded,
+          color: AppColors.textMuted, size: 20),
       onTap: onTap,
     );
   }
@@ -370,7 +409,7 @@ class _GreetingRow extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    controller.roleDisplay,
+                    'Society\nOwner',
                     style: AppTextStyles.bodySmall
                         .copyWith(color: AppColors.textMuted),
                   ),
@@ -464,7 +503,7 @@ class _GreetingRow extends StatelessWidget {
   }
 }
 
-// ── 4 metric cards one row ───────────────────────────────
+// ── Metrics ──────────────────────────────────────────────
 class _MetricsRow extends StatelessWidget {
   final DashboardController controller;
   const _MetricsRow({required this.controller});
@@ -474,12 +513,11 @@ class _MetricsRow extends StatelessWidget {
     return Obx(() {
       final buildings = controller.stats.value?.buildings ?? 0;
 
-
       return Row(
         children: [
           Expanded(
             child: _MetricCard(
-              icon: Icons.home_rounded,
+              icon: Icons.home,
               iconBg: AppColors.rolePlumberBg,
               iconColor: AppColors.accentGreenDark,
               value: '$buildings',
@@ -492,20 +530,20 @@ class _MetricsRow extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: _MetricCard(
-              icon: Icons.person_rounded,
+              icon: LucideIcons.crown,
               iconBg: AppColors.dangerBg,
-              iconColor: AppColors.textMuted,
+              iconColor: Colors.red,
               value: '${controller.ownersCount.value}',
               label: 'Owners',
               subtitle: 'Total',
-              subtitleColor: AppColors.textMuted,
+              subtitleColor: Colors.red,
               onTap: controller.goToOwners,
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: _MetricCard(
-              icon: Icons.groups_rounded,
+              icon: LucideIcons.user,
               iconBg: const Color(0xFFEEE8FF),
               iconColor: const Color(0xFF7C3AED),
               value: '${controller.residentsCount.value}',
@@ -517,7 +555,7 @@ class _MetricsRow extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Expanded(
-              child: _MetricCard(
+            child: _MetricCard(
               icon: Icons.groups_2_rounded,
               iconBg: AppColors.pendingBg,
               iconColor: AppColors.pending,
@@ -526,8 +564,8 @@ class _MetricsRow extends StatelessWidget {
               subtitle: 'Members',
               subtitleColor: AppColors.pending,
               onTap: controller.goToCommittee,
-  ),
-),
+            ),
+          ),
         ],
       );
     });
@@ -822,16 +860,16 @@ class _QuickActions extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-  child: Obx(
-    () => _QuickChip(
-      icon: Icons.chat_bubble_outline_rounded,
-      color: AppColors.warning,
-      label: 'Complaints',
-      badgeCount: controller.complaintsCount.value, // 2 with demo data
-      onTap: controller.goToComplaints,
-    ),
-  ),
-),
+                child: Obx(
+                  () => _QuickChip(
+                    icon: Icons.chat_bubble_outline_rounded,
+                    color: AppColors.warning,
+                    label: 'Complaints',
+                    badgeCount: controller.complaintsCount.value,
+                    onTap: controller.goToComplaints,
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -921,6 +959,156 @@ class _QuickChip extends StatelessWidget {
     );
   }
 }
+
+// ── Residents Overview (overall Owners + Tenants) ────────
+class _ResidentsOverviewCard extends StatelessWidget {
+  final DashboardController controller;
+  const _ResidentsOverviewCard({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final owners = controller.ownersCount.value;
+      final tenants = controller.residentsCount.value;
+      final total = owners + tenants;
+      final oFrac = total == 0 ? 0.0 : owners / total;
+      final tFrac = total == 0 ? 0.0 : tenants / total;
+
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.borderLight),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Residents Overview',
+              style: AppTextStyles.labelLarge
+                  .copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                SizedBox(
+                  width: 120,
+                  height: 120,
+                  child: CustomPaint(
+                    painter: _DonutPainter(
+                      segments: [
+                        (oFrac, AppColors.accentGreen),
+                        (tFrac, const Color(0xFF3B82F6)),
+                      ],
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '$total',
+                            style: AppTextStyles.h3
+                                .copyWith(fontWeight: FontWeight.w800),
+                          ),
+                          Text(
+                            'Total',
+                            style: AppTextStyles.caption
+                                .copyWith(color: AppColors.textMuted),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    children: [
+                      _LegendRow(
+                        color: AppColors.accentGreen,
+                        label: 'Owners',
+                        value: '$owners',
+                      ),
+                      const SizedBox(height: 14),
+                      _LegendRow(
+                        color: const Color(0xFF3B82F6),
+                        label: 'Tenants',
+                        value: '$tenants',
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
+  }
+}
+
+class _LegendRow extends StatelessWidget {
+  final Color color;
+  final String label;
+  final String value;
+  const _LegendRow({
+    required this.color,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Expanded(child: Text(label, style: AppTextStyles.bodySmall)),
+        Text(
+          value,
+          style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
+        ),
+      ],
+    );
+  }
+}
+
+class _DonutPainter extends CustomPainter {
+  final List<(double, Color)> segments;
+  _DonutPainter({required this.segments});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 16
+      ..strokeCap = StrokeCap.round;
+
+    paint.color = AppColors.surfaceMuted;
+    canvas.drawArc(rect.deflate(8), 0, 2 * math.pi, false, paint);
+
+    var start = -math.pi / 2;
+    for (final (frac, color) in segments) {
+      if (frac <= 0) continue;
+      final sweep = frac * 2 * math.pi;
+      paint.color = color;
+      canvas.drawArc(rect.deflate(8), start, sweep, false, paint);
+      start += sweep;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DonutPainter old) => old.segments != segments;
+}
+
 // ── Recent activity ──────────────────────────────────────
 class _RecentActivityCard extends StatelessWidget {
   final DashboardController controller;
@@ -1132,7 +1320,7 @@ class _IconCircle extends StatelessWidget {
   }
 }
 
-// ── Join code key button ─────────────────────────────────
+// ── Join code key ────────────────────────────────────────
 class _JoinCodeExpandButton extends StatefulWidget {
   final VoidCallback onCopy;
   const _JoinCodeExpandButton({required this.onCopy});
@@ -1192,14 +1380,14 @@ class _JoinCodeExpandButtonState extends State<_JoinCodeExpandButton>
       animation: _t,
       builder: (context, _) {
         final t = _t.value;
-        final width = 40 + (100 * (1 - t));
+        final width = 40 + (120 * (1 - t));
         final radius = 20 + (12 * (1 - t));
 
         return GestureDetector(
           onTap: _onTap,
           child: Container(
             width: width,
-            height: 20,
+            height: 30,
             decoration: BoxDecoration(
               color: AppColors.primaryDark,
               borderRadius: BorderRadius.circular(radius),
