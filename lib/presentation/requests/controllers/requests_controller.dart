@@ -7,6 +7,10 @@ import 'package:apartmate/domain/repositories/i_request_repository.dart';
 import 'package:apartmate/domain/repositories/i_resident_repository.dart';
 import 'package:apartmate/domain/repositories/i_owner_repository.dart';
 import 'package:apartmate/core/utils/app_snackbar.dart';
+import 'package:apartmate/core/constants/app_colors.dart';
+import 'package:apartmate/core/constants/app_dimens.dart';
+import 'package:apartmate/core/constants/app_text_styles.dart';
+import 'package:apartmate/core/services/app_notification_service.dart';
 import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
 
 class RequestsController extends GetxController
@@ -130,16 +134,131 @@ class RequestsController extends GetxController
     }
   }
 
-  Future<void> ignore(RequestModel request) async {
-    try {
-      await _requestRepository.deleteRequest(request.id);
-      _removeFromLists(request.id);
-      AppSnackbar.info('Removed', 'Request from ${request.tenantName} was removed');
-    } catch (e) {
-      AppSnackbar.error('Failed', 'Could not remove request: $e');
-    }
-  }
+  // Future<void> ignore(RequestModel request) async {
+  //   try {
+  //     await _requestRepository.deleteRequest(request.id);
+  //     _removeFromLists(request.id);
+  //     AppSnackbar.info('Removed', 'Request from ${request.tenantName} was removed');
+  //   } catch (e) {
+  //     AppSnackbar.error('Failed', 'Could not remove request: $e');
+  //   }
+  // }
 
+  void confirmIgnore(RequestModel request) {
+  final reasonCtrl = TextEditingController();
+
+  Get.dialog(
+    Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      backgroundColor: AppColors.surface,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Reject request?',
+              style: AppTextStyles.h4,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tell ${request.tenantName} why their request was declined. They can resubmit after fixing the issue.',
+              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: reasonCtrl,
+              maxLines: 3,
+              textInputAction: TextInputAction.done,
+              decoration: InputDecoration(
+                hintText: 'Reason for rejection…',
+                filled: true,
+                fillColor: AppColors.surfaceMuted,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.all(14),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () {
+                  final reason = reasonCtrl.text.trim();
+                  if (reason.isEmpty) {
+                    AppSnackbar.error('Missing reason', 'Please enter a reason before continuing');
+                    return;
+                  }
+                  Get.back();
+                  ignore(request, reason: reason);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.danger,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+                  ),
+                ),
+                child: Text(
+                  'Done',
+                  style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => Get.back(),
+              child: Text(
+                'Cancel',
+                style: AppTextStyles.labelLarge.copyWith(color: AppColors.textPrimary),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ).whenComplete(reasonCtrl.dispose);
+}
+
+Future<void> ignore(RequestModel request, {required String reason}) async {
+  try {
+    await _requestRepository.deleteRequest(request.id);
+    // Optional: mark rejected instead of delete if you prefer history
+    // await _requestRepository.updateStatus(request.id, RequestStatus.rejected);
+
+    _removeFromLists(request.id);
+
+    if (Get.isRegistered<DashboardController>()) {
+      Get.find<DashboardController>().refreshRequestCounts();
+    }
+
+    final message =
+        'Your join request was not approved.\n\n'
+        'Reason: $reason\n\n'
+        'You may correct the details and resubmit your application.';
+
+    // Local stand-in until real push/email to the applicant exists
+    await AppNotificationService.show(
+      id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      title: 'Request declined — ${request.tenantName}',
+      body: message,
+      channelId: 'apartmate_requests',
+      channelName: 'Requests',
+    );
+
+    AppSnackbar.success(
+      'Sent',
+      'Rejection reason sent to ${request.tenantName}. They can resubmit.',
+    );
+  } catch (e) {
+    AppSnackbar.error('Failed', 'Could not remove request: $e');
+  }
+}
   void _removeFromLists(String id) {
     ownerRequests.removeWhere((r) => r.id == id);
     tenantRequests.removeWhere((r) => r.id == id);

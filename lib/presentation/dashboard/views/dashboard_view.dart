@@ -1,15 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:apartmate/core/constants/app_colors.dart';
 import 'package:apartmate/core/constants/app_dimens.dart';
 import 'package:apartmate/core/constants/app_text_styles.dart';
 import 'package:apartmate/core/widgets/app_bottom_nav.dart';
 import 'package:apartmate/core/widgets/app_responsive_container.dart';
-import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
-import 'package:apartmate/core/widgets/send_update_sheet.dart';
 import 'package:apartmate/core/widgets/app_skeletons.dart';
-import 'package:lottie/lottie.dart';
+import 'package:apartmate/core/widgets/send_update_sheet.dart';
+import 'package:apartmate/presentation/dashboard/controllers/dashboard_controller.dart';
+import 'package:apartmate/presentation/updates/controllers/updates_badge_controller.dart';
 
 class DashboardView extends GetView<DashboardController> {
   const DashboardView({super.key});
@@ -22,10 +23,9 @@ class DashboardView extends GetView<DashboardController> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      drawer: _DashboardDrawer(controller: controller),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: AppAddFab(
-        onPressed: showSendUpdateSheet,
-      ),
+      floatingActionButton: AppAddFab(onPressed: showSendUpdateSheet),
       bottomNavigationBar: AppBottomNav(
         activeTab: AppNavTab.home,
         onHome: () {},
@@ -44,382 +44,24 @@ class DashboardView extends GetView<DashboardController> {
             onRefresh: controller.refreshAll,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
               child: AppResponsiveContainer(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Society name + logout
-                    Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: AppColors.accentGreen,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.accentGreen.withValues(alpha: 0.7),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Obx(
-                            () => Text(
-                              controller.societyNameText.toUpperCase(),
-                              style: AppTextStyles.overline,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: controller.confirmLogout,
-                          icon: const Icon(Icons.logout_rounded, color: AppColors.danger),
-                          style: IconButton.styleFrom(
-                            backgroundColor: AppColors.surfaceMuted,
-                            shape: const CircleBorder(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Greeting + animation
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Obx(
-                            () => RichText(
-                              text: TextSpan(
-                                style: AppTextStyles.h1.copyWith(
-                                  color: AppColors.textPrimary,
-                                  height: 1.1,
-                                ),
-                                children: [
-                                  TextSpan(text: '${DashboardController.greeting},\n'),
-                                  TextSpan(
-                                    text: '${controller.ownerFirstName}.',
-                                    style: const TextStyle(color: AppColors.accentGreen),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Lottie.asset(
-                          DashboardController.greetingAnimationAsset,
-                          width: 64,
-                          height: 64,
-                          fit: BoxFit.contain,
-                          repeat: true,
-                        ),
-                      ],
-                    ),
+                    _TopBar(controller: controller),
                     const SizedBox(height: 20),
-
-                    // Avatar + role
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: controller.goToProfile,
-                          child: Obx(() {
-                            final photoPath = controller.society.value?.ownerPhotoPath;
-                            final hasPhoto = photoPath != null && photoPath.isNotEmpty;
-                            return Container(
-                              width: 40,
-                              height: 40,
-                              decoration: const BoxDecoration(
-                                color: AppColors.surfaceMuted,
-                                shape: BoxShape.circle,
-                              ),
-                              alignment: Alignment.center,
-                              child: hasPhoto
-                                  ? ClipOval(
-                                      child: Image.file(
-                                        File(photoPath),
-                                        width: 40,
-                                        height: 40,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : Text(
-                                      controller.ownerInitials,
-                                      style: AppTextStyles.labelMedium.copyWith(
-                                        color: AppColors.primaryDark,
-                                      ),
-                                    ),
-                            );
-                          }),
-                        ),
-                        const SizedBox(width: 12),
-                        const Expanded(child: Divider(color: AppColors.borderLight)),
-                        const SizedBox(width: 12),
-                        Text(
-                          controller.roleDisplay,
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Stat pills — 2 rows × 3
-                    Obx(
-                      () => Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _StatPill(
-                                  icon: Icons.villa_rounded,
-                                  value: '${controller.stats.value?.buildings ?? 0}',
-                                  label: 'Buildings',
-                                  filled: true,
-                                  onTap: controller.goToBuildings,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: _StatPill(
-                                  icon: Icons.report_problem_rounded,
-                                  value: '${controller.complaintsCount.value}',
-                                  label: 'Complaints',
-                                  onTap: controller.goToComplaints,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: _StatPill(
-                                  icon: Icons.document_scanner_rounded,
-                                  value: '${controller.residentsCount.value}',
-                                  label: 'Residents',
-                                  onTap: controller.goToResidents,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _StatPill(
-                                  icon: Icons.person_2_rounded,
-                                  value: '${controller.ownersCount.value}',
-                                  label: 'Owners',
-                                  onTap: controller.goToOwners,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: _StatPill(
-                                  icon: Icons.groups_2_rounded,
-                                  value: '${controller.committeeCount.value}',
-                                  label: 'Committee',
-                                  onTap: controller.goToCommittee,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: _StatPill(
-                                  icon: Icons.hourglass_bottom_rounded,
-                                  value: '${controller.pendingRequestsCount.value}',
-                                  label: 'Pending',
-                                  danger: true,
-                                  onTap: controller.goToRequests,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-
-                    // ACTIONS + green key (copy join code)
-                    Row(
-                      children: [
-                        Text(
-                          'ACTIONS',
-                          style: AppTextStyles.overline.copyWith(
-                            color: AppColors.primaryDark,
-                          ),
-                        ),
-                        const Spacer(),
-                        Material(
-                          color: Colors.transparent,
-                          
-                        ),
-                        _JoinCodeExpandButton(onCopy: controller.copyJoinCode),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    const Divider(color: AppColors.borderLight, height: 1),
+                    _GreetingRow(controller: controller),
+                    const SizedBox(height: 18),
+                    _MetricsRow(controller: controller),
                     const SizedBox(height: 16),
-
-                    _ActionRow(
-                      icon: Icons.edit_rounded,
-                      title: 'Edit Society',
-                      subtitle: 'Manage society details',
-                      onTap: controller.goToEditSociety,
-                    ),
-                    const SizedBox(height: 12),
-                    _ActionRow(
-                      icon: Icons.groups_rounded,
-                      title: 'Manage Staff',
-                      subtitle: 'Manage society staff',
-                      onTap: controller.goToAddStaff,
-                    ),
-                    const SizedBox(height: 12),
-                    _ActionRow(
-                      icon: Icons.campaign_rounded,
-                      title: 'Post Update',
-                      subtitle: 'Notify all residents',
-                      filled: true,
-                      onTap: showSendUpdateSheet,
-                    ),
-
-                    const SizedBox(height: 28),
-
-                    // Occupancy overview
-                    Text(
-                      'OCCUPANCY OVERVIEW',
-                      style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
-                    ),
-                    const SizedBox(height: 12),
-                    Obx(() {
-                      final list = controller.buildingOccupancy;
-                      if (list.isEmpty) {
-                        return Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-                            border: Border.all(color: AppColors.borderLight),
-                          ),
-                          child: Text(
-                            'No buildings yet',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        );
-                      }
-                      return Column(
-                        children: [
-                          for (var i = 0; i < list.length; i++) ...[
-                            if (i > 0) const SizedBox(height: 12),
-                            _OccupancyCard(item: list[i]),
-                          ],
-                        ],
-                      );
-                    }),
-
-                    const SizedBox(height: 24),
-
-                    // Recent activity
-                    Text(
-                      'RECENT ACTIVITY',
-                      style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
-                    ),
-                    const SizedBox(height: 12),
-                    Obx(() {
-                      final items = controller.recentActivity;
-                      if (items.isEmpty) {
-                        return Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-                            border: Border.all(color: AppColors.borderLight),
-                          ),
-                          child: Text(
-                            'No recent activity yet',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        );
-                      }
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-                          border: Border.all(color: AppColors.borderLight),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x14000000),
-                              blurRadius: 10,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            for (var i = 0; i < items.length; i++) ...[
-                              if (i > 0)
-                                const Divider(height: 1, color: AppColors.borderLight),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 14,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      items[i].icon,
-                                      size: 20,
-                                      color: items[i].iconColor,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            items[i].title,
-                                            style: AppTextStyles.labelLarge,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            items[i].timeLabel,
-                                            style: AppTextStyles.caption.copyWith(
-                                              color: AppColors.textMuted,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      );
-                    }),
-
-                    const SizedBox(height: 24),
-
-                    // Complaints last 7 days
-                    Text(
-                      'COMPLAINTS, LAST 7 DAYS',
-                      style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
-                    ),
-                    const SizedBox(height: 12),
-                    Obx(
-                      () => _ComplaintsChart(
-                        counts: controller.weeklyComplaintCounts.toList(),
-                      ),
-                    ),
+                    _PendingApprovalsCard(controller: controller),
+                    const SizedBox(height: 16),
+                    _QuickActions(controller: controller),
+                    const SizedBox(height: 16),
+                    _RecentActivityCard(controller: controller),
+                    const SizedBox(height: 16),
+                    _OccupancyOverview(controller: controller),
                   ],
                 ),
               ),
@@ -430,6 +72,1067 @@ class DashboardView extends GetView<DashboardController> {
     );
   }
 }
+
+// ── Side drawer (hamburger) ──────────────────────────────
+class _DashboardDrawer extends StatelessWidget {
+  final DashboardController controller;
+  const _DashboardDrawer({required this.controller});
+
+  void _closeAnd(BuildContext context, VoidCallback action) {
+    Navigator.of(context).pop();
+    action();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: AppColors.background,
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+          children: [
+            Obx(() {
+              final name = controller.societyNameText.isEmpty
+                  ? 'ApartMate'
+                  : controller.societyNameText;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: AppTextStyles.h3),
+                  const SizedBox(height: 4),
+                  Text(
+                    controller.roleDisplay,
+                    style: AppTextStyles.bodySmall
+                        .copyWith(color: AppColors.textSecondary),
+                  ),
+                ],
+              );
+            }),
+            const SizedBox(height: 20),
+            const Divider(color: AppColors.borderLight),
+            const SizedBox(height: 8),
+            _DrawerTile(
+              icon: Icons.home_rounded,
+              label: 'Buildings',
+              onTap: () => _closeAnd(context, controller.goToBuildings),
+            ),
+            _DrawerTile(
+              icon: Icons.groups_rounded,
+              label: 'Residents',
+              onTap: () => _closeAnd(context, controller.goToResidents),
+            ),
+            _DrawerTile(
+              icon: Icons.person_rounded,
+              label: 'Owners',
+              onTap: () => _closeAnd(context, controller.goToOwners),
+            ),
+            _DrawerTile(
+              icon: Icons.groups_2_rounded,
+              label: 'Committee',
+              onTap: () => _closeAnd(context, controller.goToCommittee),
+            ),
+            _DrawerTile(
+              icon: Icons.badge_rounded,
+              label: 'Staff',
+              onTap: () => _closeAnd(context, controller.goToAddStaff),
+            ),
+            _DrawerTile(
+              icon: Icons.inbox_rounded,
+              label: 'Requests',
+              onTap: () => _closeAnd(context, controller.goToRequests),
+            ),
+            _DrawerTile(
+              icon: Icons.campaign_rounded,
+              label: 'Updates',
+              onTap: () => _closeAnd(context, controller.goToUpdates),
+            ),
+            _DrawerTile(
+              icon: Icons.report_problem_rounded,
+              label: 'Complaints',
+              onTap: () => _closeAnd(context, controller.goToComplaints),
+            ),
+            _DrawerTile(
+              icon: Icons.edit_rounded,
+              label: 'Edit Society',
+              onTap: () => _closeAnd(context, controller.goToEditSociety),
+            ),
+            _DrawerTile(
+              icon: Icons.person_outline_rounded,
+              label: 'Profile',
+              onTap: () => _closeAnd(context, controller.goToProfile),
+            ),
+            const SizedBox(height: 8),
+            const Divider(color: AppColors.borderLight),
+            _DrawerTile(
+              icon: Icons.logout_rounded,
+              label: 'Log out',
+              color: AppColors.danger,
+              onTap: () => _closeAnd(context, controller.confirmLogout),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DrawerTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
+
+  const _DrawerTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final c = color ?? AppColors.textPrimary;
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon, color: c, size: 22),
+      title: Text(
+        label,
+        style: AppTextStyles.labelLarge.copyWith(color: c),
+      ),
+      trailing: Icon(Icons.chevron_right_rounded, color: AppColors.textMuted, size: 20),
+      onTap: onTap,
+    );
+  }
+}
+
+// ── Top bar ──────────────────────────────────────────────
+class _TopBar extends StatelessWidget {
+  final DashboardController controller;
+  const _TopBar({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _IconCircle(
+          icon: Icons.menu_rounded,
+          onTap: () => Scaffold.of(context).openDrawer(),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Obx(() {
+            final name = controller.societyNameText.isEmpty
+                ? 'SOCIETY'
+                : controller.societyNameText.toUpperCase();
+            return Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: AppColors.accentGreen,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    name,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.labelLarge.copyWith(
+                      letterSpacing: 0.4,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
+              ],
+            );
+          }),
+        ),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            _IconCircle(
+              icon: Icons.notifications_none_rounded,
+              onTap: controller.goToUpdates,
+            ),
+            if (Get.isRegistered<UpdatesBadgeController>())
+              Obx(() {
+                final n = Get.find<UpdatesBadgeController>().unreadCount.value;
+                if (n <= 0) return const SizedBox.shrink();
+                return Positioned(
+                  right: -2,
+                  top: -2,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: AppColors.danger,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      n > 9 ? '9+' : '$n',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+          ],
+        ),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: controller.goToProfile,
+          child: Obx(() {
+            final photo = controller.society.value?.ownerPhotoPath;
+            final has = photo != null && photo.isNotEmpty;
+            final initial = controller.ownerInitials.isEmpty
+                ? 'A'
+                : controller.ownerInitials[0];
+            return Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.roleAdminText,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+              alignment: Alignment.center,
+              child: has
+                  ? ClipOval(
+                      child: Image.file(
+                        File(photo),
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Text(
+                          initial,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Text(
+                      initial,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Greeting + date + join code ──────────────────────────
+class _GreetingRow extends StatelessWidget {
+  final DashboardController controller;
+  const _GreetingRow({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final dateStr = DateFormat('d MMM yyyy, EEE').format(DateTime.now());
+    final isNight = DashboardController.greeting == 'Good Evening' ||
+        DashboardController.greeting == 'Good Night';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${DashboardController.greeting},',
+                style: AppTextStyles.bodyLarge
+                    .copyWith(color: AppColors.textSecondary),
+              ),
+              Obx(
+                () => Text(
+                  '${controller.ownerFirstName}.',
+                  style: AppTextStyles.h1.copyWith(
+                    color: AppColors.accentGreenDark,
+                    fontWeight: FontWeight.w800,
+                    height: 1.1,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Text(
+                    controller.roleDisplay,
+                    style: AppTextStyles.bodySmall
+                        .copyWith(color: AppColors.textMuted),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.accentGreen.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.verified_rounded,
+                            size: 12, color: AppColors.accentGreenDark),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Admin',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.accentGreenDark,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x0F000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_today_rounded,
+                              size: 12, color: AppColors.textMuted),
+                          const SizedBox(width: 4),
+                          Text(
+                            "Today's Date",
+                            style: AppTextStyles.caption
+                                .copyWith(color: AppColors.textMuted),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        dateStr,
+                        style: AppTextStyles.labelMedium
+                            .copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 10),
+                  Icon(
+                    isNight ? Icons.nightlight_round : Icons.wb_sunny_rounded,
+                    color:
+                        isNight ? AppColors.roleAdminText : AppColors.warning,
+                    size: 22,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            _JoinCodeExpandButton(onCopy: controller.copyJoinCode),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ── 4 metric cards one row ───────────────────────────────
+class _MetricsRow extends StatelessWidget {
+  final DashboardController controller;
+  const _MetricsRow({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final buildings = controller.stats.value?.buildings ?? 0;
+
+
+      return Row(
+        children: [
+          Expanded(
+            child: _MetricCard(
+              icon: Icons.home_rounded,
+              iconBg: AppColors.rolePlumberBg,
+              iconColor: AppColors.accentGreenDark,
+              value: '$buildings',
+              label: 'Buildings',
+              subtitle: 'Active',
+              subtitleColor: AppColors.accentGreenDark,
+              onTap: controller.goToBuildings,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _MetricCard(
+              icon: Icons.person_rounded,
+              iconBg: AppColors.dangerBg,
+              iconColor: AppColors.textMuted,
+              value: '${controller.ownersCount.value}',
+              label: 'Owners',
+              subtitle: 'Total',
+              subtitleColor: AppColors.textMuted,
+              onTap: controller.goToOwners,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _MetricCard(
+              icon: Icons.groups_rounded,
+              iconBg: const Color(0xFFEEE8FF),
+              iconColor: const Color(0xFF7C3AED),
+              value: '${controller.residentsCount.value}',
+              label: 'Residents',
+              subtitle: 'Total',
+              subtitleColor: const Color(0xFF7C3AED),
+              onTap: controller.goToResidents,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+              child: _MetricCard(
+              icon: Icons.groups_2_rounded,
+              iconBg: AppColors.pendingBg,
+              iconColor: AppColors.pending,
+              value: '${controller.committeeCount.value}',
+              label: 'Committee',
+              subtitle: 'Members',
+              subtitleColor: AppColors.pending,
+              onTap: controller.goToCommittee,
+  ),
+),
+        ],
+      );
+    });
+  }
+}
+
+class _MetricCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+  final String value;
+  final String label;
+  final String subtitle;
+  final Color subtitleColor;
+  final VoidCallback onTap;
+
+  const _MetricCard({
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+    required this.value,
+    required this.label,
+    required this.subtitle,
+    required this.subtitleColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.borderLight),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: iconBg,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, size: 14, color: iconColor),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.chevron_right_rounded,
+                      size: 14, color: AppColors.textMuted),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                value,
+                style: AppTextStyles.h4
+                    .copyWith(fontWeight: FontWeight.w800, fontSize: 18),
+              ),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.caption
+                    .copyWith(color: AppColors.textSecondary, fontSize: 10),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.caption.copyWith(
+                  color: subtitleColor,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 9,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Pending Requests ─────────────────────────────────────
+class _PendingApprovalsCard extends StatelessWidget {
+  final DashboardController controller;
+  const _PendingApprovalsCard({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Pending Requests',
+                style: AppTextStyles.labelLarge
+                    .copyWith(fontWeight: FontWeight.w700),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: controller.goToRequests,
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.accentGreenDark,
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text('View All'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Obx(() {
+            return Column(
+              children: [
+                _PendingCategoryRow(
+                  icon: Icons.person_rounded,
+                  iconBg: AppColors.dangerBg,
+                  iconColor: AppColors.danger,
+                  label: 'Owner Approvals',
+                  count: controller.pendingOwnerRequestsCount.value,
+                  onTap: controller.goToRequests,
+                ),
+                const Divider(height: 1, color: AppColors.borderLight),
+                _PendingCategoryRow(
+                  icon: Icons.home_work_rounded,
+                  iconBg: const Color(0xFFEEE8FF),
+                  iconColor: const Color(0xFF7C3AED),
+                  label: 'Tenancy Approvals',
+                  count: controller.pendingTenantRequestsCount.value,
+                  onTap: controller.goToRequests,
+                ),
+                const Divider(height: 1, color: AppColors.borderLight),
+                _PendingCategoryRow(
+                  icon: Icons.description_outlined,
+                  iconBg: const Color(0xFFE0F2FE),
+                  iconColor: const Color(0xFF0284C7),
+                  label: 'Property Updates',
+                  count: controller.pendingPropertyUpdatesCount.value,
+                  onTap: controller.goToUpdates,
+                ),
+              ],
+            );
+          }),
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 48,
+            child: ElevatedButton.icon(
+              onPressed: controller.goToRequests,
+              icon: const Icon(Icons.checklist_rounded,
+                  size: 18, color: Colors.white),
+              label: Text(
+                'Review All Requests',
+                style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accentGreen,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PendingCategoryRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconBg;
+  final Color iconColor;
+  final String label;
+  final int count;
+  final VoidCallback onTap;
+
+  const _PendingCategoryRow({
+    required this.icon,
+    required this.iconBg,
+    required this.iconColor,
+    required this.label,
+    required this.count,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 18, color: iconColor),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: Text(label, style: AppTextStyles.labelLarge)),
+            Text(
+              '$count',
+              style: AppTextStyles.labelLarge.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.chevron_right_rounded,
+                size: 20, color: AppColors.textMuted),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Quick Actions ────────────────────────────────────────
+class _QuickActions extends StatelessWidget {
+  final DashboardController controller;
+  const _QuickActions({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Quick Actions',
+            style:
+                AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _QuickChip(
+                  icon: Icons.home_work_rounded,
+                  color: AppColors.accentGreenDark,
+                  label: 'Edit Society',
+                  onTap: controller.goToEditSociety,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _QuickChip(
+                  icon: Icons.person_add_alt_1_rounded,
+                  color: AppColors.roleAdminText,
+                  label: 'Add Staff',
+                  onTap: controller.goToAddStaff,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _QuickChip(
+                  icon: Icons.campaign_rounded,
+                  color: const Color(0xFF8B5CF6),
+                  label: 'Post Update',
+                  onTap: showSendUpdateSheet,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+  child: Obx(
+    () => _QuickChip(
+      icon: Icons.chat_bubble_outline_rounded,
+      color: AppColors.warning,
+      label: 'Complaints',
+      badgeCount: controller.complaintsCount.value, // 2 with demo data
+      onTap: controller.goToComplaints,
+    ),
+  ),
+),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuickChip extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String label;
+  final VoidCallback onTap;
+  final int? badgeCount;
+
+  const _QuickChip({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.onTap,
+    this.badgeCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final showBadge = badgeCount != null && badgeCount! > 0;
+
+    return Material(
+      color: color.withValues(alpha: 0.10),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: color.withValues(alpha: 0.25)),
+          ),
+          child: Column(
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(icon, color: color, size: 20),
+                  if (showBadge)
+                    Positioned(
+                      right: -10,
+                      top: -6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.danger,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          badgeCount! > 9 ? '9+' : '$badgeCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.caption.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+// ── Recent activity ──────────────────────────────────────
+class _RecentActivityCard extends StatelessWidget {
+  final DashboardController controller;
+  const _RecentActivityCard({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                'Recent Activity',
+                style: AppTextStyles.labelLarge
+                    .copyWith(fontWeight: FontWeight.w700),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: controller.goToUpdates,
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.accentGreenDark,
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text('View All'),
+              ),
+            ],
+          ),
+          Obx(() {
+            final items = controller.recentActivity;
+            if (items.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Text(
+                  'No recent activity yet',
+                  style: AppTextStyles.bodySmall
+                      .copyWith(color: AppColors.textMuted),
+                ),
+              );
+            }
+            return Column(
+              children: [
+                for (var i = 0; i < items.length; i++) ...[
+                  if (i > 0)
+                    const Divider(height: 1, color: AppColors.borderLight),
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: items[i].iconColor.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(items[i].icon,
+                          size: 18, color: items[i].iconColor),
+                    ),
+                    title: Text(
+                      items[i].title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.labelMedium
+                          .copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      items[i].timeLabel,
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.textMuted),
+                    ),
+                  ),
+                ],
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Occupancy ────────────────────────────────────────────
+class _OccupancyOverview extends StatelessWidget {
+  final DashboardController controller;
+  const _OccupancyOverview({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'OCCUPANCY OVERVIEW',
+          style: AppTextStyles.overline.copyWith(color: AppColors.primaryDark),
+        ),
+        const SizedBox(height: 12),
+        Obx(() {
+          final list = controller.buildingOccupancy;
+          if (list.isEmpty) {
+            return Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+                border: Border.all(color: AppColors.borderLight),
+              ),
+              child: Text(
+                'No buildings yet',
+                style: AppTextStyles.bodyMedium
+                    .copyWith(color: AppColors.textSecondary),
+              ),
+            );
+          }
+          return Column(
+            children: [
+              for (var i = 0; i < list.length; i++) ...[
+                if (i > 0) const SizedBox(height: 12),
+                _OccupancyCard(item: list[i]),
+              ],
+            ],
+          );
+        }),
+      ],
+    );
+  }
+}
+
+class _OccupancyCard extends StatelessWidget {
+  final BuildingOccupancy item;
+  const _OccupancyCard({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = item.percent;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            item.buildingName,
+            style: AppTextStyles.labelLarge
+                .copyWith(color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                '${item.occupiedFlats}/${item.totalFlats} flats',
+                style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
+              ),
+              const Spacer(),
+              Text(
+                '${(pct * 100).round()}%',
+                style: AppTextStyles.labelLarge
+                    .copyWith(color: AppColors.accentGreenDark),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+            child: LinearProgressIndicator(
+              value: pct,
+              minHeight: 10,
+              backgroundColor: AppColors.surfaceMuted,
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(AppColors.accentGreen),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IconCircle extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  const _IconCircle({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surface,
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(icon, size: 20, color: AppColors.textPrimary),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Join code key button ─────────────────────────────────
 class _JoinCodeExpandButton extends StatefulWidget {
   final VoidCallback onCopy;
   const _JoinCodeExpandButton({required this.onCopy});
@@ -453,7 +1156,6 @@ class _JoinCodeExpandButtonState extends State<_JoinCodeExpandButton>
     );
     _t = CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic);
 
-    // Start expanded, then collapse to key after a short delay
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.delayed(const Duration(milliseconds: 2200));
       if (!mounted) return;
@@ -473,7 +1175,6 @@ class _JoinCodeExpandButtonState extends State<_JoinCodeExpandButton>
       widget.onCopy();
       return;
     }
-    // Expand briefly, then copy
     setState(() => _expanded = true);
     _controller.reverse().then((_) async {
       await Future.delayed(const Duration(milliseconds: 1200));
@@ -490,16 +1191,15 @@ class _JoinCodeExpandButtonState extends State<_JoinCodeExpandButton>
     return AnimatedBuilder(
       animation: _t,
       builder: (context, _) {
-        // 0 = expanded, 1 = collapsed key
         final t = _t.value;
-        final width = 40 + (180 * (1 - t)); // ~220 → 40
+        final width = 40 + (100 * (1 - t));
         final radius = 20 + (12 * (1 - t));
 
         return GestureDetector(
           onTap: _onTap,
           child: Container(
             width: width,
-            height: 40,
+            height: 20,
             decoration: BoxDecoration(
               color: AppColors.primaryDark,
               borderRadius: BorderRadius.circular(radius),
@@ -521,350 +1221,37 @@ class _JoinCodeExpandButtonState extends State<_JoinCodeExpandButton>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Flexible(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  code.isEmpty ? '————' : code,
-                                  style: AppTextStyles.labelLarge.copyWith(
-                                    color: AppColors.accentGreen,
-                                    fontFamily: 'monospace',
-                                    letterSpacing: 1.5,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              code.isEmpty ? '————' : code,
+                              style: AppTextStyles.labelLarge.copyWith(
+                                color: AppColors.accentGreen,
+                                fontFamily: 'monospace',
+                                letterSpacing: 1.5,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 6),
-                          const Icon(Icons.copy_rounded, size: 16, color: AppColors.accentGreen),
+                          const Icon(
+                            Icons.copy_rounded,
+                            size: 16,
+                            color: AppColors.accentGreen,
+                          ),
                         ],
                       ),
                     ),
                   )
                 : Opacity(
                     opacity: ((t - 0.5) * 2).clamp(0.0, 1.0),
-                    child: const Icon(Icons.key_rounded, size: 20, color: AppColors.accentGreen),
+                    child: const Icon(
+                      Icons.key_rounded,
+                      size: 20,
+                      color: AppColors.accentGreen,
+                    ),
                   ),
           ),
         );
       },
     );
   }
-}
-class _OccupancyCard extends StatelessWidget {
-  final BuildingOccupancy item;
-  const _OccupancyCard({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    final pct = item.percent;
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 10,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            item.buildingName,
-            style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Text(
-                '${item.occupiedFlats}/${item.totalFlats} flats',
-                style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
-              ),
-              const Spacer(),
-              Text(
-                '${(pct * 100).round()}%',
-                style: AppTextStyles.labelLarge.copyWith(color: AppColors.accentGreenDark),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppDimens.radiusFull),
-            child: LinearProgressIndicator(
-              value: pct,
-              minHeight: 10,
-              backgroundColor: AppColors.surfaceMuted,
-              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accentGreen),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatPill extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final bool filled;
-  final bool danger;
-  final VoidCallback? onTap;
-
-  const _StatPill({
-    required this.icon,
-    required this.value,
-    required this.label,
-    this.filled = false,
-    this.danger = false,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final Color bg;
-    final Color fg;
-    final Color iconColor;
-    final Color labelColor;
-
-    if (filled) {
-      bg = AppColors.accentGreen;
-      fg = Colors.white;
-      iconColor = Colors.white;
-      labelColor = Colors.white.withValues(alpha: 0.85);
-    } else if (danger) {
-      bg = AppColors.dangerBg;
-      fg = AppColors.danger;
-      iconColor = AppColors.danger;
-      labelColor = AppColors.danger.withValues(alpha: 0.85);
-    } else {
-      bg = AppColors.surface;
-      fg = AppColors.textPrimary;
-      iconColor = AppColors.textMuted;
-      labelColor = AppColors.textMuted;
-    }
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-          border: filled
-              ? null
-              : Border.all(
-                  color: danger ? Colors.white : AppColors.borderLight,
-                ),
-          boxShadow: filled
-              ? [
-                  BoxShadow(
-                    color: AppColors.accentGreen.withValues(alpha: 0.25),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 16, color: iconColor),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: AppTextStyles.h4.copyWith(color: fg, fontSize: 18),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.caption.copyWith(color: labelColor, fontSize: 11),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionRow extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final bool filled;
-  final VoidCallback onTap;
-
-  const _ActionRow({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    this.filled = false,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final bg = filled ? AppColors.accentGreen : AppColors.surface;
-    final titleColor = filled ? Colors.white : AppColors.textPrimary;
-    final subtitleColor =
-        filled ? Colors.white.withValues(alpha: 0.8) : AppColors.textMuted;
-    final iconBg =
-        filled ? Colors.white.withValues(alpha: 0.2) : AppColors.surfaceMuted;
-    final iconColor = filled ? Colors.white : AppColors.textSecondary;
-    final chevronColor =
-        filled ? Colors.white.withValues(alpha: 0.8) : AppColors.textMuted;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-          border: filled ? null : Border.all(color: AppColors.borderLight),
-          boxShadow: filled
-              ? [
-                  BoxShadow(
-                    color: AppColors.accentGreen.withValues(alpha: 0.25),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-              alignment: Alignment.center,
-              child: Icon(icon, size: 19, color: iconColor),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppTextStyles.labelLarge.copyWith(color: titleColor),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: AppTextStyles.bodySmall.copyWith(color: subtitleColor),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded, size: 20, color: chevronColor),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ComplaintsChart extends StatelessWidget {
-  final List<int> counts;
-  const _ComplaintsChart({required this.counts});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 160,
-      padding: const EdgeInsets.fromLTRB(12, 16, 12, 8),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimens.radiusXl),
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 10,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Expanded(
-            child: CustomPaint(
-              painter: _LineChartPainter(counts: counts),
-              size: Size.infinite,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Mon', style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
-              Text('Sun', style: TextStyle(fontSize: 11, color: AppColors.textMuted)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LineChartPainter extends CustomPainter {
-  final List<int> counts;
-  _LineChartPainter({required this.counts});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (counts.isEmpty) return;
-
-    final maxVal = counts.reduce((a, b) => a > b ? a : b).clamp(1, 999);
-    final paint = Paint()
-      ..color = const Color(0xFFEA580C)
-      ..strokeWidth = 2.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final path = Path();
-    final stepX = size.width / (counts.length - 1).clamp(1, 999);
-
-    for (var i = 0; i < counts.length; i++) {
-      final x = i * stepX;
-      final y = size.height -
-          (counts[i] / maxVal) * size.height * 0.85 -
-          size.height * 0.08;
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    canvas.drawPath(path, paint);
-
-    final dotPaint = Paint()..color = const Color(0xFFEA580C);
-    for (var i = 0; i < counts.length; i++) {
-      final x = i * stepX;
-      final y = size.height -
-          (counts[i] / maxVal) * size.height * 0.85 -
-          size.height * 0.08;
-      canvas.drawCircle(Offset(x, y), 3.5, dotPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _LineChartPainter old) => old.counts != counts;
 }

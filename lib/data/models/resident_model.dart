@@ -1,3 +1,5 @@
+enum OccupantType { owner, tenant }
+
 class ResidentModel {
   final String id;
   final String buildingId;
@@ -19,7 +21,7 @@ class ResidentModel {
   final String emergencyContact;
   final bool rentPaid;
   final bool maintenancePaid;
-  
+  final OccupantType occupiedBy;
 
   const ResidentModel({
     required this.id,
@@ -42,6 +44,7 @@ class ResidentModel {
     required this.emergencyContact,
     this.rentPaid = false,
     this.maintenancePaid = false,
+    this.occupiedBy = OccupantType.tenant,
   });
 
   String get initials {
@@ -50,7 +53,14 @@ class ResidentModel {
     return letters.isEmpty ? '?' : letters.toUpperCase();
   }
 
-  ResidentModel copyWith({bool? rentPaid, bool? maintenancePaid}) {
+  String get occupiedByLabel =>
+      occupiedBy == OccupantType.owner ? 'Owner' : 'Tenant';
+
+  ResidentModel copyWith({
+    bool? rentPaid,
+    bool? maintenancePaid,
+    OccupantType? occupiedBy,
+  }) {
     return ResidentModel(
       id: id,
       buildingId: buildingId,
@@ -72,6 +82,7 @@ class ResidentModel {
       emergencyContact: emergencyContact,
       rentPaid: rentPaid ?? this.rentPaid,
       maintenancePaid: maintenancePaid ?? this.maintenancePaid,
+      occupiedBy: occupiedBy ?? this.occupiedBy,
     );
   }
 }

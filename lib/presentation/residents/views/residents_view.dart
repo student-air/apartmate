@@ -362,8 +362,7 @@ class _EmptyResidentsState extends StatelessWidget {
       ),
     );
   }
-}
-class _ResidentTile extends StatelessWidget {
+}class _ResidentTile extends StatelessWidget {
   final ResidentModel resident;
   const _ResidentTile({required this.resident});
 
@@ -377,68 +376,271 @@ class _ResidentTile extends StatelessWidget {
   }
 
   @override
-Widget build(BuildContext context) {
-  return GestureDetector(
-    onTap: () => Get.toNamed(AppRoutes.residentDetail, arguments: resident),
-    child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppDimens.radiusLg),
-        boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 10, offset: Offset(0, 3))],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.primaryDark.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(14),
+  Widget build(BuildContext context) {
+    final controller = Get.find<ResidentsController>();
+
+    return GestureDetector(
+      onTap: () => Get.toNamed(AppRoutes.residentDetail, arguments: resident),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusLg),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x14000000),
+              blurRadius: 10,
+              offset: Offset(0, 3),
             ),
-            alignment: Alignment.center,
-            child: Text(
-              resident.initials,
-              style: AppTextStyles.labelLarge.copyWith(color: AppColors.primaryDark, fontSize: 16),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(resident.name, style: AppTextStyles.h4),
-                const SizedBox(height: 2),
-                Text(
-                  '${resident.buildingName} · Floor ${resident.floor} · Flat ${resident.flatNumber}',
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryDark.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    resident.initials,
+                    style: AppTextStyles.labelLarge.copyWith(
+                      color: AppColors.primaryDark,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(resident.name, style: AppTextStyles.h4),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${resident.buildingName} · Floor ${resident.floor} · Flat ${resident.flatNumber}',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: _call,
+                  icon: const Icon(
+                    Icons.call_rounded,
+                    size: 20,
+                    color: AppColors.successGreenDark,
+                  ),
+                  style: IconButton.styleFrom(
+                    backgroundColor:
+                        AppColors.successGreen.withValues(alpha: 0.12),
+                    shape: const CircleBorder(),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                PopupMenuButton<String>(
+                  padding: EdgeInsets.zero,
+                  offset: const Offset(0, 8),
+                  color: AppColors.surface,
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppDimens.radiusXl),
+                  ),
+                  onSelected: (value) {
+                    switch (value) {
+                      case 'rent':
+                        controller.toggleRentPaid(resident.id);
+                        break;
+                      case 'maintenance':
+                        controller.toggleMaintenancePaid(resident.id);
+                        break;
+                      case 'notify':
+                        showSendUpdateSheet(
+                          prefillBuildingName: resident.buildingName,
+                          prefillFloor: resident.floor,
+                          prefillFlatNumber: resident.flatNumber,
+                        );
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'rent',
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: (resident.rentPaid
+                                      ? AppColors.accentGreen
+                                      : AppColors.warning)
+                                  .withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              resident.rentPaid
+                                  ? Icons.check_rounded
+                                  : Icons.payments_outlined,
+                              size: 16,
+                              color: resident.rentPaid
+                                  ? AppColors.accentGreenDark
+                                  : AppColors.warning,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              resident.rentPaid
+                                  ? 'Rent paid'
+                                  : 'Mark rent paid',
+                              style: AppTextStyles.labelLarge,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'maintenance',
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: (resident.maintenancePaid
+                                      ? AppColors.accentGreen
+                                      : AppColors.warning)
+                                  .withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Icon(
+                              resident.maintenancePaid
+                                  ? Icons.check_rounded
+                                  : Icons.build_outlined,
+                              size: 16,
+                              color: resident.maintenancePaid
+                                  ? AppColors.accentGreenDark
+                                  : AppColors.warning,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              resident.maintenancePaid
+                                  ? 'Maintenance paid'
+                                  : 'Mark maintenance paid',
+                              style: AppTextStyles.labelLarge,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    PopupMenuItem(
+                      value: 'notify',
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryDark.withValues(alpha: 0.08),
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.campaign_rounded,
+                              size: 16,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text('Send update', style: AppTextStyles.labelLarge),
+                        ],
+                      ),
+                    ),
+                  ],
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryDark.withValues(alpha: 0.08),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.more_horiz_rounded,
+                      size: 20,
+                      color: AppColors.primaryDark,
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            onPressed: _call,
-            icon: const Icon(Icons.call_rounded, size: 20, color: AppColors.successGreenDark),
-            style: IconButton.styleFrom(
-              backgroundColor: AppColors.successGreen.withValues(alpha: 0.12),
-              shape: const CircleBorder(),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                _PaymentChip(label: 'Rent', paid: resident.rentPaid),
+                const SizedBox(width: 6),
+                _PaymentChip(label: 'Maint', paid: resident.maintenancePaid),
+              ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PaymentChip extends StatelessWidget {
+  final String label;
+  final bool paid;
+  const _PaymentChip({required this.label, required this.paid});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = paid ? AppColors.accentGreenDark : AppColors.warning;
+    final bg = paid
+        ? AppColors.accentGreen.withValues(alpha: 0.12)
+        : AppColors.warning.withValues(alpha: 0.12);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(AppDimens.radiusFull),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
-          const SizedBox(width: 6),
-          IconButton(
-            onPressed: () => showSendUpdateSheet(
-              prefillBuildingName: resident.buildingName,
-              prefillFloor: resident.floor,
-              prefillFlatNumber: resident.flatNumber,
+          const SizedBox(width: 5),
+          Text(
+            '$label · ${paid ? 'Paid' : 'Due'}',
+            style: AppTextStyles.caption.copyWith(
+              color: color,
+              fontWeight: FontWeight.w600,
+              fontSize: 11,
             ),
-            icon: const Icon(Icons.campaign_rounded, size: 20, color: AppColors.textSecondary),
-            style: IconButton.styleFrom(backgroundColor: AppColors.surfaceMuted, shape: const CircleBorder()),
           ),
         ],
       ),
-    ),
-  );
-}
+    );
+  }
 }

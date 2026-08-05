@@ -83,6 +83,7 @@ class LocalRequestRepository implements IRequestRepository {
       ),
 
       // ── Owner requests (2) ──
+      // Later: flatOccupancy = ownerOccupied / rented
       RequestModel(
         id: 'req-owner-1',
         buildingId: 'bldg-sample-1',
@@ -148,7 +149,10 @@ class LocalRequestRepository implements IRequestRepository {
   }
 
   @override
-  Future<RequestModel> updateStatus(String requestId, RequestStatus status) async {
+  Future<RequestModel> updateStatus(
+    String requestId,
+    RequestStatus status,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 300));
     final index = _requests.indexWhere((r) => r.id == requestId);
     if (index == -1) {

@@ -330,7 +330,7 @@ class _RequestCard extends StatelessWidget {
     child: SizedBox(
       height: 48,
       child: ElevatedButton.icon(
-        onPressed: () => controller.ignore(request),
+        onPressed: () => controller.confirmIgnore(request),
         icon: const Icon(Icons.close_rounded, size: 18, color: Colors.white),
         label: Text(
           'Delete',
